@@ -7,8 +7,13 @@ newPackage(
 	Date => "May 2016",
 	Authors => {
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
+  		{Name => "Sara Lamboglia", Email => "", HomePage=>""}
 	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
-    		{Name => "others...", Email => "", HomePage=>""}
+   		{Name => "Benjamin Smith", Email => "", HomePage=>""},
+    		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
+
+
+		   		{Name => "others...", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
@@ -29,6 +34,22 @@ export {
   "tropicalPrevariety"
 }
 
+------------------------------------------------------------------------------
+-- CODE
+------------------------------------------------------------------------------
+
+--Setting up the data type TropicalCycle
+
+TropicalCycle = new Type of Fan
+TropicalCycle.synonym = "tropical cycle"
+TropicalCycle.GlobalAssignHook = globalAssignFunction
+TropicalCycle.GlobalReleaseHook = globalReleaseFunction
+
+
+--basic operations on a toric cycle
+
+
+--Computing a tropical prevariety
 tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"t" => false,
 	"tplane" => false,
@@ -41,6 +62,11 @@ tropicalPrevariety (List) := (L) -> opts -> (
   gfanTropicalIntersection(L, opts)
 )
 
+
+
+------------------------------------------------------------------------------
+-- DOCUMENTATION
+------------------------------------------------------------------------------
 beginDocumentation()
 doc ///
     Key
@@ -50,6 +76,28 @@ doc ///
     Description
     	Text
 	    This is the main M2 package for all tropical computations.
+///
+
+doc///
+    Key
+	tropicalPrevariety
+	(tropicalPrevariety, List)
+    Headline
+	the intersection of the tropical hypersurfaces of polynomials in L
+    Usage
+	tropicalPrevariety(L)
+    Inputs
+	L:List
+	    of polynomials
+    Outputs
+	F:List
+	    the intersection of the tropical hypersurfaces of polynomials in L
+    Description
+	Text
+	    This method intersects a list of tropical hypersurfaces. The input is a list of polynomials whose 		    tropicalizations give the hypersurfaces.
+        Example
+	    QQ[x,y]
+	    tropicalPrevariety{x+y+1, x+y}
 ///
 
 
