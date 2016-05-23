@@ -18,10 +18,10 @@ needsPackage "PolyhedralObjects"
 needsPackage "gfanInterface2"
 
 export {
-  "tropicalIntersection"
+  "tropicalPrevariety"
 }
 
-tropicalIntersection = method(TypicalValue => List,  Options => {
+tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"t" => false,
 	"tplane" => false,
 	"symmetryPrinting" => false,
@@ -29,6 +29,6 @@ tropicalIntersection = method(TypicalValue => List,  Options => {
 	"restrict" => false,
 	"stable" => false
 	})
-tropicalIntersection (List) := (L) -> opts -> (
+tropicalPrevariety (List) := (L) -> opts -> (
   gfanTropicalIntersection(L, opts)
 )
