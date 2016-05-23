@@ -49,6 +49,19 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 --basic operations on a toric cycle
 
 
+tropicalCycle = F->(
+    
+)    
+
+
+isBalanced = F->(
+    
+)
+
+isWellDefined = F ->(
+ -- Check that the fan is pure, and then call isBalanced   
+)        
+
 --Computing a tropical prevariety
 tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"t" => false,
