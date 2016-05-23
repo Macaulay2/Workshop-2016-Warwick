@@ -1,8 +1,6 @@
 needsPackage"RandomIdeal"
 
---viewHelp RandomIdeal 
-
-
+--viewHelp RandomIdeal t
 kk=ZZ/101;
 S=kk[a..e];
 L={3,3,4,6};
@@ -23,3 +21,10 @@ lista={};
 for i from 0 to n do  lista=lista|{random 10};
 lista
 
+method(
+    
+    )
+end
+
+load"SCMexamples.m2"
+lista
