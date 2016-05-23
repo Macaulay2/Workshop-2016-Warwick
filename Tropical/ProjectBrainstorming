@@ -9,7 +9,7 @@ gfanInterface2.m2: brainstorming ideas
 -customize gfan install
 
 
-How do we want to separate gfanInterface2 from gfanInterface? Do we want to have a Tropical.m2?
+How do we want to separate gfanInterface2 from gfanInterface? Do we want to have a Tropical.m2? YES!
 
 Tropical.m2 ought to have:
 ==========================
