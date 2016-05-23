@@ -7,8 +7,13 @@ newPackage(
 	Date => "May 2016",
 	Authors => {
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
+  		{Name => "Sara Lamboglia", Email => "", HomePage=>""}
 	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
-    		{Name => "others...", Email => "", HomePage=>""}
+   		{Name => "Benjamin Smith", Email => "", HomePage=>""},
+    		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
+
+
+		   		{Name => "others...", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
@@ -28,6 +33,7 @@ needsPackage "SimpleDoc"
 export {
   "tropicalPrevariety"
 }
+
 
 tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"t" => false,
