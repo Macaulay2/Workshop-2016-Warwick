@@ -1,18 +1,28 @@
 
-intersectSlice = (w,slcRR) -> (
-    eqn := w.Equations;
-    R2 := ring eqn;
-    X := transpose (vars(R2) | 1);
-    startSys:=join(equations(w),slice(w));
-    --targetSys:=join(equations(w),for i to 1 list sum for j to 5 list realPart(w.Slice_(i,j))*1_CC*(R2_j))
-    targetSys := equations(w) | slcRR;
-    trackPaths(targetSys,startSys,w.Points)
-)
+--intersectSlice = (w,slcRR) -> (
+--    startSys:=join(equations(w),slice(w));
+--    targetSys := equations(w) | slcRR;
+--    trackPaths(targetSys,startSys,w.Points)
+--)
 
 myFunction = (x) -> (1-x)*sin((3*x)^3)
 
-gradientDescent = (F) -> (
-    minvalue = ???
+goldenSearch = (F,a,b,tol) -> (
+    gr := 1.6180339887498948;
+    c := b - gr * (b - a);
+    d := a + gr * (b - a);
+    while abs(c - d) > tol do (
+        print c;
+        Fc := F(c);
+        Fd := F(d);
+        if Fc < Fd then (
+            b = d;)
+        else (
+            a = c;);
+        c = b - gr * (b - a);
+        d = a + gr * (b - a);
+    );
+    return (b + a) / 2
 )
 
 -- Example
@@ -22,5 +32,7 @@ I=minors(3,M);
 f=flatten entries gens I;
 (w,ns) = topWitnessSet(f,2);
 slcmat = matrix applyTable (entries w.Slice, x->1_CC*realPart x);
+R2 := ring w.Equations;
+X := transpose (vars(R2) | 1);
 slcRR = flatten entries (promote(slcmat,R2) * X);
 fsols = intersectSlice(w,slcRR)
