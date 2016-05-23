@@ -6,8 +6,9 @@ newPackage(
 	Version => "0.1",
 	Date => "May 2016",
 	Authors => {
-	    	{Name => "", Email => "", HomePage=>""},
-	    	{Name => "", Email => "", HomePage=>""}
+	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
+	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
+    		{Name => "others...", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
