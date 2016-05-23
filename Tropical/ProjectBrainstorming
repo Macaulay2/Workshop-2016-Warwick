@@ -35,3 +35,18 @@ https://polymake.org/release_docs/2.12/tropical.html
 TropicalHypersurface
 TropicalPolytopes
 
+End of Monday status:
+Diane and Kathlen:
+- defined new Type TropicalCycle
+- outline of methods
+- To do:  * documentation for tropicalCycle
+     	  * isWellDefined code and documentation
+	  * isBalanced code and documentation
+	  * Add skeleton for stableIntersection
+
+Carlos and Paolo
+
+
+Sara and Ben
+
+	  

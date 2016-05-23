@@ -6,7 +6,7 @@ newPackage(
 	Version => "0.1",
 	Date => "May 2016",
 	Authors => {
-   		{Name => "Carlos Amendola", Email => "", HomePage=>""}
+   		{Name => "Carlos Amendola", Email => "", HomePage=>""},
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
   		{Name => "Sara Lamboglia", Email => "", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
@@ -29,7 +29,10 @@ needsPackage "gfanInterface2"
 needsPackage "SimpleDoc"
 
 export {
-  "tropicalPrevariety"
+  "tropicalCycle",
+  "tropicalPrevariety",
+  "MaximalCones",
+  "Multiplicities"
 }
 
 ------------------------------------------------------------------------------
@@ -47,8 +50,11 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 --basic operations on a toric cycle
 
 
-tropicalCycle = F->(
-    
+tropicalCycle = (F,mult)->(
+    if #F.MaximalCones != #mult then error("The multiplicity list has the wrong length");
+    T := new TropicalCycle from F;
+    T.Multiplicities = mult;
+    return T
 )    
 
 
@@ -56,7 +62,8 @@ isBalanced = F->(
     
 )
 
-isWellDefined = F ->(
+isWellDefined TropicalCycle := Boolean =>
+ F ->(
  -- Check that the fan is pure, and then call isBalanced   
 )        
 
@@ -70,9 +77,9 @@ tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"stable" => false
 	})
 tropicalPrevariety (List) := (L) -> opts -> (
-  gfanTropicalIntersection(L, opts)
+  F:=gfanTropicalIntersection(L, opts);G:=new Fan;
+scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G
 )
-
 
 
 ------------------------------------------------------------------------------
@@ -89,15 +96,24 @@ doc ///
 	    This is the main M2 package for all tropical computations.
 ///
 
-o
+
+
+
+doc///
+    Key
+	(isWellDefined,TropicalCycle)
+    Headline
+	whether a tropical cycle is well defined.
+    Usage
+    	isWellDefined T
+    Inputs
+	T:TropicalCycle
+    Outputs
+    	B:Boolean
     Description
 	Text
-	    This method intersects a list of tropical hypersurfaces. The input is a list of polynomials whose 		    tropicalizations give the hypersurfaces.
-        Example
-	    QQ[x,y]
-	    tropicalPrevariety{x+y+1, x+y}
+	    A TropicalCycle is well defined if the underlying Fan is pure, and the multiplicity function makes the fan balanced.
 ///
-
 
 
 doc///
