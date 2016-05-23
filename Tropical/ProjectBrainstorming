@@ -16,3 +16,6 @@ Tropical.m2 ought to have:
 -tropical number min/max
 -stableIntersection (make ourselves? interface with Singular?)
 -aTint interface
+
+
+Missing documentation from gfanInterface2.m2
