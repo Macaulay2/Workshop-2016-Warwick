@@ -8,7 +8,7 @@ m = matrix{{a^3,b^4+c^4,d^5}};
 randomListOfList={};
 for i from 1 to 3 do(
                       n=random (1,5);
-		      randomList=apply (n,i->random 50);
+		      randomList=apply (n,i->random 5);
 		      randomListOfList=randomListOfList|{randomList};
 		      );
 ListRandomIdeal=apply(randomListOfList,i->randomIdeal(i,m));		 
