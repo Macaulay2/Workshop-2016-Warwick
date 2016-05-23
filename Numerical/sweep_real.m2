@@ -9,6 +9,12 @@ intersectSlice = (w,slcRR) -> (
     trackPaths(targetSys,startSys,w.Points)
 )
 
+myFunction = (x) -> (1-x)*sin((3*x)^3)
+
+gradientDescent = (F) -> (
+    minvalue = ???
+)
+
 -- Example
 R=CC[a,b,c,d];
 M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);

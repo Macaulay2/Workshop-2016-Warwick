@@ -77,9 +77,9 @@ tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"stable" => false
 	})
 tropicalPrevariety (List) := (L) -> opts -> (
-  gfanTropicalIntersection(L, opts)
+  F:=gfanTropicalIntersection(L, opts);G:=new Fan;
+scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G
 )
-
 
 
 ------------------------------------------------------------------------------
