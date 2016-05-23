@@ -6,7 +6,7 @@ newPackage(
 	Version => "0.1",
 	Date => "May 2016",
 	Authors => {
-   		{Name => "Carlos Amendola", Email => "", HomePage=>""}
+   		{Name => "Carlos Amendola", Email => "", HomePage=>""},
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
   		{Name => "Sara Lamboglia", Email => "", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
