@@ -17,7 +17,7 @@ newPackage(
     	HomePage => "http://www.msri.org/~de",
     	Headline => "a package for creating random ideals of various sorts",
 	AuxiliaryFiles => false, -- set to true if package comes with auxiliary files,
-    	DebuggingMode => false,	 -- set to true only during development
+    	DebuggingMode => true,	 -- set to true only during development
 	Reload => true 
     	)
 
