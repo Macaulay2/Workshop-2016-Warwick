@@ -12,10 +12,11 @@ randomListOfList={};
 for i from 1 to 10 do(
                       n=random (1,20);
 		      randomList=apply (n,i->random 100);
-		      randomListOfList=randomListOfList|randomList;
+		      randomListOfList=randomListOfList|{randomList};
 		      );
 
 end 
 
 restart
 load "SCMexamples.m2"
+randomListOfList
