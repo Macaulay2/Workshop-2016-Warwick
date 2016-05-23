@@ -21,7 +21,7 @@ powerList(Ideal,ZZ) := (J, n) -> (
     L = apply(n+1, l-> pdim((R^1)/(J^l))); -- R^1 is a module   
     
     return L;  
-      --  return for i from 0 to n list gens J^i --was supposed to work  
+      --  return for i from 0 to n list gens J^i  
     )
 end
 
