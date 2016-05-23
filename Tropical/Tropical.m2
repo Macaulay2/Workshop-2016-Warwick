@@ -6,14 +6,12 @@ newPackage(
 	Version => "0.1",
 	Date => "May 2016",
 	Authors => {
+   		{Name => "Carlos Amendola", Email => "", HomePage=>""}
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
-  		{Name => "Sara Lamboglia", Email => "", HomePage=>""}
+  		{Name => "Sara Lamboglia", Email => "", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
-    		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
-
-
-		   		{Name => "others...", Email => "", HomePage=>""}
+    		{Name => "Paolo Tripoli", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
@@ -91,6 +89,17 @@ doc ///
 	    This is the main M2 package for all tropical computations.
 ///
 
+o
+    Description
+	Text
+	    This method intersects a list of tropical hypersurfaces. The input is a list of polynomials whose 		    tropicalizations give the hypersurfaces.
+        Example
+	    QQ[x,y]
+	    tropicalPrevariety{x+y+1, x+y}
+///
+
+
+
 doc///
     Key
 	tropicalPrevariety
@@ -112,6 +121,8 @@ doc///
 	    QQ[x,y]
 	    tropicalPrevariety{x+y+1, x+y}
 ///
+
+
 
 
 
