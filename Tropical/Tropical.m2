@@ -56,7 +56,8 @@ isBalanced = F->(
     
 )
 
-isWellDefined TropicalCycle := Boolean => F ->(
+isWellDefined TropicalCycle := Boolean =>
+ F ->(
  -- Check that the fan is pure, and then call isBalanced   
 )        
 
@@ -89,14 +90,6 @@ doc ///
 	    This is the main M2 package for all tropical computations.
 ///
 
-
-    Description
-	Text
-	    This method intersects a list of tropical hypersurfaces. The input is a list of polynomials whose 		    tropicalizations give the hypersurfaces.
-        Example
-	    QQ[x,y]
-	    tropicalPrevariety{x+y+1, x+y}
-///
 
 
 
