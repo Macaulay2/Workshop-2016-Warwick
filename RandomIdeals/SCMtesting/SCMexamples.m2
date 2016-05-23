@@ -15,11 +15,15 @@ RandomI(ZZ):=(len)->(
     local kk,S,m;
 kk=ZZ/101;
 S=kk[a..e];
-m = matrix{{a^3,b^4+c^4,d^5}};
+
+--codim ideal(a^3,b^4+c^4,d^5)
+--codim ideal(m)
+
+m = matrix{{a^3,b^4+c^4,d^5}};--codimension 2 or 3?
 randomListOfList={};
 for i from 1 to 10 do(
-                      n=random (1,len);
-		      randomList=apply (n,i->random 20);
+                      n=codim ideal(m)+1;--4;--+random (1,len);(is codimension of m +1)
+		      randomList=apply (n,i->4+random 2);
 		      randomListOfList=randomListOfList|{randomList};
 		      );
 ListRandomIdeal=apply(randomListOfList,i->randomIdeal(i,m));
@@ -31,4 +35,11 @@ restart
 load "SCMexamples.m2"
 randomListOfList
 ListRandomIdeal
-RandomI(5)
+l=RandomI(5);
+betti res l_(2)
+tally apply(l,i->betti res i)
+--cm means that the codimension of the ideal is  equal than the lenght of the resolution 
+koszul(gens l_(0))
+random 2
+
+--one generator more than the codimension (starting with codimension 4 or 5)
