@@ -17,5 +17,12 @@ Tropical.m2 ought to have:
 -stableIntersection (make ourselves? interface with Singular?)
 -aTint interface
 
-
+test 
 Missing documentation from gfanInterface2.m2
+-polymakeConeToCone
+- polymakeFanToFan
+-gfanFunctions
+-gfanTropicalHyperSurfaceReconstruction
+-gfanTropicalHyperSurfaceReconstruction(Fan), key: (gfanTropicalHyperSurfaceReconstruction,Fan)
+-markedPolynomialList(List), key: (markedPolynomialList,List)
+- gfanVersion
