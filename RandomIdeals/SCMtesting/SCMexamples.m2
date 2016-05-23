@@ -1,6 +1,6 @@
-needsPackage"RandomIdeal" -- hit F11
+needsPackage"RandomIdeal"
 
-viewHelp RandomIdeal -- hit F11
+--viewHelp RandomIdeal 
 
 
 kk=ZZ/101
@@ -18,3 +18,4 @@ n=20
 for i from 0 to n do  lista=lista|{random(ZZ}
 for i from 0 to n do  lista=lista|{random 10}
 lista
+
