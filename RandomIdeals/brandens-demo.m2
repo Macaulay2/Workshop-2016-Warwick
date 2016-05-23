@@ -21,7 +21,7 @@ powerList(Ideal,ZZ) := (J, n) -> (
     L = apply(n+1, l-> pdim((R^1)/(J^l))); -- R^1 is a module   
     
     return L;  
-      --  return for i from 0 to n list gens J^i  
+      --  return for i from 0 to n list gens J^i (was supposed to work)  
     )
 end
 
@@ -41,5 +41,12 @@ load "brandens-demo.m2"
 R = ZZ/101[x,y,z]
 I = ideal"x3,xy,zyx2"
 powerList (I, 20) -- want this
+<<<<<<< HEAD
+--This was a good turorial..
+=======
 
 --add a line
+<<<<<<< HEAD
+=======
+>>>>>>> d7e526aa7007456ad0d5557afe6b97c911ecbd8b
+>>>>>>> d526557c06176709c8b30521b91813b3d558f2a7
