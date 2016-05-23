@@ -45,6 +45,12 @@ Diane and Kathlen:
 	  * Add skeleton for stableIntersection
 
 Carlos and Paolo
+- defined and documented method tropicalPrevariety, 
+- deleted multiplicities from fan output
+- To do:  * add strategy choice
+	  * add valuations
+	  * define function isTropicalBasis
+	  * define function stableIntersection
 
 
 Sara and Ben
