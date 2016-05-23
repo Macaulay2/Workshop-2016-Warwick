@@ -14,7 +14,6 @@ newPackage(
 		"path" => "",
 		"fig2devpath" => "",
 		"keepfiles" => false,
-		"verbose" => false,
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
@@ -25,6 +24,17 @@ needsPackage "PolyhedralObjects"
 needsPackage "gfanInterface2"
 
 export {
-
+  "tropicalPrevariety"
 }
 
+tropicalPrevariety = method(TypicalValue => List,  Options => {
+	"t" => false,
+	"tplane" => false,
+	"symmetryPrinting" => false,
+	"symmetryExploit" => false,
+	"restrict" => false,
+	"stable" => false
+	})
+tropicalPrevariety (List) := (L) -> opts -> (
+  gfanTropicalIntersection(L, opts)
+)
