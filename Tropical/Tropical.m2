@@ -2,12 +2,12 @@ needsPackage "PolyhedralObjects"
 needsPackage "gfanInterface2"
 
 newPackage(
-	"gfanInterface2",
+    	"Tropical",
 	Version => "0.1",
-	Date => "May 2016"
+	Date => "May 2016",
 	Authors => {
-		{Name => "Mike Stillman", Email => "mike@math.cornell.edu", HomePage => ""},
-		{Name => "Andrew Hoefel", Email => "andrew.hoefel@mathstat.dal.ca", HomePage =>"http://www.mast.queensu.ca/~ahhoefel/"}
+	    	{Name => "", Email => "", HomePage=>""},
+	    	{Name => "", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
@@ -22,6 +22,7 @@ newPackage(
 
 needsPackage "PolyhedralObjects"
 needsPackage "gfanInterface2"
+needsPackage "SimpleDoc"
 
 export {
   "tropicalPrevariety"
@@ -38,3 +39,22 @@ tropicalPrevariety = method(TypicalValue => List,  Options => {
 tropicalPrevariety (List) := (L) -> opts -> (
   gfanTropicalIntersection(L, opts)
 )
+
+beginDocumentation()
+doc ///
+    Key
+    	Tropical
+    Headline
+    	the main M2 package for tropical computations
+    Description
+    	Text
+	    This is the main M2 package for all tropical computations.
+///
+
+
+
+
+TEST ///
+    assert (1==1)
+///    	    	
+       
