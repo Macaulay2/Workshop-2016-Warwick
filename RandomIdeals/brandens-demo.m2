@@ -40,4 +40,9 @@ load "brandens-demo.m2"
 R = ZZ/101[x,y,z]
 I = ideal"x3,xy,zyx2"
 powerList (I, 20) -- want this
+<<<<<<< HEAD
 --This was a good turorial..
+=======
+
+--add a line
+>>>>>>> d7e526aa7007456ad0d5557afe6b97c911ecbd8b
