@@ -29,7 +29,10 @@ needsPackage "gfanInterface2"
 needsPackage "SimpleDoc"
 
 export {
-  "tropicalPrevariety"
+  "tropicalCycle",
+  "tropicalPrevariety",
+  "MaximalCones",
+  "Multiplicities"
 }
 
 ------------------------------------------------------------------------------
@@ -47,8 +50,11 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 --basic operations on a toric cycle
 
 
-tropicalCycle = F->(
-    
+tropicalCycle = (F,mult)->(
+    if #F.MaximalCones != #mult then error("The multiplicity list has the wrong length");
+    T := new TropicalCycle from F;
+    T.Multiplicities = mult;
+    return T
 )    
 
 
@@ -91,6 +97,23 @@ doc ///
 ///
 
 
+
+
+doc///
+    Key
+	(isWellDefined,TropicalCycle)
+    Headline
+	whether a tropical cycle is well defined.
+    Usage
+    	isWellDefined T
+    Inputs
+	T:TropicalCycle
+    Outputs
+    	B:Boolean
+    Description
+	Text
+	    A TropicalCycle is well defined if the underlying Fan is pure, and the multiplicity function makes the fan balanced.
+///
 
 
 doc///
