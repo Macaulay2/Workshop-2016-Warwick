@@ -10,3 +10,5 @@ Collaboration area for the Macaulay2 workshop at the University of Warwick, May 
 - The other package, ResidualIntersection.m2, contains tests for many of the special properties of Cohen-Macaulay ideals that have been used in the theory of residual intersections; things such as "strongly Cohen-Macaulay" and "sliding depth" and "G_d"
 
 - Eisenbud hopes to use these two packages together to construct interesting new families of square-free monomial ideals for which these strong Cohen-Macaulay properties hold, and to try in this way to understand them combinatorially.
+
+- Dan Grayson adds something to this file
