@@ -34,7 +34,22 @@ export {
   "tropicalPrevariety"
 }
 
+------------------------------------------------------------------------------
+-- CODE
+------------------------------------------------------------------------------
 
+--Setting up the data type TropicalCycle
+
+TropicalCycle = new Type of Fan
+TropicalCycle.synonym = "tropical cycle"
+TropicalCycle.GlobalAssignHook = globalAssignFunction
+TropicalCycle.GlobalReleaseHook = globalReleaseFunction
+
+
+--basic operations on a toric cycle
+
+
+--Computing a tropical prevariety
 tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"t" => false,
 	"tplane" => false,
@@ -47,6 +62,11 @@ tropicalPrevariety (List) := (L) -> opts -> (
   gfanTropicalIntersection(L, opts)
 )
 
+
+
+------------------------------------------------------------------------------
+-- DOCUMENTATION
+------------------------------------------------------------------------------
 beginDocumentation()
 doc ///
     Key
