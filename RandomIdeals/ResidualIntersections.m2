@@ -52,9 +52,9 @@ genericArtinNagata(ZZ,Ideal) := (s,I) -> (
     K := genericResidual(s,I);
     s' := codim K;
     if s' === s then 
-      codepth := numgens (ring K) - depth ((ring K)^1/K)
+      codepth := (numgens (ring K) -s) - depth ((ring K)^1/K)
     else codepth = -1;
-    {s',codepth,K}
+    {codepth,K}
     )
     --tests whether the generic link is CM
 
@@ -66,6 +66,7 @@ genericResidual(ZZ,Ideal):= (s,I) ->(
     n := numcols rgens;
     (ideal (rgens_{n-s..n-1})): I
     )
+
 
 ///
 restart
@@ -82,10 +83,11 @@ I = minors(3, random(S^3, S^{-2,-3,-3,-3}));
 --codim 3
 codim I
 s = 2;
+dim I
 depthsOfPowers(3,I)
 codim genericResidual(3,I)
-L = genericArtinNagata(s,I);
-L_{0,1}
+L = (genericArtinNagata(4,I))_0
+
 ///
 ---Licci code
 randomLink = method()
@@ -346,6 +348,7 @@ doc ///
      This package implements tests for most of these properties.
    SeeAlso
     isLicci
+    residualCodims
     genericResidual
     genericArtinNagata
     numgensByCodim
