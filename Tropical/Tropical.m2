@@ -7,8 +7,13 @@ newPackage(
 	Date => "May 2016",
 	Authors => {
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
+  		{Name => "Sara Lamboglia", Email => "", HomePage=>""}
 	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
-    		{Name => "others...", Email => "", HomePage=>""}
+   		{Name => "Benjamin Smith", Email => "", HomePage=>""},
+    		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
+
+
+		   		{Name => "others...", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
@@ -29,6 +34,22 @@ export {
   "tropicalPrevariety"
 }
 
+------------------------------------------------------------------------------
+-- CODE
+------------------------------------------------------------------------------
+
+--Setting up the data type TropicalCycle
+
+TropicalCycle = new Type of Fan
+TropicalCycle.synonym = "tropical cycle"
+TropicalCycle.GlobalAssignHook = globalAssignFunction
+TropicalCycle.GlobalReleaseHook = globalReleaseFunction
+
+
+--basic operations on a toric cycle
+
+
+--Computing a tropical prevariety
 tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"t" => false,
 	"tplane" => false,
@@ -41,6 +62,11 @@ tropicalPrevariety (List) := (L) -> opts -> (
   gfanTropicalIntersection(L, opts)
 )
 
+
+
+------------------------------------------------------------------------------
+-- DOCUMENTATION
+------------------------------------------------------------------------------
 beginDocumentation()
 doc ///
     Key
