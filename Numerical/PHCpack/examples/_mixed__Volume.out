@@ -1,0 +1,62 @@
+-- -*- M2-comint -*- {* hash: -1229619679 *}
+--loading configuration for package "PHCpack" from file /Users/diego/Library/Application Support/Macaulay2/init-PHCpack.m2
+
+i1 : R = CC[x,y];
+
+i2 : f = { x^3*y^5 + y^2 + x^2*y, x*y + x^2 - 1};
+
+i3 : I=ideal f;
+
+o3 : Ideal of R
+
+i4 : dim I
+-- warning: experimental computation over inexact field begun
+--          results not reliable (one warning given per session)
+
+o4 = 0
+
+i5 : degree I
+
+o5 = 10
+
+i6 : m = mixedVolume(f) -- counts the number of complex roots in the torus (without zero components)
+
+o6 = 8
+
+i7 : (mv,sv) = mixedVolume(f,StableMixedVolume=>true)
+
+o7 = (8, 10)
+
+o7 : Sequence
+
+i8 : (mv,q,qsols) = mixedVolume(f,StartSystem=>true);
+
+i9 : q --let's take a look at the start system:
+
+                             3 5                            2                
+o9 = {(.407966 - .912997*ii)x y  + (- .405765 + .913977*ii)x y + (- .694905 +
+     ------------------------------------------------------------------------
+                 2                         2
+     .719102*ii)y , (.612044 - .790823*ii)x  + (.915396 + .402555*ii)x*y +
+     ------------------------------------------------------------------------
+     .0923045 + .995731*ii}
+
+o9 : List
+
+i10 : qsols --and its solutions:
+
+o10 = {{.999913+.006735*ii, -.739668+.097487*ii}, {-.662976+.359969*ii,
+      -----------------------------------------------------------------------
+      -.17654+.595138*ii}, {.128117-.271543*ii, 2.17635-2.51445*ii},
+      -----------------------------------------------------------------------
+      {.892197-.869397*ii, .838537+.30145*ii}, {1.42505-.399208*ii,
+      -----------------------------------------------------------------------
+      -.113808+.82194*ii}, {-.136725+.30403*ii, -2.05685+2.19731*ii},
+      -----------------------------------------------------------------------
+      {-1.23867+.869676*ii, -.613704-.755201*ii}, {-1.40691-.000261*ii,
+      -----------------------------------------------------------------------
+      .685681-.743674*ii}}
+
+o10 : List
+
+i11 : 
