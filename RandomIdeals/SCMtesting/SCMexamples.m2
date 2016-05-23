@@ -45,3 +45,25 @@ koszul(gens l_(0))
 random 2
 
 --one generator more than the codimension (starting with codimension 4 or 5)
+
+---------------------------------------------------------------------------------------
+--From the Package Depth
+
+--=========================================================================--
+
+--isCM = method()
+--isCM(Ring) := Boolean => (A) -> (
+--     dim(A) == depth(A) -- note we should *not* switch to modules - see depth(Ideal,QuotientRing)
+--     )
+
+-----------------------------------------------------------------------------
+
+--isCM(Module) := Boolean => (M) -> (
+--     dim(M) == depth(M)
+--     )
+
+--=========================================================================--
+
+needsPackage"Depth"
+viewHelp Depth
+---------------------------------------------------------------------------------------
