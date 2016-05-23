@@ -19,3 +19,10 @@ Tropical.m2 ought to have:
 
 
 Missing documentation from gfanInterface2.m2
+-polymakeConeToCone
+- polymakeFanToFan
+-gfanFunctions
+-gfanTropicalHyperSurfaceReconstruction
+-gfanTropicalHyperSurfaceReconstruction(Fan), key: (gfanTropicalHyperSurfaceReconstruction,Fan)
+-markedPolynomialList(List), key: (markedPolynomialList,List)
+- gfanVersion
