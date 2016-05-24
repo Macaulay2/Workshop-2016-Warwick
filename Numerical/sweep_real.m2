@@ -7,22 +7,31 @@
 
 myFunction = (x) -> (1-x)*sin((3*x)^3)
 
+-- Inputs: slcmat -> Matrix representing the slice
+--         w -> Witness set
+sliceCost = (slcmat, w) -> (
+    R2 := ring w.Equations;
+    X := transpose (vars(R2) | 1);
+    slc := flatten entries (promote(slcmat,R2) * X);
+    fsols := intersectSlice(w,slc);
+    cost := norm ( coordinates(fsols_0) / imaginaryPart );
+    return cost;
+)
+
 goldenSearch = (F,a,b,tol) -> (
-    gr := 1.6180339887498948;
+    gr := (sqrt(5) - 1)/2;
     c := b - gr * (b - a);
     d := a + gr * (b - a);
     while abs(c - d) > tol do (
         print c;
         Fc := F(c);
         Fd := F(d);
-        if Fc < Fd then (
-            b = d;)
-        else (
-            a = c;);
+        if Fc < Fd then ( b = d;)
+        else ( a = c;);
         c = b - gr * (b - a);
         d = a + gr * (b - a);
     );
-    return (b + a) / 2
+    return (b + a) / 2;
 )
 
 -- Example
@@ -36,3 +45,5 @@ R2 := ring w.Equations;
 X := transpose (vars(R2) | 1);
 slcRR = flatten entries (promote(slcmat,R2) * X);
 fsols = intersectSlice(w,slcRR)
+
+goldenSearch( myFunction, .4, .7, .00001)
