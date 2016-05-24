@@ -36,15 +36,16 @@ RandomI(ZZ):=(len)->( --len is the length of the list of random ideals
 		      --all not CM and not SCM
 		      --S=kk[a..e];
 		      --M = matrix{{a^3,b^4+c^4,d^5}}; --codimension 3 ideal
+		      --S=kk[a..e];
+		      --M = matrix{{a^3,b^4+c^4,d^5}}; --codimension 3 ideal
 		      ---------------------------------
 		      --all CM and SCM (not on Magda machine!)
 		      --S=kk[a..d]; 
 		      --M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
 		      ---------------------------------
 		      --computation very long, the first elements are not CM
-		      --
-		      S=kk[a..e]; 
-		      M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
+		      --S=kk[a..e]; 
+		      --M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
 		      IM=ideal M;
 		      if(codim IM==length res IM) then <<"Starting from a CM ideal of codimension "<< codim IM <<endl
 		      else <<"Starting from a non CM ideal of codimension "<< codim IM <<endl;
