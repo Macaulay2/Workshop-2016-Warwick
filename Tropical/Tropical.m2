@@ -65,7 +65,8 @@ isBalanced = F->(
 isWellDefined TropicalCycle := Boolean =>
  F ->(
  -- Check that the fan is pure, and then call isBalanced   
-)        
+       if F#"Pure" then isBalanced(F) else false
+)      
 
 
 
