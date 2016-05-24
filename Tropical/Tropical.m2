@@ -1,6 +1,3 @@
-needsPackage "PolyhedralObjects"
-needsPackage "gfanInterface2"
-
 newPackage(
     	"Tropical",
 	Version => "0.1",
@@ -21,21 +18,17 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
+        PackageExports => {"PolyhedralObjects","gfanInterface2"},
 	DebuggingMode => true
 )
-
-needsPackage "PolyhedralObjects"
-needsPackage "gfanInterface2"
-needsPackage "SimpleDoc"
 
 export {
   "tropicalCycle",
   "isBalanced",
   "tropicalPrevariety",
-  "MaximalCones",
-  "Multiplicities",
    "computeMultiplicities",
   "Prime",
+  "stableIntersection",
   "tropicalVariety"
 }
 
@@ -55,9 +48,9 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 
 tropicalCycle = (F,mult)->(
-    if #F.MaximalCones != #mult then error("The multiplicity list has the wrong length");
+    if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
-    T.Multiplicities = mult;
+    T#"Multiplicities" = mult;
     return T
 )    
 
@@ -89,10 +82,10 @@ else error "options not valid"
 --Computing a tropical variety
 
 tropicalVariety = method(TypicalValue => Ideal,  Options => {
-	"computeMultiplicities" => true,
-	"Prime" => true
+	computeMultiplicities => true,
+	Prime => true
 	})
-tropicalVariety (Ideal) := (I) -> Options >> o -> (
+tropicalVariety (Ideal) := o -> I  -> (
 	if (o.computeMultiplicities==true and o.Prime== true)
 	then  gfanTropicalTraverse gfanTropicalStartingCone I
 	else
@@ -103,7 +96,10 @@ tropicalVariety (Ideal) := (I) -> Options >> o -> (
 stableIntersection = method(TypicalValue =>
 (TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
 
+stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
     
+    return T;
+)    
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -215,6 +211,56 @@ doc///
 
 
 
+doc///
+    Key
+	tropicalVariety
+    Headline
+	the tropical variety associated to an ideal
+    Usage
+	tropicalVariety(I)
+    Inputs
+	I:Ideal
+	    of polynomials
+    Outputs
+        F:Ideal
+    Description 
+    	Text
+	   This method takes an ideal and computes the tropical variety associated to it. 
+	   By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
+	   In this case use optional inputs Prime=>false.
+	Example
+	    QQ[x,y,z]
+	   I=ideal(x+y+z)
+	   tropicalVariety(I)
+	   tropicalVariety(I,computeMultiplicities=>false)
+	   J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+	   isPrime J
+           tropicalVariety(J,Prime=>false)
+
+///
+
+
+doc///
+    Key
+	stableIntersection
+    Headline
+    	computes the stable intersection of two tropical varieties
+    Usage
+	stableIntersection(F,G)
+    Inputs
+	F:TropicalCycle and
+	G:TropicalCycle
+    Outputs
+        T:TropicalCycle
+    Description 
+    	Text
+	    This computes the stable intersection of two tropical
+	    cycles.  For details on the definition of stable
+	    intersection, see, for example, Section 3.6 of
+	    ???TropicalBook
+	Example
+    	    1+1
+///
 
 
 
