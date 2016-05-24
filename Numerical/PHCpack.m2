@@ -1528,7 +1528,7 @@ zeroFilter (List,ZZ,RR) := (sols,k,tol) -> (
 intersectSlice = method(TypicalValue => List)
 intersectSlice (WitnessSet, List) := (w, slcRR) -> (
   -- IN: w, a witness set;
-  --     slicRR, a list of linear equations.
+  --     slcRR, a list of linear equations.
   -- OUT: solutions of the equations of the witness set w
   --      which satisfy the list of linear equations.
   startSys:=join(equations(w),slice(w));
