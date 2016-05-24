@@ -1,7 +1,5 @@
 -- -*- coding: utf-8 -*-
 
-needsPackage "PolyhedralObjects"
-
 newPackage(
 	"gfanInterface2",
 	Version => "0.4",
@@ -19,10 +17,9 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
+	PackageExports => {"PolyhedralObjects"},
 	DebuggingMode => true
 )
-
-needsPackage "PolyhedralObjects"
 
 export {
 	"MarkedPolynomialList",
