@@ -1531,9 +1531,6 @@ intersectSlice (WitnessSet, List) := (w, slcRR) -> (
   --     slicRR, a list of linear equations.
   -- OUT: solutions of the equations of the witness set w
   --      which satisfy the list of linear equations.
-  eqn := w.Equations;
-  R2 := ring eqn;
-  X := transpose (vars(R2) | 1);
   startSys:=join(equations(w),slice(w));
   targetSys := equations(w) | slcRR;
   trackPaths(targetSys,startSys,w.Points)

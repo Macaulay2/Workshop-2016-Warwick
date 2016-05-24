@@ -67,6 +67,27 @@ isWellDefined TropicalCycle := Boolean =>
  -- Check that the fan is pure, and then call isBalanced   
 )        
 
+
+
+--Computing a tropical variety
+opts= {
+	Multiplicities=> true,
+	Prime=> true
+	}
+tropicalVariety := opts >> o -> I -> (
+	if (o.Multiplicities==true and o.Prime== true)
+	then  gfanTropicalTraverse gfanTropicalStartingCone I
+	else
+	(if o.Multiplicities==false 
+		then gfanTropicalBruteForce gfanBuchberger I
+		else print  " Cannot compute multiplicities if ideal not prime"  ))
+
+
+
+
+
+
+
 --Computing a tropical prevariety
 tropicalPrevariety = method(TypicalValue => List,  Options => {
 	"t" => false,
@@ -138,6 +159,35 @@ doc///
 	    tropicalPrevariety{x+y+1, x+y}
 ///
 
+
+
+doc ///
+     Key 
+        tropicalVariety,
+     Headline
+        Computes the variety of an ideal
+     Usage 
+        F=tropicalVariety(I)
+     Inputs 
+          I:Ideal an homogeneous ideal
+          
+     Outputs 
+          F:Fan
+     Description
+        Text       
+      This function takes an ideal and computes its tropical variety. Multiplicities are computed by default but may be excluded to decrease computation time
+     Example  
+			QQ[x,y,z]
+      		I=ideal(x+y+z)
+			F=tropicalVariety (I)
+			I=ideal(x^2+y^2+z*y,z*x+y^2)
+			F=tropicalVariety(I,Multiplicities=>False)
+			I=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+			F=tropicalVariety(I,Prime=>False)
+      Text      
+      In order to compute the multiplicities the ideal has to be prime
+     
+///
 
 
 
