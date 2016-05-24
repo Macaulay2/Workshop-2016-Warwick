@@ -13,7 +13,7 @@ newPackage ( "ResidualIntersections",
 	{Name => "Jay Yang",
 	    Email => "jkelleyy@gmail.com"}
 	},
-    PackageExports => {"RandomIdeal"},
+    PackageExports => {"RandomIdeal","PushForward"},
     Headline => "Package for studying conditions associated to Residual Intersection theory",
     Reload => true,
     DebuggingMode => true
@@ -295,10 +295,12 @@ pushOptions := new OptionTable from {
 	  }
 
 pushNonLinear := opts -> (f,M) -> (				    -- this returns the presentation matrix of the pushforward module
+
     -- written by Mike and David
     R := target f;
     assert( ring M === R );
     comp := PushforwardComputation{M,NonLinear};
+    viewHelp PushforwardComputation
 print"push1";    
     if not f.cache#?comp then (	       -- a bad place to cache the computation, because M may not get garbage-collected
 	S := source f;
@@ -357,33 +359,36 @@ pushF = method (Options => pushOptions)
 pushF(RingMap, Module) := Module => opts -> (f,M) -> (
      if isHomogeneous f and isHomogeneous M then (
 	  -- given f:R-->S, and M an S-module, finite over R, find R-presentation for M
-	  print"time check 1";
 	  S := target f;
-	  print"time check 2";	  
 	  M = cokernel presentation M;
-	  print"time check 3";	  
 	  M1 := M / ideal f.matrix;
-	  print"time check 4";	  
 	  M2 := subquotient(matrix basis M1, relations M);
-	  print f;
-	  print"time check 5";	 
 	  P :=  (pushNonLinear opts)(f,M2);
-	  print"time check 6";	 
 	  cokernel P
 	  )
      else error "not implemented yet for inhomogeneous modules or maps"
      )
 
 
+
 ///
 restart
+--installPackage "PushForward"
 path = path|{"~/GitHub/Workshop-2016-Warwick/RandomIdeals/"}
 debug loadPackage ("ResidualIntersections", Reload=>true)
 n = 3
 c = 3
 m = n+c-1
 S = ZZ/101[x_1..x_(n*m)]
+
+isSurjective RingMap := f -> (
+    coker (sub(
+    )
+
+    
 I = minors(n, genericMatrix(S,x_1,m,n));
+
+
 time profondeur(S^1/I^4)
 
 loadPackage ("Depth", Reload=>true)
