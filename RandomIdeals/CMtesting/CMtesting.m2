@@ -81,7 +81,6 @@ LicciTest (ZZ, List) := (n, L) ->(
     local I;
     local kk;
     local S;
-    local i;
         
     kk=ZZ/1291;
     S=kk[x_1..x_n];
@@ -103,5 +102,5 @@ end
 restart
 load "CMtesting.m2"
 L=for i from 1 to 6 list random(2,8)
-tally apply(200,t-> LicciTest(6, L))
+tally apply(1000,t-> LicciTest(6, L))
 --installPackage"RandomIdeal"
