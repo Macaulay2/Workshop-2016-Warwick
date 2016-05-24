@@ -72,7 +72,7 @@ isWellDefined TropicalCycle := Boolean =>
 
 
 --Computing a tropical prevariety
-tropicalPrevariety = method(TypicalValue => List,  Options => {
+tropicalPrevariety = method(TypicalValue => Fan,  Options => {
 	Strategy=> "gfan"
 	})
 
@@ -238,7 +238,7 @@ doc///
 	Strategy=>String
 	    Strategy (currently only "gfan")
     Outputs
-	F:List
+	F:Fan
 	    the intersection of the tropical hypersurfaces of polynomials in L
     Description
 	Text
