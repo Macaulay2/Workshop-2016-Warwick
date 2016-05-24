@@ -36,6 +36,7 @@ export {
   "Multiplicities",
    "computeMultiplicities",
   "Prime",
+  "stableIntersection",
   "tropicalVariety"
 }
 
@@ -241,6 +242,29 @@ doc///
 	   J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
            tropicalVariety(I,Prime=>false)
 
+///
+
+
+doc///
+    Key
+	stableIntersection
+    Headline
+    	computes the stable intersection of two tropical varieties
+    Usage
+	stableIntersection(F,G)
+    Inputs
+	F:TropicalCycle and
+	G:TropicalCycle
+    Outputs
+        T:TropicalCycle
+    Description 
+    	Text
+	    This computes the stable intersection of two tropical
+	    cycles.  For details on the definition of stable
+	    intersection, see, for example, Section 3.6 of
+	    ???TropicalBook
+	Example
+    	    1+1
 ///
 
 
