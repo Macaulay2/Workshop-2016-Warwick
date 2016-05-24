@@ -45,6 +45,30 @@ goldenSearch = (F,a,b,tol) -> (
     return (b + a) / 2;
 )
 
+rotationOfSlice=(t,startSlice)-> (
+    c:=numColumns(startSlice);
+    M1:=id_(CC^c);
+    M2:=mutableMatrix M1;
+    M2_(0,0)=cos(t);
+    M2_(0,1)=-sin(t);
+    M2_(1,0)=sin(t);
+    M2_(1,1)=cos(t);
+    M3:=matrix M2;
+    return startSlice*M3;
+    )
+
+discretization=(F,n,startSlice,w) -> (
+    angles:=for i to n-1 list 2*pi*i/n;
+    functionValues:={};
+    for i to n-1 do (
+	   newSlice:=rotationOfSlice(angles#i,startSlice);
+	   functionValues=append(functionValues,sliceCost(newSlice,w));
+    )
+    minValue:=min(functionValues);
+    minPosition:=position(functionValues,a->(a==minValue)); 
+    rotationOfSlice(angles#minPosition,startSlice);
+)
+
 -- Example: rank 3 matrices
 R=CC[a,b,c,d];
 M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);
