@@ -17,8 +17,7 @@ newPackage(
 -- Any symbols or functions that the user is to have access to
 -- must be placed in one of the following two lists
 
-export {
-    "firstFunction", 
+export { 
     "MLBundle"
     }
 exportMutable {}
@@ -34,44 +33,59 @@ MLBundle Polyhedron := P -> (
     f := matrix {apply(rank source L, i-> 1/1)};
     return ker(E,f)
     )
-
-
-firstFunction = method(TypicalValue => String)
-firstFunction ZZ := String => n -> (
-	if n == 1
-	then "Hello, World!"
-	else "D'oh!"	
-	)
   
 
 
 beginDocumentation()
-document { 
-	Key => MLBundles,
-	Headline => "an example Macaulay2 package",
-	EM "PackageTemplate", " is an example package which can
-	be used as a template for user packages."
-	}
-document {
-	Key => {firstFunction, (firstFunction,ZZ)},
-	Headline => "a silly first function",
-	Usage => "firstFunction n",
-	Inputs => {
-		"n" => ZZ => {}
-		},
-	Outputs => {
-		String => {}
-		},
 
-	"This function is provided by the package ", TO MLBundles, ".",
+doc ///
+Key  
+  MLBundles
+Headline 
+  routines for working with Mukai-Lazarsfeld bundles
+Description
+  Text 
+     Computes the ML bundle associated to the toric divisor associated to a polytope
+///
 
-	EXAMPLE {
-		"firstFunction 1",
-		"firstFunction 0"
-		}
-	}
-
-
+doc ///
+Key  
+  MLBundle
+  (MLBundle, Polyhedron)
+Headline 
+  creates Mukai-Lazarsfeld bundle
+Usage 
+  M = MLBundle(P) 
+Inputs  
+  P:Polyhedron 
+    the polytope corresponding to a polarised toric variety
+Outputs 
+  M:ToricVectorBundleKlyachko
+    the Lazarsfeld-Mukai bundle expressed as a toric vector bundle
+Description
+  Text 
+    The Mukai-Lazarsfeld bundle is the kernel of the evaluation map 
+    of the global sections of a globally generated line bundle. On a 
+    toric variety, it is a toric vector bundle. If the polarisation is very ample, 
+    these bundles can be used to compute the Betti numbers of the minimal 
+    free resolution of the coordinate ring. 
+     
+    This constructs the cotangent bundle on projective two space twisted by O(1). 
+  Example
+    P = convexHull matrix{{0,1,0},{0,0,1}};
+    M = MLBundle(P)
+    O = cotangentBundle projectiveSpaceFan 2
+    O = twist(O,{1,0,0})
+    areIsomorphic(O,M)
+  Text
+    This constructs the Mukai-Lazarsfeld bundle associated to an ample line bundle 
+    on the Hirzebruch surface F2. 
+  Example      
+    P = convexHull matrix{{0,1,0,2},{0,0,1,1}}
+    M = MLBundle(P)
+    details M
+    HH^1 exteriorPower(2,MLBundle(P))
+///
 
 -- testing the cotangent bundle on P2
 TEST ///
@@ -98,22 +112,12 @@ end
 
 -- Here place M2 code that you find useful while developing this
 -- package.  None of it will be executed when the file is loaded,
--- because loading stops when the symbol "end" is encountered.
-
-installPackage "PackageTemplate"
-installPackage("PackageTemplate", RemakeAllDocumentation=>true)
-check PackageTemplate
-
-restart
-needsPackage "MLBundles"
-loadPackage "ToricVectorBundles"
-loadPackage "NormalToricVarieties"
-<<<<<<< HEAD
- 
- 
+-- because loading stops when the symbol "end" is encountered. 
 ------------------------------------------------------------------------
+
+uninstallPackage "MLBundles"
 restart
 needsPackage "MLBundles"
 check "MLBundles"
-=======
->>>>>>> 5524cf5e60749a425861f74822002b57d087cac0
+installPackage "MLBundles"
+viewHelp
