@@ -262,6 +262,7 @@ profondeur Module := M -> (
     MM := pushForward(r,M);
     numgens S0 - pdim MM)
 *}
+
 profondeur Module := M -> (
     --profondeur of a module with respect to the max ideal, via finite proj dim
     --gives error if the ultimate coeficient ring of R = ring M is not a field.
@@ -271,14 +272,107 @@ profondeur Module := M -> (
     if not isField coefficientRing S then error"input must be a module over an affine ring";
     S0 := ring presentation S;
     r := F*map(S,S0);
-    MM := pushForward(r,M);
-    error();
+    print"before pushforward";
+    MM := pushF(r,M);
+    print MM;
+    print"after pushforward";
+--    error();
     numgens S0 - pdim MM)
+
+
+protect NonLinear
+
+pushOptions := new OptionTable from {
+	  MonomialOrder => Eliminate,       -- default is an elimination order
+	  UseHilbertFunction => true,  -- if possible
+	  StopBeforeComputation => false,
+	  DegreeLimit => {},
+	  PairLimit => infinity,
+	  -- unused options:
+	  -- Strategy => NonLinear,            -- use the best choice
+	  -- BasisElementLimit => infinity,  -- number of generators of GB in the subring
+	  -- StopWithMinimalGenerators => false            -- determine the minimal generators of the subring
+	  }
+
+pushNonLinear := opts -> (f,M) -> (				    -- this returns the presentation matrix of the pushforward module
+    -- written by Mike and David
+    R := target f;
+    assert( ring M === R );
+    comp := PushforwardComputation{M,NonLinear};
+    if not f.cache#?comp then (	       -- a bad place to cache the computation, because M may not get garbage-collected
+	S := source f;
+	n1 := numgens R;				    -- what if R is a tower?
+        order := if opts.MonomialOrder === Eliminate then Eliminate n1
+                 else if opts.MonomialOrder === ProductOrder then ProductOrder{n1, numgens S}
+		 else if opts.MonomialOrder === Lex then Lex
+		 else error("MonomialOrder option: expected Eliminate, ProductOrder, or Lex");
+	J := graphIdeal(f,MonomialOrder => order, VariableBaseName => local X);
+	G := ring J;
+	m := presentation M;
+	xvars := map(G, R, submatrix(vars G, toList(0..n1-1)));
+	m1 := presentation (cokernel xvars m  **  cokernel generators J);
+	if opts.UseHilbertFunction and all((f,m),isHomogeneous) then (
+	     p := poincare cokernel m;
+     	     assert( degreesRing R === degreesRing G );
+	     DG := degreesRing G;
+	     hf := p * product(degrees source generators J, d -> 1 - DG_d);
+	     assert( degreesRing ring m1 === ring hf );
+	     (cokernel m1).cache.poincare = hf;
+	     );
+	deglen := degreeLength S;
+	mapbackdeg := d -> take(d,-deglen);
+	-- that choice of degree map was chosen to make the symmetricPower functor homogeneous, but it doesn't have much
+	-- else to recommend it.
+	-- we should really be *lifting* the result to S along the natural map S ---> G
+	mapback := map(S, G, map(S^1, S^n1, 0) | vars S, DegreeMap => mapbackdeg );
+	-- let's at least check it splits f's degree map:
+	for i from 0 to deglen-1 do (
+	     e := for j from 0 to deglen-1 list if i === j then 1 else 0;
+	     if mapbackdeg f.cache.DegreeMap e =!= e then error "not implemented yet: unexpected degree map of ring map";
+	     );
+	cleanupcode := g -> mapback selectInSubring(if numgens target f > 0 then 1 else 0, generators g);
+	f.cache#comp = (m1, cleanupcode);
+	);
+    if # f.cache#comp === 1
+    then f.cache#comp#0
+    else (
+	 (m1, cleanupcode) = f.cache#comp;
+	 g := gb(m1, new OptionTable from {
+		   StopBeforeComputation => opts.StopBeforeComputation,
+		   DegreeLimit => opts.DegreeLimit,
+		   PairLimit => opts.PairLimit});
+	 result := cleanupcode g;
+	 --if isdone g then f.cache#comp = {result};  -- MES: There is NO way to check this yet!!
+	 -- MES: check if the monomial order restricts to S.  If so, then do `` forceGB result ''
+	 result
+	 )
+    )
+
+
+pushF = method (Options => pushOptions)
+pushF(RingMap, Module) := Module => opts -> (f,M) -> (
+     if isHomogeneous f and isHomogeneous M then (
+	  -- given f:R-->S, and M an S-module, finite over R, find R-presentation for M
+	  print"time check 1";
+	  S := target f;
+	  print"time check 2";	  
+	  M = cokernel presentation M;
+	  print"time check 3";	  
+	  M1 := M / ideal f.matrix;
+	  print"time check 4";	  
+	  M2 := subquotient(matrix basis M1, relations M);
+	  print"time check 5";	  
+	  cokernel (pushNonLinear opts)(f,M2)
+	  )
+     else error "not implemented yet for inhomogeneous modules or maps"
+     )
 
 
 ///
 restart
 loadPackage ("Depth", Reload=>true)
+path = path|{"~/GitHub/Workshop-2016-Warwick/RandomIdeals/"}
+--load"pushforward-tests.m2"
 debug loadPackage ("ResidualIntersections", Reload=>true)
 
 pdim1 = method()
@@ -289,12 +383,12 @@ c = 3
 m = n+c-1
 S = ZZ/101[x_1..x_(n*m)]
 I = minors(n, genericMatrix(S,x_1,m,n));
-apply(4, i->elapsedTime pdim(S^1/I^(i+1)))
-apply(4, i->time pdim1(S^1/I^(i+1)))
+apply(3, i->elapsedTime pdim(S^1/I^(i+1)))
+apply(3, i->time pdim1(S^1/I^(i+1)))
 
-apply(4, i->elapsedTime res(S^1/I^(i+1)))
-apply(4, i->elapsedTime res(S^1/I^(i+1), FastNonminimal => true))
-time profondeur(S^1/I^4)
+apply(3, i->elapsedTime res(S^1/I^(i+1)))
+apply(3, i->elapsedTime res(S^1/I^(i+1), FastNonminimal => true))
+time profondeur(S^1/I^3)
 apply(4, i->elapsedTime depth(S^1/I^(i+1)))
 ///
 
