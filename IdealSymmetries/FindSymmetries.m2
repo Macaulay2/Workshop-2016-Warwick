@@ -124,8 +124,57 @@ FindSymmetry List := Polys-> (
     );
   );
   
+  NumberOfVariables = #(TermList#0#0) + 1;
+
   PolysAsLists := MakeConstIntoVar(TermList);
-  return createNautyString(PolysAsLists, CoefficientList);
+  DreadnautStrs := callDreadnaut(createNautyString(PolysAsLists, CoefficientList)) - 1;
+  PermutationStrs := new MutableList;
+  i := 1;
+  while i < #DreadnautStrs do (
+    DreadnautStr := DreadnautStrs#i;
+    if regex("orbits", DreadnautStr) != null then break;
+
+    if DreadnautStr#0 == "(" then (
+      NewPermutationStr = DreadnautStr;
+      for j from i + 1 to #DreadnautStrs - 1 do (
+        TestDreadnautStr = DreadnautStrs#j;
+        if TestDreadnautStr#0 == "(" then (
+          i = j;
+          break;
+        );
+        if TestDreadnautStr#0 == " " then (
+          NewPermutationStr = NewPermutationStr | substring(TestDreadnautStr,3,#TestDreadnautStr);
+        );
+      );
+      TempPermutationStr = parsePermutationStr(NewPermutationStr, NumberOfVariables);
+      if TempPermutationStr != "" then (
+        PermutationStrs = PermutationStrs | "***" | TempPermutationStr;
+      );
+    );
+  );
+  return PermutationStrs
+)
+
+parsePermutationStr = method()
+parsePermutationStr (String, ZZ) := (PermStr, NumberOfVariables) -> (
+  PermStr = substring(PermStr,1,#PermStr - 2);
+  PermStr = replace("(","", PermStr);
+  SplitCycles := separate(")", PermStr);
+  Result = "";
+  for Cycle in SplitCycles do (
+    SplitCycle = separate(" ", Cycle);
+    CycleIsVarPermutation = true;
+    for Term in SplitCycle do (
+      if value Term > NumberOfVariables then (
+        CycleIsVarPermutation = false;
+        break;
+      );
+    );
+    if CycleIsVarPermutation then (
+      Result = Result | ";" | Cycle;
+    );
+  );
+  return Result;
 )
 
 dreadnautPath = prefixDirectory | currentLayout#"programs" | "dreadnaut";
