@@ -17,8 +17,11 @@ RandomI(ZZ):=(len)->( --len is the length of the list of random ideals
 		      kk=ZZ/101;
 		      --S=kk[a..e];
 		      --M = matrix{{a^3,b^4+c^4,d^5}}; --codimension 3 ideal
-		      S=kk[a..d];
-		      M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
+		      ---------------------------------
+		      --all CM and SCM
+		      --S=kk[a..d]; 
+		      --M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
+		      ---------------------------------
 		      IM=ideal M;
 		      if(codim IM==length res IM) then <<"Starting from a CM ideal of codimension "<< codim IM <<endl
 		      else <<"Starting from a non CM ideal of codimension "<< codim IM <<endl;
