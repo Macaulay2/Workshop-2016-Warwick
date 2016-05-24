@@ -5,7 +5,7 @@ PartString (BasicList) := Partition -> (
 )
 
 createNautyString = method(TypicalValue => BasicList)
-createNautyString (BasicList) := Polys -> (
+createNautyString (BasicList, BasicList) := Polys, Coefficients -> (
   n := #(Polys#0#0);
   SystemAsLists := new MutableList from for i in 0..n list new MutableList;
   Monomials := new MutableList;
@@ -102,3 +102,15 @@ MakeConstIntoVar := Polys -> (
     return Polys
 )
 
+FindSymmetry := Polys-> (
+  CoefficientList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
+  TermList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
+  for i from 0 to #Polys - 1 do {
+    Poly = Polys#i;
+    for Term in listForm Poly do {
+      TermList#i = append(TermList#i,Term#0);
+      CoefficientList#i = append(CoefficientList#i,Term#0);
+    }
+  PolysAsLists := MakeConstIntoVar(TermList);
+  createNautyString(PolysAsLists, TermList)
+}
