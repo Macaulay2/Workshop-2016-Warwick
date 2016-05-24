@@ -11,9 +11,10 @@ createNautyString (BasicList) := Polys -> (
   Monomials := new MutableList;
   Polynomials := new MutableList;
   Variables := toList(1..n-1);
-  NewNodeRef := n+1;
-  TermToNode := new MutableHashTable;
+  NewNodeRef := n;
   SystemNode = NewNodeRef;
+  NewNodeRef = NewNodeRef+1;
+  TermToNode := new MutableHashTable;
 
   for i in 0..#Polys - 1 do (
     PolyNode := NewNodeRef;
@@ -63,7 +64,7 @@ createNautyString (BasicList) := Polys -> (
   );
 
 
-  ReturnString := "c -a -m n=" | toString(#Polys) | " g ";
+  ReturnString := "c -a -m n=" | toString(#SystemAsLists) | " g ";
   for Poly in SystemAsLists do (
     for Term in Poly do (
       ReturnString = ReturnString | toString(Term) | " ";
