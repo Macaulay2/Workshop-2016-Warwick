@@ -1,28 +1,28 @@
 PartString = method()
-PartString (List) := Partition -> (
-  Partition = replace(",","",toString(Partition));
-  substring(Partition, 1, #Partition - 2);
+PartString (BasicList) := Partition -> (
+  Partition = replace(",","",toString(toList Partition));
+  return substring(Partition, 1, #Partition - 2);
 )
 
-createNautyString = method(TypicalValue => List)
-createNautyString (List) := Polys -> (
+createNautyString = method(TypicalValue => BasicList)
+createNautyString (BasicList) := Polys -> (
   n := #(Polys#0#0);
-  SystemAsLists := new MutableList from for i in 0..n list MutableList;
+  SystemAsLists := new MutableList from for i in 0..n list new MutableList;
   Monomials := new MutableList;
   Polynomials := new MutableList;
-  Variables := 1..n-1;
+  Variables := toList(1..n-1);
   NewNodeRef := n+1;
   TermToNode := new MutableHashTable;
   SystemNode = NewNodeRef;
 
   for i in 0..#Polys - 1 do (
     PolyNode := NewNodeRef;
-    Polynomials = Polynomials|{NewNodeRef};
-    SystemAsLists = SystemAsLists|{{SystemNode}};
+    Polynomials = append(Polynomials,NewNodeRef);
+    SystemAsLists = append(SystemAsLists,{SystemNode});
     NewNodeRef = NewNodeRef + 1;
     for j in 0..#(Polys#i) - 1 do (
       MonomialNode = NewNodeRef;
-      Monomials = Monomials|{MonomialNode};
+      Monomials = append(Monomials,MonomialNode);
       SystemAsLists#PolyNode = append(SystemAsLists#PolyNode,MonomialNode);
       SystemAsLists = append(SystemAsLists, new MutableList);
       NewNodeRef = NewNodeRef + 1;
@@ -63,20 +63,20 @@ createNautyString (List) := Polys -> (
   );
 
 
-  ReturnString := "c -a -m n=" + toString(#Polys) + " g ";
-  for Poly in Polys do (
+  ReturnString := "c -a -m n=" | toString(#Polys) | " g ";
+  for Poly in SystemAsLists do (
     for Term in Poly do (
-      ReturnString = ReturnString | toString(Term) + " ";
+      ReturnString = ReturnString | toString(Term) | " ";
     );
-    ReturnString = ReturnString | " ";
+    ReturnString = ReturnString | ";";
   );
   ReturnString = substring(ReturnString, 0, #ReturnString - 1) | ". f = [ 0 | " | toString(SystemNode) | " | ";
   ReturnString = ReturnString | PartString(Variables) | " | " | PartString(Monomials);
-  ReturnString = ReturnString | " | " | PartString(PolyPart) | " | ";
-  for Part in PowerList do (
+  ReturnString = ReturnString | " | " | PartString(Polynomials) | " | ";
+  for Part in PartList do (
     ReturnString = ReturnString | PartString(Part) | " | ";
   );
-  ReturnString = ReturnString | "] x @ b";
+  return ReturnString | "] x @ b";
 )
 
 
