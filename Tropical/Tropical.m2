@@ -222,7 +222,7 @@ doc///
 	I:Ideal
 	    of polynomials
     Outputs
-        F:Ideal
+        F:TropicalCycle
     Description 
     	Text
 	   This method takes an ideal and computes the tropical variety associated to it. 
