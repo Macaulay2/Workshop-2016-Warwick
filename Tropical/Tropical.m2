@@ -122,7 +122,19 @@ doc ///
 ///
 
 
-
+doc ///
+    Key 
+    	TropicalCycle
+    Headline
+    	a Type for working with tropical cycles
+    Description
+    	Text
+    	   This is the main type for tropical cycles.  A TropicalCycle
+    	   consists of a Fan with an extra HashKey Multiplicities,
+	   which is the list of multiplicities on the maximal cones,
+	   listed in the order that the maximal cones appear in the
+	   MaximalCones list.
+///	   
 
 doc ///
     Key
