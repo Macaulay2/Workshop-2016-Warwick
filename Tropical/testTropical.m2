@@ -30,8 +30,7 @@ export {
    "computeMultiplicities",
   "Prime",
   "stableIntersection",
-  "tropicalVariety",
-  "convertToPolymake"
+  "tropicalVariety"
 }
 
 ------------------------------------------------------------------------------
@@ -83,30 +82,25 @@ else error "options not valid"
 )
 --Computing a tropical variety
 
-tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
+tropicalVariety = method(TypicalValue => Ideal,  Options => {
 	computeMultiplicities => true,
 	Prime => true
 	})
 tropicalVariety (Ideal) := o -> I  -> (
 	if (o.computeMultiplicities==true and o.Prime== true)
-	then (F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
-	    tropicalCycle(F,F#"Multiplicities"))
+	then  gfanTropicalTraverse gfanTropicalStartingCone I
 	else
 	(if o.computeMultiplicities==false 
 		then gfanTropicalBruteForce gfanBuchberger I
 		else print  " Cannot compute multiplicities if ideal not prime"  ))
 
 stableIntersection = method(TypicalValue =>
-TropicalCycle, Options => {Strategy=>"atint"})
+(TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
+    
+    return T;
 )    
-
-convertToPolymake = (T) ->(
-	str := "new Cycle<Min>";
---	str := tropicalMax;
-	return str
-) 
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -220,33 +214,23 @@ doc///
 
 doc///
     Key
-	tropicalVariety	
-	(tropicalVariety, Ideal)
-	[tropicalVariety, computeMultiplicities]
-	[tropicalVariety, Prime]
-
+	tropicalVariety
     Headline
 	the tropical variety associated to an ideal
     Usage
 	tropicalVariety(I)
-	tropicalVariety(I,computeMultiplicities=>true)
-	tropicalVariety(I,Prime=>true)
     Inputs
 	I:Ideal
 	    of polynomials
-	computeMultiplicities =>Boolean
-	Prime=>Boolean
     Outputs
-        F:TropicalCycle
+        F:Ideal
     Description 
     	Text
 	   This method takes an ideal and computes the tropical variety associated to it. 
 	   By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
 	   In this case use optional inputs Prime=>false.
-	   By default it computes multiplicities but setting computeMultiplicities=>false
-	   turns this off to decrease computation time.
 	Example
-	   QQ[x,y,z]
+	    QQ[x,y,z]
 	   I=ideal(x+y+z)
 	   tropicalVariety(I)
 	   tropicalVariety(I,computeMultiplicities=>false)
@@ -260,7 +244,6 @@ doc///
 doc///
     Key
 	stableIntersection
-	(stableIntersection,TropicalCycle,TropicalCycle)
     Headline
     	computes the stable intersection of two tropical varieties
     Usage
