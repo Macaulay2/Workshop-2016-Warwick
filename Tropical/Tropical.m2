@@ -73,16 +73,14 @@ isWellDefined TropicalCycle := Boolean =>
 
 --Computing a tropical prevariety
 tropicalPrevariety = method(TypicalValue => List,  Options => {
-	"t" => false,
-	"tplane" => false,
-	"symmetryPrinting" => false,
-	"symmetryExploit" => false,
-	"restrict" => false,
-	"stable" => false
+	Strategy=> "gfan"
 	})
-tropicalPrevariety (List) := (L) -> opts -> (
-  F:=gfanTropicalIntersection(L, opts);G:=new Fan;
-scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G
+
+tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+if (o.Strategy=="gfan") then (
+  F:=gfanTropicalIntersection(L, gfanopt); G:=new Fan;
+scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
+else error "options not valid"
 )
 
 
