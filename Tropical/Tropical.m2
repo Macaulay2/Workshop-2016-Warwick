@@ -103,7 +103,10 @@ tropicalVariety (Ideal) := o -> I  -> (
 stableIntersection = method(TypicalValue =>
 (TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
 
+stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
     
+    return T;
+)    
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
