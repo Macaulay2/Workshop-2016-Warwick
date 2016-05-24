@@ -84,7 +84,10 @@ scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
 else error "options not valid"
 )
 
+stableIntersection = method(TypicalValue =>
+(TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
 
+    
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -102,7 +105,7 @@ doc ///
 
 
 
-doc///
+doc ///
     Key
 	(isWellDefined,TropicalCycle)
     Headline
@@ -118,6 +121,29 @@ doc///
     	    A TropicalCycle is well defined if the underlying Fan is
     	    pure, and the multiplicity function makes the fan
     	    balanced.
+      	Example
+	    1+1	    
+///
+
+doc ///
+    Key
+	tropicalCycle
+    Headline
+    	constructs a TropicalCycle from a Fan and a multiplicity function
+    Usage
+    	tropicalCycle(F,mult)
+    Inputs
+    	F:Fan 
+    Outputs
+    	T:TropicalCycle
+    Description
+	Text
+	    A TropicalCycle consists of a Fan with an extra HashKey
+	    Multiplicities, which is the list of multiplicities on the
+	    maximal cones, listed in the order that the maximal cones
+	    appear in the MaximalCones list.  This function takes a
+	    Fan (which does not have a list of multiplicties) and adds
+	    the Multiplicities key.
       	Example
 	    1+1	    
 ///
@@ -175,6 +201,6 @@ doc///
 
 
 TEST ///
-    assert (1==1)
+    assert (1+1==2)
 ///    	    	
        
