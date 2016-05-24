@@ -89,10 +89,10 @@ else error "options not valid"
 --Computing a tropical variety
 
 tropicalVariety = method(TypicalValue => Ideal,  Options => {
-	"computeMultiplicities" => true,
-	"Prime" => true
+	computeMultiplicities => true,
+	Prime => true
 	})
-tropicalVariety (Ideal) := (I) -> Options >> o -> (
+tropicalVariety (Ideal) := o -> I  -> (
 	if (o.computeMultiplicities==true and o.Prime== true)
 	then  gfanTropicalTraverse gfanTropicalStartingCone I
 	else
@@ -215,6 +215,30 @@ doc///
 
 
 
+doc///
+    Key
+	tropicalVariety
+    Headline
+	the tropical variety associated to an ideal
+    Usage
+	tropicalVariety(I)
+    Inputs
+	I:Ideal
+	    of polynomials
+    Outputs
+        F:Ideal
+    Description 
+    	Text
+	   This method takes an ideal and computes the tropical variety associated to it.
+	Example
+	    QQ[x,y,z]
+	   I=ideal(x+y+z)
+	   tropicalVariety(I)
+	   tropicalVariety(I,computeMultiplicities=>false)
+	   J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+           tropicalVariety(I,Prime=>false)
+
+///
 
 
 
