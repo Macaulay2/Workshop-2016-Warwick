@@ -31,7 +31,7 @@ export {
   "Prime",
   "stableIntersection",
   "tropicalVariety",
-  "isTropicalBasis"
+  "isTropicalBasis",
   "convertToPolymake"
 }
 
