@@ -403,7 +403,7 @@ systemFromFile (String) := (name) -> (
   L := lines(s);
   dimL0 := separate(" ", L_0); -- deal with case of nonsquare systems
   n := value dimL0_0;          -- first is always number of equations
-  if n == null then
+  if not instance(n,ZZ) then
     n = value dimL0_1;         -- deal with leading spaces
   result := {};
   i := 0; j := 1;
@@ -621,11 +621,11 @@ cascade (List) := o -> (system) -> (
     stdio << "writing output to file " << PHCoutputFile << endl;
   
   systemToFile(system,PHCinputFile);
-  s := concatenate("0\ny\n",PHCinputFile);
-  s = concatenate(s,"\n",PHCoutputFile);
+  s := concatenate("0\ny\n",PHCinputFile); -- option 0, system on file
+  s = concatenate(s,"\n",PHCoutputFile);   -- add name of the output file
   s = concatenate(s,"\n");
-  s = concatenate(s,toString(startdim));
-  s = concatenate(s,"\nn\n");
+  s = concatenate(s,toString(startdim));   -- add top dimension
+  s = concatenate(s,"\nn\n");              -- do not restrict slices
   bat := openOut PHCbatchFile;
   bat << s;
   close bat;
