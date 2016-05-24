@@ -81,13 +81,14 @@ else error "options not valid"
 )
 --Computing a tropical variety
 
-tropicalVariety = method(TypicalValue => Ideal,  Options => {
+tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	computeMultiplicities => true,
 	Prime => true
 	})
 tropicalVariety (Ideal) := o -> I  -> (
 	if (o.computeMultiplicities==true and o.Prime== true)
-	then  gfanTropicalTraverse gfanTropicalStartingCone I
+	then (F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
+	    tropicalCycle(F,F#"Multiplicities"))
 	else
 	(if o.computeMultiplicities==false 
 		then gfanTropicalBruteForce gfanBuchberger I
