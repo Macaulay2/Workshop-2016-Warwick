@@ -78,3 +78,27 @@ createNautyString (List) := Polys -> (
   }
   ReturnString = ReturnString | "] x @ b";
 )
+
+
+
+MakeConstIntoVar := Polys -> (
+    --This is a helper function to add the constant term into each monomial list.
+    --Converting this makes the parsing easier later on.
+    Polys = new MutableList from Polys;
+    for i in 0..#Polys -1 do (
+        Polys#i = new MutableList from Polys#i;
+        for j in 0..#(Polys#i)-1 do (
+            IsConstant := true;
+            for Term in Polys#i#j do (
+                if Term != 0 then (
+                    IsConstant = false;
+                    break;
+                );
+            );
+            if IsConstant then Polys#i#j = {1}|Polys#i#j
+            else Polys#i#j = {0}|Polys#i#j;
+        );
+    );
+    return Polys
+)
+
