@@ -52,13 +52,14 @@ genericArtinNagata(ZZ,Ideal) := (s,I) -> (
     K := genericResidual(s,I);
     s' := codim K;
     if s' === s then 
-      codepth := numgens (ring K) - depth ((ring K)^1/K)
+      codepth := (numgens (ring K) -s) - depth ((ring K)^1/K)
     else codepth = -1;
-    {s',codepth,K}
+    {codepth,K}
     )
     --tests whether the generic link is CM
 
 genericResidual = method()
+{*
 genericResidual(ZZ,Ideal):= (s,I) ->(
     if s>= numgens I then return ideal(1_(ring I));
     sgens := sort gens I;
@@ -66,11 +67,31 @@ genericResidual(ZZ,Ideal):= (s,I) ->(
     n := numcols rgens;
     (ideal (rgens_{n-s..n-1})): I
     )
+*}
+genericResidual(ZZ,Ideal):= (s,I) ->(
+    --computes a generic residual 
+    S := ring I;
+    sgens := sort gens I;
+    rgens := (sgens)*random(source sgens, S^{ -1}**source sgens);
+    n := numcols rgens;
+    if s <= n then return ((ideal (rgens_{n-s..n-1})):I);
+    d :=  max flatten (degrees gens I)_1;
+    rgens = (rgens | sgens *random(source sgens, S^{(s-n):-d-1}));
+    (ideal rgens):I
+    )
+
 
 ///
 restart
 loadPackage("RandomIdeal", Reload => true)
 loadPackage("ResidualIntersections", Reload =>true)
+
+     setRandomSeed 0
+     S = ZZ/101[a,b,c,d,e]
+     I = minors(2, random(S^2, S^{3:-1}))
+     genericResidual(4,I)
+     (genericArtinNagata(5,I))_0
+
 S = ZZ/32003[x_0..x_5]
 --6 vars
 I = randomShellableIdeal(S,2,4)
@@ -82,10 +103,11 @@ I = minors(3, random(S^3, S^{-2,-3,-3,-3}));
 --codim 3
 codim I
 s = 2;
+dim I
 depthsOfPowers(3,I)
 codim genericResidual(3,I)
-L = genericArtinNagata(s,I);
-L_{0,1}
+L = (genericArtinNagata(4,I))_0
+
 ///
 ---Licci code
 randomLink = method()
@@ -314,36 +336,47 @@ doc ///
    Headline
     Tests for the conditions used in the theory of residual intersections
    Description
-    Definition: If I \subset S is an ideal in a polynomial ring (or Gorenstein ring) and
-    a_1..a_s are elements of I, then K = (a_1..a_s):I is called an
-    s-residual intersection of I if the codimension of K is at least s.
+    Text
+     Definition: If I \subset S is an ideal in a polynomial ring (or Gorenstein ring) and
+     a_1..a_s are elements of I, then K = (a_1..a_s):I is called an
+     s-residual intersection of I if the codimension of K is at least s.
     
-    In the simplest case, s == codim I, the ideal K is said to be linked to I
-    if also I = (a_1..a_s):K; this is automatic when S/I is Cohen-Macaulay,
-    and in this case S/K is also Cohen-Macaulay; see Peskine-Szpiro,
-    Liaison des variétés algébriques. I. Invent. Math. 26 (1974), 271–302).
+     In the simplest case, s == codim I, the ideal K is said to be linked to I
+     if also I = (a_1..a_s):K; this is automatic when S/I is Cohen-Macaulay,
+     and in this case S/K is also Cohen-Macaulay; see Peskine-Szpiro,
+     Liaison des variétés algébriques. I. Invent. Math. 26 (1974), 271–302).
 
-    The theory for s>c, which has been used in algebraic geometry since the 19th century,
-    was initiated in a commutative algebra setting by Artin and Nagata in the paper
-    Residual intersections in Cohen-Macaulay rings. 
-    J. Math. Kyoto Univ. 12 (1972), 307–323.
+     The theory for s>c, which has been used in algebraic geometry since the 19th century,
+     was initiated in a commutative algebra setting by Artin and Nagata in the paper
+     Residual intersections in Cohen-Macaulay rings. 
+     J. Math. Kyoto Univ. 12 (1972), 307–323.
     
-    Craig Huneke (Strongly Cohen-Macaulay schemes and residual intersections,
-    Trans. Amer. Math. Soc. 277 (1983), no. 2, 739–763)
-    proved that an s-residual intersection K is Cohen-Macaulay
-    if I satisfies the G_d condition and
-    is strongly Cohen-Macaulay, and successive authors have weakened the latter
-    condition to sliding depth, and, most recently, Bernd Ulrich
-    (Artin-Nagata properties and reductions of ideals. 
-    Commutative algebra: syzygies, multiplicities, and 
-    birational algebra,
-    Contemp. Math., 159, 1994) showed that
-    the weaker condition
-    depth( S/(I^t) ) >= dim(S/I) - (t-1) for t = 1..s-codim I +1
-    suffices. All these properties are true if I is licci.
+     Craig Huneke (Strongly Cohen-Macaulay schemes and residual intersections,
+     Trans. Amer. Math. Soc. 277 (1983), no. 2, 739–763)
+     proved that an s-residual intersection K is Cohen-Macaulay
+     if I satisfies the G_d condition and
+     is strongly Cohen-Macaulay, and successive authors have weakened the latter
+     condition to sliding depth, and, most recently, Bernd Ulrich
+     (Artin-Nagata properties and reductions of ideals. 
+     Commutative algebra: syzygies, multiplicities, and 
+     birational algebra,
+     Contemp. Math., 159, 1994) showed that
+     the weaker condition
+     depth( S/(I^t) ) >= dim(S/I) - (t-1) for t = 1..s-codim I +1
+     suffices. All these properties are true if I is licci.
     
-    This package implements tests for most of these properties.
+     This package implements tests for most of these properties.
    SeeAlso
+    isLicci
+    residualCodims
+    genericResidual
+    genericArtinNagata
+    numgensByCodim
+    maxGs
+    koszulDepth
+    hasSlidingDepth
+    isStronglyCM
+    depthsOfPowers
 ///
 
 ------------------------------------------------------------
@@ -520,7 +553,7 @@ doc ///
    Headline
     Generic Artin nagata
    Usage
-    L = genericArtinNagata(n,I)
+    L = genericArtinNagata(s,I)
    Inputs
     n:ZZ
     I:Ideal
@@ -528,19 +561,21 @@ doc ///
     L:List
    Description
     Text
-     Produces an "efficient" regular sequence that is among a set of minimal generators of I
-     by the following algorithm
-     Sorts the generators of I by degree-rev-lex to get sgens, and
-     takes as many elements from this list as possible. Then 
-     makes a general triangular change of generators to get rgens.
-     and take the rest of the regular sequence from this list.
+     forms an ideal F generated by s generic linear combinations of the generators of I
+     in the degree of the highest degree generator, and computes K = F:I. If the
+     codimension of K is not equal to s, returns {-1,K}. Otherwise returns
+     {codepth R/K,K}, where codepth R/K is the deviation from Cohen-Macaulayness.
+     Thus genericArtinNagata(s,I)_0 = 0 means that K is an s-residual intersection
+     of codim s and R/K is Cohen-Macaulay.
+     
+     In the following example, all the generic residual intersectionsa are Cohen-Macaulay,
+     until we get to the 6-residual intersection, which cannot be codim 6 because
+     there are only 5 variables.
     Example
      setRandomSeed 0
-     S = ZZ/101[a,b,c]
-     I = ideal"ab,b2,c2"
-     minimalRegularSequence I
-     I = ideal"cb,b2,a2"
-     minimalRegularSequence I     
+     S = ZZ/101[a,b,c,d,e]
+     I = minors(2, random(S^2, S^{3:-1}))
+     apply(5, i-> (genericArtinNagata(i+2,I))_0)
    Caveat
    SeeAlso
 ///
@@ -797,18 +832,13 @@ assert(isStronglyCM I)
 ///
 end--
 
-linkageBound (I, UseNormalModule => false)
-time linkageBound (I, UseNormalModule => true)
-
-
---b = linkageBound I
-
 restart
 loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
 uninstallPackage "ResidualIntersections"
 installPackage "ResidualIntersections"
-
+check "ResidualIntersections"
+viewHelp ResidualIntersections
 J = idealChainFromSC randomChain(10,5,20);
 J/maxGs
 J/residualCodims
