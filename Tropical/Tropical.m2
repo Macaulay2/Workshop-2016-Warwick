@@ -253,39 +253,41 @@ doc///
 
 doc///
     Key
-	tropicalVariety	
-	(tropicalVariety, Ideal)
-	[tropicalVariety, computeMultiplicities]
-	[tropicalVariety, Prime]
+    tropicalVariety    
+    (tropicalVariety, Ideal, Boolean)
+    [tropicalVariety, computeMultiplicities]
+    [tropicalVariety, Prime]
 
     Headline
-	the tropical variety associated to an ideal
+    the tropical variety associated to an ideal
     Usage
-	tropicalVariety(I)
-	tropicalVariety(I,computeMultiplicities=>true)
-	tropicalVariety(I,Prime=>true)
+    tropicalVariety(I,b)
+    tropicalVariety(I,computeMultiplicities=>true)
+    tropicalVariety(I,Prime=>true)
     Inputs
-	I:Ideal
-	    of polynomials
-	computeMultiplicities =>Boolean
-	Prime=>Boolean
+    I:Ideal
+        of polynomials
+    b:Boolean
+        a boolean    
+    computeMultiplicities =>Boolean
+    Prime=>Boolean
     Outputs
         F:TropicalCycle
     Description 
-    	Text
-	   This method takes an ideal and computes the tropical variety associated to it. 
-	   By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
-	   In this case use optional inputs Prime=>false.
-	   By default it computes multiplicities but setting computeMultiplicities=>false
-	   turns this off to decrease computation time.
-	Example
-	   QQ[x,y,z]
-	   I=ideal(x+y+z)
-	   tropicalVariety(I)
-	   tropicalVariety(I,computeMultiplicities=>false)
-	   J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
-	   isPrime J
-           tropicalVariety(J,Prime=>false)
+        Text
+       This method takes an ideal and computes the tropical variety associated to it. 
+       By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
+       In this case use optional inputs Prime=>false.
+       By default it computes multiplicities but setting computeMultiplicities=>false
+       turns this off to decrease computation time.
+    Example
+       QQ[x,y,z]
+       I=ideal(x+y+z)
+       tropicalVariety(I,true)
+       tropicalVariety(I,true,computeMultiplicities=>false)
+       J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+       isPrime J
+           tropicalVariety(J,true,Prime=>false)
 
 ///
 
