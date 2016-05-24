@@ -51,6 +51,7 @@ Description
 doc ///
 Key  
   MLBundle
+  (MLBundle, Polyhedron)
 Headline 
   creates Mukai-Lazarsfeld bundle
 Usage 
