@@ -1,4 +1,4 @@
-PartString = method();
+PartString = method()
 PartString (List) := Partition -> (
   Partition = replace(",","",toString(Partition));
   substring(Partition, 1, #Partition - 2);
@@ -15,70 +15,69 @@ createNautyString (List) := Polys -> (
   TermToNode := new MutableHashTable;
   SystemNode = NewNodeRef;
 
-  for i in 0..#Polys - 1 do {
+  for i in 0..#Polys - 1 do (
     PolyNode := NewNodeRef;
     Polynomials = Polynomials|{NewNodeRef};
     SystemAsLists = SystemAsLists|{{SystemNode}};
     NewNodeRef = NewNodeRef + 1;
-    for j in 0..#(Polys#i) - 1 do {
+    for j in 0..#(Polys#i) - 1 do (
       MonomialNode = NewNodeRef;
       Monomials = Monomials|{MonomialNode};
       SystemAsLists#PolyNode = append(SystemAsLists#PolyNode,MonomialNode);
       SystemAsLists = append(SystemAsLists, new MutableList);
       NewNodeRef = NewNodeRef + 1;
-      for k in 0..#(Polys#i#j) - 1 do {
-        if Polys#i#j#k != 0 then {
-          if TermToNode#?{Polys#i#j#k,k} == false then {
+      for k in 0..#(Polys#i#j) - 1 do (
+        if Polys#i#j#k != 0 then (
+          if TermToNode#?{Polys#i#j#k,k} == false then (
             TermToNode#{Polys#i#j#k,k} = NewNodeRef;
             SystemAsLists = append(SystemAsLists, new MutableList);
             SystemAsLists#k = append(SystemAsLists#k, NewNodeRef);
             NewNodeRef = NewNodeRef + 1;
-          }
+          );
           SystemAsLists#MonomialNode = append(SystemAsLists#MonomialNode, TermToNode#{Polys#i#j#k,k})
-        }
-      }
-    }
-  }
+        );
+      );
+    );
+  );
   PartList := new MutableList from {new MutableList};
   ExponentsToPartition := keys TermToNode;
   ExponentsToPartition = sort(ExponentsToPartition);
   CurrentPower := ExponentsToPartition#0#0;
   PowerString := toString CurrentPower | " ";
-  for i in 0..#ExponentsToPartition - 1 do {
+  for i in 0..#ExponentsToPartition - 1 do (
     PossiblyNewPower = ExponentsToPartition#i#0;
-    if CurrentPower != PossiblyNewPower then {
+    if CurrentPower != PossiblyNewPower then (
       CurrentPower = PossiblyNewPower;
       PowerString = PowerString | toString CurrentPower | " ";
-    }
-  }
-  if #ExponentsToPartition > 0 then {
+    );
+  );
+  if #ExponentsToPartition > 0 then (
     MinValue = ExponentsToPartition#0#0;
-  }
-  for Key in ExponentsToPartition do {
-    if Key#0 != MinValue then {
+  );
+  for Key in ExponentsToPartition do (
+    if Key#0 != MinValue then (
       PartList = append(PartList, new MutableList);
       MinValue = Key#0;
-    }
+    );
     PartList#-1 = append(PartList#-1, TermToNode#Key);
-  }
+  );
 
 
   ReturnString := "c -a -m n=" + toString(#Polys) + " g ";
-  for Poly in Polys do {
-    for Term in Poly do {
+  for Poly in Polys do (
+    for Term in Poly do (
       ReturnString = ReturnString | toString(Term) + " ";
-    }
+    );
     ReturnString = ReturnString | " ";
-  }
+  );
   ReturnString = substring(ReturnString, 0, #ReturnString - 1) | ". f = [ 0 | " | toString(SystemNode) | " | ";
   ReturnString = ReturnString | PartString(Variables) | " | " | PartString(Monomials);
   ReturnString = ReturnString | " | " | PartString(PolyPart) | " | ";
-  for Part in PowerList do {
+  for Part in PowerList do (
     ReturnString = ReturnString | PartString(Part) | " | ";
-  }
+  );
   ReturnString = ReturnString | "] x @ b";
 )
-
 
 
 MakeConstIntoVar := Polys -> (
