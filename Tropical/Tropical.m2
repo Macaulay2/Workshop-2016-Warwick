@@ -1,6 +1,3 @@
-needsPackage "PolyhedralObjects"
-needsPackage "gfanInterface2"
-
 newPackage(
     	"Tropical",
 	Version => "0.1",
@@ -21,19 +18,14 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
+        PackageExports => {"PolyhedralObjects","gfanInterface2"},
 	DebuggingMode => true
 )
-
-needsPackage "PolyhedralObjects"
-needsPackage "gfanInterface2"
-needsPackage "SimpleDoc"
 
 export {
   "tropicalCycle",
   "isBalanced",
   "tropicalPrevariety",
-  "MaximalCones",
-  "Multiplicities",
    "computeMultiplicities",
   "Prime",
   "stableIntersection",
@@ -56,9 +48,9 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 
 tropicalCycle = (F,mult)->(
-    if #F.MaximalCones != #mult then error("The multiplicity list has the wrong length");
+    if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
-    T.Multiplicities = mult;
+    T#"Multiplicities" = mult;
     return T
 )    
 
