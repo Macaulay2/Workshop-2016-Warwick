@@ -5,15 +5,17 @@ PartString (BasicList) := Partition -> (
 )
 
 createNautyString = method(TypicalValue => BasicList)
-createNautyString (BasicList) := Polys -> (
+createNautyString (BasicList, BasicList) := (Polys, Coefficients) -> (
   n := #(Polys#0#0);
   SystemAsLists := new MutableList from for i in 0..n list new MutableList;
-  Monomials := new MutableList;
+  --Monomials := new MutableList;
+  CoeffToMonomialNode := new MutableHashTable;
   Polynomials := new MutableList;
   Variables := toList(1..n-1);
-  NewNodeRef := n+1;
-  TermToNode := new MutableHashTable;
+  NewNodeRef := n;
   SystemNode = NewNodeRef;
+  NewNodeRef = NewNodeRef+1;
+  TermToNode := new MutableHashTable;
 
   for i in 0..#Polys - 1 do (
     PolyNode := NewNodeRef;
@@ -22,7 +24,12 @@ createNautyString (BasicList) := Polys -> (
     NewNodeRef = NewNodeRef + 1;
     for j in 0..#(Polys#i) - 1 do (
       MonomialNode = NewNodeRef;
-      Monomials = append(Monomials,MonomialNode);
+      --Monomials = append(Monomials,MonomialNode);
+      if CoeffToMonomialNode#?(Coefficients#i#j) then (
+         CoeffToMonomialNode#(Coefficients#i#j) = CoeffToMonomialNode#(Coefficients#i#j)|{MonomialNode};
+      ) else (
+         CoeffToMonomialNode#(Coefficients#i#j) = {MonomialNode};
+      );
       SystemAsLists#PolyNode = append(SystemAsLists#PolyNode,MonomialNode);
       SystemAsLists = append(SystemAsLists, new MutableList);
       NewNodeRef = NewNodeRef + 1;
@@ -63,7 +70,7 @@ createNautyString (BasicList) := Polys -> (
   );
 
 
-  ReturnString := "c -a -m n=" | toString(#Polys) | " g ";
+  ReturnString := "c -a -m n=" | toString(#SystemAsLists) | " g ";
   for Poly in SystemAsLists do (
     for Term in Poly do (
       ReturnString = ReturnString | toString(Term) | " ";
@@ -71,8 +78,12 @@ createNautyString (BasicList) := Polys -> (
     ReturnString = ReturnString | ";";
   );
   ReturnString = substring(ReturnString, 0, #ReturnString - 1) | ". f = [ 0 | " | toString(SystemNode) | " | ";
-  ReturnString = ReturnString | PartString(Variables) | " | " | PartString(Monomials);
-  ReturnString = ReturnString | " | " | PartString(Polynomials) | " | ";
+  ReturnString = ReturnString | PartString(Variables) | " | "; 
+  print peek CoeffToMonomialNode;
+  for NodesWithSameCoefficient in values CoeffToMonomialNode do (
+    ReturnString = ReturnString | PartString(NodesWithSameCoefficient) | " | ";
+  );
+  ReturnString = ReturnString | PartString(Polynomials) | " | ";
   for Part in PartList do (
     ReturnString = ReturnString | PartString(Part) | " | ";
   );
@@ -101,3 +112,17 @@ MakeConstIntoVar := Polys -> (
     return Polys
 )
 
+FindSymmetry = Polys-> (
+  CoefficientList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
+  TermList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
+  for i from 0 to #Polys - 1 do (
+    Poly = Polys#i;
+    for Term in listForm Poly do (
+      TermList#i = append(TermList#i,Term#0);
+      CoefficientList#i = append(CoefficientList#i,Term#1);
+    );
+  );
+  
+  PolysAsLists := MakeConstIntoVar(TermList);
+  return createNautyString(PolysAsLists, CoefficientList);
+)

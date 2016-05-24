@@ -35,7 +35,7 @@ https://polymake.org/release_docs/2.12/tropical.html
 TropicalHypersurface
 TropicalPolytopes
 
-End of Monday status:
+Mid-Tuesday status:
 Diane and Kathlen:
 - defined new Type TropicalCycle
 - outline of methods
@@ -47,9 +47,10 @@ Diane and Kathlen:
 Carlos and Paolo
 - defined and documented method tropicalPrevariety, 
 - deleted multiplicities from fan output
-- To do:  * add strategy choice
-	  * add valuations
-	  * define function isTropicalBasis
+- added strategy choice
+- To do:  
+          * add valuations
+          * define function isTropicalBasis
 	  * define function stableIntersection
 
 
