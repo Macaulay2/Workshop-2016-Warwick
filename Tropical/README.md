@@ -39,9 +39,9 @@ End of Monday status:
 Diane and Kathlen:
 - defined new Type TropicalCycle
 - outline of methods
-- To do:  * documentation for tropicalCycle
-     	  * isWellDefined code and documentation
-	  * isBalanced code and documentation
+- To do:  * documentation for tropicalCycle.  HALF-DONE.  Needs example.
+     	  * isWellDefined code and documentation.  DOCUMENTATION DONE except for an example.
+	  * isBalanced code and documentation.  DOCUMENTATION DONE except for an example.
 	  * Add skeleton for stableIntersection
 
 Carlos and Paolo

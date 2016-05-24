@@ -30,9 +30,13 @@ needsPackage "SimpleDoc"
 
 export {
   "tropicalCycle",
+  "isBalanced",
   "tropicalPrevariety",
   "MaximalCones",
-  "Multiplicities"
+  "Multiplicities",
+   "computeMultiplicities",
+  "Prime",
+  "tropicalVariety"
 }
 
 ------------------------------------------------------------------------------
@@ -69,38 +73,32 @@ isWellDefined TropicalCycle := Boolean =>
 
 
 
---Computing a tropical variety
-opts= {
-	Multiplicities=> true,
-	Prime=> true
-	}
-tropicalVariety := opts >> o -> I -> (
-	if (o.Multiplicities==true and o.Prime== true)
-	then  gfanTropicalTraverse gfanTropicalStartingCone I
-	else
-	(if o.Multiplicities==false 
-		then gfanTropicalBruteForce gfanBuchberger I
-		else print  " Cannot compute multiplicities if ideal not prime"  ))
-
-
-
-
-
 
 
 --Computing a tropical prevariety
 tropicalPrevariety = method(TypicalValue => List,  Options => {
-	"t" => false,
-	"tplane" => false,
-	"symmetryPrinting" => false,
-	"symmetryExploit" => false,
-	"restrict" => false,
-	"stable" => false
+	Strategy=> "gfan"
 	})
-tropicalPrevariety (List) := (L) -> opts -> (
-  F:=gfanTropicalIntersection(L, opts);G:=new Fan;
-scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G
+
+tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+if (o.Strategy=="gfan") then (
+  F:=gfanTropicalIntersection(L, gfanopt); G:=new Fan;
+scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
+else error "options not valid"
 )
+--Computing a tropical variety
+
+tropicalVariety = method(TypicalValue => Ideal,  Options => {
+	"computeMultiplicities" => true,
+	"Prime" => true
+	})
+tropicalVariety (Ideal) := (I) -> Options >> o -> (
+	if (o.computeMultiplicities==true and o.Prime== true)
+	then  gfanTropicalTraverse gfanTropicalStartingCone I
+	else
+	(if o.computeMultiplicities==false 
+		then gfanTropicalBruteForce gfanBuchberger I
+		else print  " Cannot compute multiplicities if ideal not prime"  ))
 
 
 ------------------------------------------------------------------------------
@@ -133,7 +131,32 @@ doc///
     	B:Boolean
     Description
 	Text
-	    A TropicalCycle is well defined if the underlying Fan is pure, and the multiplicity function makes the fan balanced.
+    	    A TropicalCycle is well defined if the underlying Fan is
+    	    pure, and the multiplicity function makes the fan
+    	    balanced.
+      	Example
+	    1+1	    
+///
+
+doc///
+    Key
+	isBalanced
+    Headline
+	whether a tropical cycle is balanced
+    Usage
+    	isBalanced T
+    Inputs
+	T:TropicalCycle
+    Outputs
+    	B:Boolean
+    Description
+	Text
+	    A TropicalCycle is balanced if the underlying Fan,
+	    together with the multiplicity function makes the fan
+	    balanced.  See, for example, ???addTropicalBook Section
+	    3.4, for the mathematical definitions. 
+        Example
+	    1+1	    
 ///
 
 
@@ -161,33 +184,7 @@ doc///
 
 
 
-doc ///
-     Key 
-        tropicalVariety,
-     Headline
-        Computes the variety of an ideal
-     Usage 
-        F=tropicalVariety(I)
-     Inputs 
-          I:Ideal an homogeneous ideal
-          
-     Outputs 
-          F:Fan
-     Description
-        Text       
-      This function takes an ideal and computes its tropical variety. Multiplicities are computed by default but may be excluded to decrease computation time
-     Example  
-			QQ[x,y,z]
-      		I=ideal(x+y+z)
-			F=tropicalVariety (I)
-			I=ideal(x^2+y^2+z*y,z*x+y^2)
-			F=tropicalVariety(I,Multiplicities=>False)
-			I=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
-			F=tropicalVariety(I,Prime=>False)
-      Text      
-      In order to compute the multiplicities the ideal has to be prime
-     
-///
+
 
 
 
