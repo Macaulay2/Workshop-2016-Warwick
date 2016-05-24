@@ -30,7 +30,8 @@ export {
    "computeMultiplicities",
   "Prime",
   "stableIntersection",
-  "tropicalVariety"
+  "tropicalVariety",
+  "convertToPolymake"
 }
 
 ------------------------------------------------------------------------------
@@ -99,6 +100,12 @@ TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
 )    
+
+convertToPolymake = (T) ->(
+--	str = "new Cycle<Min>";
+	str := tropicalMax;
+	return str
+) 
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
