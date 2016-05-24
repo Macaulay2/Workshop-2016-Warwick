@@ -44,7 +44,9 @@ export {
 "Cone",
 "Fan",
 "Polyhedron",
-"PolyhedralComplex"
+"PolyhedralComplex",
+"Multiplicities",
+"MaximalCones"
 }
 -- Defining the new type PolyhedralObject
 PolyhedralObject = new Type of MutableHashTable

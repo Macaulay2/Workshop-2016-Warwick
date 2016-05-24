@@ -1,6 +1,3 @@
-needsPackage "PolyhedralObjects"
-needsPackage "gfanInterface2"
-
 newPackage(
     	"Tropical",
 	Version => "0.1",
@@ -21,21 +18,17 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
+        PackageExports => {"PolyhedralObjects","gfanInterface2"},
 	DebuggingMode => true
 )
-
-needsPackage "PolyhedralObjects"
-needsPackage "gfanInterface2"
-needsPackage "SimpleDoc"
 
 export {
   "tropicalCycle",
   "isBalanced",
   "tropicalPrevariety",
-  "MaximalCones",
-  "Multiplicities",
    "computeMultiplicities",
   "Prime",
+  "stableIntersection",
   "tropicalVariety"
 }
 
@@ -55,9 +48,9 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 
 tropicalCycle = (F,mult)->(
-    if #F.MaximalCones != #mult then error("The multiplicity list has the wrong length");
+    if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
-    T.Multiplicities = mult;
+    T#"Multiplicities" = mult;
     return T
 )    
 
@@ -103,7 +96,10 @@ tropicalVariety (Ideal) := o -> I  -> (
 stableIntersection = method(TypicalValue =>
 (TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
 
+stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
     
+    return T;
+)    
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -241,6 +237,29 @@ doc///
 	   isPrime J
            tropicalVariety(J,Prime=>false)
 
+///
+
+
+doc///
+    Key
+	stableIntersection
+    Headline
+    	computes the stable intersection of two tropical varieties
+    Usage
+	stableIntersection(F,G)
+    Inputs
+	F:TropicalCycle and
+	G:TropicalCycle
+    Outputs
+        T:TropicalCycle
+    Description 
+    	Text
+	    This computes the stable intersection of two tropical
+	    cycles.  For details on the definition of stable
+	    intersection, see, for example, Section 3.6 of
+	    ???TropicalBook
+	Example
+    	    1+1
 ///
 
 
