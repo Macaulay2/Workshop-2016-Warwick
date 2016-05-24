@@ -23,6 +23,7 @@ newPackage(
 )
 
 export {
+  "TropicalCycle",
   "tropicalCycle",
   "isBalanced",
   "tropicalPrevariety",
@@ -94,11 +95,9 @@ tropicalVariety (Ideal) := o -> I  -> (
 		else print  " Cannot compute multiplicities if ideal not prime"  ))
 
 stableIntersection = method(TypicalValue =>
-(TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
+TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
-    
-    return T;
 )    
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
@@ -243,21 +242,24 @@ doc///
 doc///
     Key
 	stableIntersection
+	(stableIntersection,TropicalCycle,TropicalCycle)
     Headline
     	computes the stable intersection of two tropical varieties
     Usage
 	stableIntersection(F,G)
     Inputs
-	F:TropicalCycle and
-	G:TropicalCycle
+	F:TropicalCycle
+	  a tropical cycle
+  	G:TropicalCycle
+  	  another tropical cycle
     Outputs
         T:TropicalCycle
+	  a tropical cycle
     Description 
     	Text
 	    This computes the stable intersection of two tropical
 	    cycles.  For details on the definition of stable
-	    intersection, see, for example, Section 3.6 of
-	    ???TropicalBook
+	    intersection, see, for example, Section 3.6 of TROPICALBOOK.
 	Example
     	    1+1
 ///
