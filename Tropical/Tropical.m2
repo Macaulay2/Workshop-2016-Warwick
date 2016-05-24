@@ -164,15 +164,16 @@ doc///
     Key
 	tropicalPrevariety
 	(tropicalPrevariety, List)
+	[tropicalPrevariety, Strategy]
     Headline
 	the intersection of the tropical hypersurfaces of polynomials in L
     Usage
 	tropicalPrevariety(L)
+	tropicalPrevariety(L,Strategy=>S)
     Inputs
 	L:List
-	    of polynomials
-    Optional inputs
-        S:String
+	    of polynomials        
+	Strategy=>String
 	    Strategy (currently only "gfan")
     Outputs
 	F:List
