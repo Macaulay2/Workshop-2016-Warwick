@@ -33,7 +33,10 @@ export {
   "isBalanced",
   "tropicalPrevariety",
   "MaximalCones",
-  "Multiplicities"
+  "Multiplicities",
+   "computeMultiplicities",
+  "Prime",
+  "tropicalVariety"
 }
 
 ------------------------------------------------------------------------------
@@ -83,6 +86,19 @@ if (o.Strategy=="gfan") then (
 scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
 else error "options not valid"
 )
+--Computing a tropical variety
+
+tropicalVariety = method(TypicalValue => Ideal,  Options => {
+	"computeMultiplicities" => true,
+	"Prime" => true
+	})
+tropicalVariety (Ideal) := (I) -> Options >> o -> (
+	if (o.computeMultiplicities==true and o.Prime== true)
+	then  gfanTropicalTraverse gfanTropicalStartingCone I
+	else
+	(if o.computeMultiplicities==false 
+		then gfanTropicalBruteForce gfanBuchberger I
+		else print  " Cannot compute multiplicities if ideal not prime"  ))
 
 stableIntersection = method(TypicalValue =>
 (TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
@@ -181,6 +197,9 @@ doc///
     Inputs
 	L:List
 	    of polynomials
+    Optional inputs
+        S:String
+	    Strategy (currently only "gfan")
     Outputs
 	F:List
 	    the intersection of the tropical hypersurfaces of polynomials in L
@@ -190,6 +209,7 @@ doc///
         Example
 	    QQ[x,y]
 	    tropicalPrevariety{x+y+1, x+y}
+            tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
 ///
 
 
