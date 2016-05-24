@@ -13,15 +13,16 @@ searchSliceTranslate = w -> (
     return matrix2slice(slcmin,w)
 )
 
-searchSliceRotation = (w,startSlice) -> (
+searchSliceRotation = (w) -> (
     npoints := 20;
     delta := 0.1;
     tol := 0.0001;
+    startSlice := realPartMatrix(w.Slice);
     costfun := (a) -> sliceCost(rotationOfSlice(a,startSlice), w);
     amin := discretization1D (costfun, 0, 2*pi, npoints );
-    a := xmin - delta;
-    b := xmin + delta;
-    amin := goldenSearch (costfun, a, b, tol);
+    a := amin - delta;
+    b := amin + delta;
+    amin = goldenSearch (costfun, a, b, tol);
     slcmin := rotationOfSlice(a,startSlice);
     return matrix2slice(slcmin,w)
 )
@@ -71,7 +72,7 @@ rotationOfSlice=(t,startSlice)-> (
     )
 
 discretization1D=(F,a,b,n) -> (
-    range:=for i to n-1 list (b-a)*i/n;
+    range:=for i to n-1 list a+(b-a)*i/n;
     functionValues := for x in range list F(x);
     minValue:=min(functionValues);
     minPos:=position(functionValues,a->(a==minValue)); 
@@ -90,13 +91,16 @@ discretization=(F,n,startSlice,w) -> (
     return rotationOfSlice(angles#minPosition,startSlice);
 )
 
+realPartMatrix = (m) -> matrix applyTable (entries m, x->1_CC*realPart x)
+
 -- Example: rank 3 matrices
 R=CC[a,b,c,d];
 M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);
 I=minors(3,M);
 f=flatten entries gens I;
 (w,ns) = topWitnessSet(f,2);
-slcmat = matrix applyTable (entries w.Slice, x->1_CC*realPart x);
+-- slcmat = matrix applyTable (entries w.Slice, x->1_CC*realPart x);
+slcmat = realPartMatrix(w.Slice);
 R2 := ring w.Equations;
 X := transpose (vars(R2) | 1);
 slcRR = flatten entries (promote(slcmat,R2) * X);
@@ -110,6 +114,8 @@ goldenSearch( myFunction, .4, .7, .00001)
 R = CC[x,y];
 system = {x^2 + (y+2)^2 - 1};
 (w,ns) = topWitnessSet(system, 1);
-slc = searchSlice( w );
+slc = searchSliceTranslate( w );
 solsRR = intersectSlice( w, slc );
 
+slc = searchSliceRotation( w );
+solsRR = intersectSlice( w, slc );
