@@ -80,3 +80,4 @@ end
 restart
 load "CMtesting.m2"
 tally apply(2000,t-> CMBetti(6,{3,3,3,3,3,3}))
+--installPackage"RandomIdeal"
