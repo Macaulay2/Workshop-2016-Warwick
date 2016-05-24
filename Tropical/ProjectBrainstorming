@@ -47,8 +47,8 @@ Diane and Kathlen:
 Carlos and Paolo
 - defined and documented method tropicalPrevariety, 
 - deleted multiplicities from fan output
-- To do:  * add strategy choice
-	  * add valuations
+- added strategy choice
+- To do:  * add valuations
 	  * define function isTropicalBasis
 	  * define function stableIntersection
 
