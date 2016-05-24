@@ -25,7 +25,10 @@ newPackage(
 export {
   "tropicalCycle",
   "isBalanced",
-  "tropicalPrevariety"
+  "tropicalPrevariety",
+   "computeMultiplicities",
+  "Prime",
+  "tropicalVariety"
 }
 
 ------------------------------------------------------------------------------
@@ -75,8 +78,27 @@ if (o.Strategy=="gfan") then (
 scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
 else error "options not valid"
 )
+--Computing a tropical variety
 
+tropicalVariety = method(TypicalValue => Ideal,  Options => {
+	computeMultiplicities => true,
+	Prime => true
+	})
+tropicalVariety (Ideal) := o -> I  -> (
+	if (o.computeMultiplicities==true and o.Prime== true)
+	then  gfanTropicalTraverse gfanTropicalStartingCone I
+	else
+	(if o.computeMultiplicities==false 
+		then gfanTropicalBruteForce gfanBuchberger I
+		else print  " Cannot compute multiplicities if ideal not prime"  ))
 
+stableIntersection = method(TypicalValue =>
+(TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
+
+stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
+    
+    return T;
+)    
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -94,7 +116,7 @@ doc ///
 
 
 
-doc///
+doc ///
     Key
 	(isWellDefined,TropicalCycle)
     Headline
@@ -110,6 +132,29 @@ doc///
     	    A TropicalCycle is well defined if the underlying Fan is
     	    pure, and the multiplicity function makes the fan
     	    balanced.
+      	Example
+	    1+1	    
+///
+
+doc ///
+    Key
+	tropicalCycle
+    Headline
+    	constructs a TropicalCycle from a Fan and a multiplicity function
+    Usage
+    	tropicalCycle(F,mult)
+    Inputs
+    	F:Fan 
+    Outputs
+    	T:TropicalCycle
+    Description
+	Text
+	    A TropicalCycle consists of a Fan with an extra HashKey
+	    Multiplicities, which is the list of multiplicities on the
+	    maximal cones, listed in the order that the maximal cones
+	    appear in the MaximalCones list.  This function takes a
+	    Fan (which does not have a list of multiplicties) and adds
+	    the Multiplicities key.
       	Example
 	    1+1	    
 ///
@@ -140,13 +185,17 @@ doc///
     Key
 	tropicalPrevariety
 	(tropicalPrevariety, List)
+	[tropicalPrevariety, Strategy]
     Headline
 	the intersection of the tropical hypersurfaces of polynomials in L
     Usage
 	tropicalPrevariety(L)
+	tropicalPrevariety(L,Strategy=>S)
     Inputs
 	L:List
-	    of polynomials
+	    of polynomials        
+	Strategy=>String
+	    Strategy (currently only "gfan")
     Outputs
 	F:List
 	    the intersection of the tropical hypersurfaces of polynomials in L
@@ -156,6 +205,34 @@ doc///
         Example
 	    QQ[x,y]
 	    tropicalPrevariety{x+y+1, x+y}
+            tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
+///
+
+
+
+doc///
+    Key
+	tropicalVariety
+    Headline
+	the tropical variety associated to an ideal
+    Usage
+	tropicalVariety(I)
+    Inputs
+	I:Ideal
+	    of polynomials
+    Outputs
+        F:Ideal
+    Description 
+    	Text
+	   This method takes an ideal and computes the tropical variety associated to it.
+	Example
+	    QQ[x,y,z]
+	   I=ideal(x+y+z)
+	   tropicalVariety(I)
+	   tropicalVariety(I,computeMultiplicities=>false)
+	   J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+           tropicalVariety(I,Prime=>false)
+
 ///
 
 
@@ -163,10 +240,7 @@ doc///
 
 
 
-
-
-
 TEST ///
-    assert (1==1)
+    assert (1+1==2)
 ///    	    	
        
