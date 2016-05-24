@@ -274,7 +274,7 @@ profondeur Module := M -> (
     r := F*map(S,S0);
     print"before pushforward";
     MM := pushF(r,M);
-    print MM;
+--    print MM;
     print"after pushforward";
 --    error();
     numgens S0 - pdim MM)
@@ -299,6 +299,7 @@ pushNonLinear := opts -> (f,M) -> (				    -- this returns the presentation matr
     R := target f;
     assert( ring M === R );
     comp := PushforwardComputation{M,NonLinear};
+print"push1";    
     if not f.cache#?comp then (	       -- a bad place to cache the computation, because M may not get garbage-collected
 	S := source f;
 	n1 := numgens R;				    -- what if R is a tower?
@@ -311,6 +312,7 @@ pushNonLinear := opts -> (f,M) -> (				    -- this returns the presentation matr
 	m := presentation M;
 	xvars := map(G, R, submatrix(vars G, toList(0..n1-1)));
 	m1 := presentation (cokernel xvars m  **  cokernel generators J);
+print"push2";    	
 	if opts.UseHilbertFunction and all((f,m),isHomogeneous) then (
 	     p := poincare cokernel m;
      	     assert( degreesRing R === degreesRing G );
@@ -326,6 +328,7 @@ pushNonLinear := opts -> (f,M) -> (				    -- this returns the presentation matr
 	-- we should really be *lifting* the result to S along the natural map S ---> G
 	mapback := map(S, G, map(S^1, S^n1, 0) | vars S, DegreeMap => mapbackdeg );
 	-- let's at least check it splits f's degree map:
+print"push3";    	
 	for i from 0 to deglen-1 do (
 	     e := for j from 0 to deglen-1 list if i === j then 1 else 0;
 	     if mapbackdeg f.cache.DegreeMap e =!= e then error "not implemented yet: unexpected degree map of ring map";
@@ -333,6 +336,7 @@ pushNonLinear := opts -> (f,M) -> (				    -- this returns the presentation matr
 	cleanupcode := g -> mapback selectInSubring(if numgens target f > 0 then 1 else 0, generators g);
 	f.cache#comp = (m1, cleanupcode);
 	);
+print"push4";        
     if # f.cache#comp === 1
     then f.cache#comp#0
     else (
@@ -361,8 +365,11 @@ pushF(RingMap, Module) := Module => opts -> (f,M) -> (
 	  M1 := M / ideal f.matrix;
 	  print"time check 4";	  
 	  M2 := subquotient(matrix basis M1, relations M);
-	  print"time check 5";	  
-	  cokernel (pushNonLinear opts)(f,M2)
+	  print f;
+	  print"time check 5";	 
+	  P :=  (pushNonLinear opts)(f,M2);
+	  print"time check 6";	 
+	  cokernel P
 	  )
      else error "not implemented yet for inhomogeneous modules or maps"
      )
@@ -370,25 +377,26 @@ pushF(RingMap, Module) := Module => opts -> (f,M) -> (
 
 ///
 restart
-loadPackage ("Depth", Reload=>true)
 path = path|{"~/GitHub/Workshop-2016-Warwick/RandomIdeals/"}
---load"pushforward-tests.m2"
 debug loadPackage ("ResidualIntersections", Reload=>true)
-
-pdim1 = method()
-pdim1 Module := M ->(
-    pdim betti (res(M, FastNonminimal => true), Minimize => true))
 n = 3
 c = 3
 m = n+c-1
 S = ZZ/101[x_1..x_(n*m)]
 I = minors(n, genericMatrix(S,x_1,m,n));
+time profondeur(S^1/I^4)
+
+loadPackage ("Depth", Reload=>true)
+pdim1 = method()
+pdim1 Module := M ->(
+    pdim betti (res(M, FastNonminimal => true), Minimize => true))
+
 apply(3, i->elapsedTime pdim(S^1/I^(i+1)))
 apply(3, i->time pdim1(S^1/I^(i+1)))
 
 apply(3, i->elapsedTime res(S^1/I^(i+1)))
 apply(3, i->elapsedTime res(S^1/I^(i+1), FastNonminimal => true))
-time profondeur(S^1/I^3)
+time profondeur(S^1/I^4)
 apply(4, i->elapsedTime depth(S^1/I^(i+1)))
 ///
 
