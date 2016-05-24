@@ -942,6 +942,34 @@ doc ///
       in the solver.
 ///;
 
+doc ///
+  Key
+    computingPrecision
+  Headline
+    flag to set the working precision
+  Description
+    Text
+      The default precision is double precision.
+
+      The user can change the working precision of solveSystem
+      to double double or quad double precision by setting the
+      flag to 2 or 4.
+///;
+
+doc ///
+  Key
+    [solveSystem,computingPrecision]
+  Headline
+    option to specify the working precision
+  Usage
+    solveSystem(...,computingPrecision=>ZZ)
+  Description
+    Text
+      Use {\tt computingPrecision=>2} for double double precision.
+
+      Use {\tt computingPrecision=>4} for quad double precision.
+///;
+
 -------------------------
 -- toLaurentPolynomial --
 -------------------------
@@ -1394,4 +1422,46 @@ doc ///
   SeeAlso
     refineSolutions
     nonZeroFilter      
+///;
+
+---------------------
+-- intersectSlice  --
+---------------------
+
+doc ///
+  Key 
+    intersectSlice
+    (intersectSlice,WitnessSet,List)
+  Headline
+    intersects a witness set by a slice
+  Usage
+    fSols = intersectSlice(w, slice)
+  Inputs
+    w:WitnessSet
+      a witness set for a solution set
+    slice:List
+      a list of linear equations
+  Outputs
+    fSols:List
+      solutions that satisfy w.Equations and the equations in the slice
+  Description
+    Text
+      
+      A typical application is to find solutions for slices with
+      real coefficients.
+    
+    Example
+      R=CC[a,b,c,d];
+      M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);
+      I=minors(3,M);
+      f=flatten entries gens I;
+      (w,ns) = topWitnessSet(f,2);
+      slcmat = matrix applyTable (entries w.Slice, x->1_CC*realPart x);
+      Rtwo = ring w.Equations;
+      X = transpose matrix {gens Rtwo | {1_CC}};
+      slcRR = flatten entries (promote(slcmat,Rtwo) * X);
+      fsols = intersectSlice(w,slcRR)
+    
+  SeeAlso
+    topWitnessSet
 ///;

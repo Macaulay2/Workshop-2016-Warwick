@@ -20,7 +20,13 @@ newPackage(
     {Name => "Contributing Author: Taylor Brysiewicz",
      HomePage => "http://www.math.tamu.edu/~tbrysiewicz/"},
     {Name => "Contributing Author: Corey Harris",
-     HomePage => "http://www.coreyharris.name/"}
+     HomePage => "http://www.coreyharris.name/"},
+    {Name => "Contributing Author: Diego Cifuentes",
+     HomePage => "http://www.mit.edu/~diegcif/"},
+    {Name => "Contributing Author: Kaie Kubjas",
+     HomePage => "http://www.kaiekubjas.com/"},
+    {Name => "Contributing Author: Anna Seigal",
+     HomePage => "https://math.berkeley.edu/~seigal/"}
   },
   Headline => "Interface to PHCpack",
   Configuration => { 
@@ -81,7 +87,8 @@ export {
   "toLaurentPolynomial",
   "topWitnessSet",
   "trackPaths",
-  "zeroFilter"
+  "zeroFilter",
+  "intersectSlice"
 }
 
 protect ErrorTolerance, protect Iterations,
@@ -402,7 +409,7 @@ systemFromFile (String) := (name) -> (
   L := lines(s);
   dimL0 := separate(" ", L_0); -- deal with case of nonsquare systems
   n := value dimL0_0;          -- first is always number of equations
-  if n == null then
+  if not instance(n,ZZ) then
     n = value dimL0_1;         -- deal with leading spaces
   result := {};
   i := 0; j := 1;
@@ -620,11 +627,11 @@ cascade (List) := o -> (system) -> (
     stdio << "writing output to file " << PHCoutputFile << endl;
   
   systemToFile(system,PHCinputFile);
-  s := concatenate("0\ny\n",PHCinputFile);
-  s = concatenate(s,"\n",PHCoutputFile);
+  s := concatenate("0\ny\n",PHCinputFile); -- option 0, system on file
+  s = concatenate(s,"\n",PHCoutputFile);   -- add name of the output file
   s = concatenate(s,"\n");
-  s = concatenate(s,toString(startdim));
-  s = concatenate(s,"\nn\n");
+  s = concatenate(s,toString(startdim));   -- add top dimension
+  s = concatenate(s,"\nn\n");              -- do not restrict slices
   bat := openOut PHCbatchFile;
   bat << s;
   close bat;
@@ -1518,6 +1525,21 @@ zeroFilter (List,ZZ,RR) := (sols,k,tol) -> (
   -- OUT: list of solutions in sols where the k-th coordinate
   --      is less than the tolerance.
   return select(sols,t->isCoordinateZero(t,k,tol));
+)
+
+--------------------
+-- intersectSlice --
+--------------------
+
+intersectSlice = method(TypicalValue => List)
+intersectSlice (WitnessSet, List) := (w, slcRR) -> (
+  -- IN: w, a witness set;
+  --     slcRR, a list of linear equations.
+  -- OUT: solutions of the equations of the witness set w
+  --      which satisfy the list of linear equations.
+  startSys:=join(equations(w),slice(w));
+  targetSys := equations(w) | slcRR;
+  trackPaths(targetSys,startSys,w.Points)
 )
 
 --##########################################################################--

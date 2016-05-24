@@ -295,9 +295,10 @@ idealFromShelling = method()
 idealFromShelling (Ring,List) := (S,P) -> (
     Delta := toList (0..numgens S - 1);
     V := vars S;
-    intersect apply(P, D -> monomialIdeal {V_(Delta - set D)})
+    monomialIdeal intersect apply(P, D -> monomialIdeal {V_(Delta - set D)})
     )
 
+randomShellableIdeal
 idealFromShelling List := P -> (
     n := (max flatten P)+1;
     x := symbol x;
@@ -353,8 +354,51 @@ randomShelling(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomShelling(numgens
 
 --this is NOT the Reisner association
 listsToMonomials = (P,R) -> apply(P, D->product apply(D,d->R_d))
-monomialsToLists = (L,R) -> apply(L, m->select(numgens ring m, i->((listForm m)#0#0#i > 0)))
+monomialsToLists = (L,R) -> 
 
+------------------------------------------------------------
+-- DOCUMENTATION RandomIdeal -- documentation
+------------------------------------------------------------
+
+doc ///
+Key 
+     RandomIdeal
+Headline 
+     A package to construct various sorts of random ideals
+Description
+ Text
+     This package can be used to make experiments, trying many ideals, perhaps
+     over small fields. For example...what would you expect the regularities of
+     "typical" monomial ideals with 10 generators of degree 3 in 6 variables to be?
+     Try a bunch of examples -- it's fast.
+     Here we do only 500 -- this takes about a second on a fast machine --
+     but with a little patience, thousands can be done conveniently.
+ Example
+     setRandomSeed(currentTime())
+     kk=ZZ/101;
+     S=kk[vars(0..5)];
+     time tally for n from 1 to 500 list regularity randomMonomialIdeal(10:3,S)
+ Text
+     How does this compare with the case of binomial ideals? or pure binomial ideals?
+     We invite the reader to experiment, replacing "randomMonomialIdeal" above with
+     "randomBinomialIdeal" or "randomPureBinomialIdeal", or taking larger numbers
+     of examples. Click the link "Finding Extreme Examples" below to see
+     some other, more elaborate ways to search. 
+SeeAlso
+     "Finding Extreme Examples"
+     randomIdeal
+     randomMonomialIdeal
+     randomSquareFreeMonomialIdeal
+     randomSquareFreeStep
+     randomBinomialIdeal
+     randomPureBinomialIdeal
+     randomSparseIdeal
+     randomElementsFromIdeal
+     randomMonomial
+     randomShellableIdeal
+     randomShellableIdealChain
+     randomShelling
+///
 
 ------------------------------------------------------------
 -- DOCUMENTATION randomShelling
@@ -625,6 +669,12 @@ doc ///
 	 randomShellableIdeal
 ///         
 
+TEST///
+setRandomSeed 0
+S = ZZ/101[a,b,c,d,e]
+I = randomShellableIdeal(S,2,3) 
+I == monomialIdeal (a, c*d*e)
+///
 
 TEST///
 assert(#randomShelling(5,2,6)==6)
@@ -650,7 +700,7 @@ assert(not isShelling({{3},{1,2}}))
 
 TEST///
 setRandomSeed(0);
-assert(#randomAddition(6,3,{{1,2,3}})==2)
+assert(#randomAddition(6,2,{{1,2,3}})==2)
 assert(#randomAddition(6,3,{{1,2,3,4}})==2)
 ///
 
@@ -667,44 +717,6 @@ assert(isShellable simplicialComplex randomShelling(R,2,6))
 beginDocumentation()
 
 
-doc ///
-Key 
-     RandomIdeal
-Headline 
-     A package to construct various sorts of random ideals
-Description
- Text
-     This package can be used to make experiments, trying many ideals, perhaps
-     over small fields. For example...what would you expect the regularities of
-     "typical" monomial ideals with 10 generators of degree 3 in 6 variables to be?
-     Try a bunch of examples -- it's fast.
-     Here we do only 500 -- this takes about a second on a fast machine --
-     but with a little patience, thousands can be done conveniently.
- Example
-     setRandomSeed(currentTime())
-     kk=ZZ/101;
-     S=kk[vars(0..5)];
-     time tally for n from 1 to 500 list regularity randomMonomialIdeal(10:3,S)
- Text
-     How does this compare with the case of binomial ideals? or pure binomial ideals?
-     We invite the reader to experiment, replacing "randomMonomialIdeal" above with
-     "randomBinomialIdeal" or "randomPureBinomialIdeal", or taking larger numbers
-     of examples. Click the link "Finding Extreme Examples" below to see
-     some other, more elaborate ways to search. 
-SeeAlso
-     "Finding Extreme Examples"
-     randomIdeal
-     randomMonomialIdeal
-     randomSquareFreeMonomialIdeal
-     randomSquareFreeStep
-     randomBinomialIdeal
-     randomPureBinomialIdeal
-     randomSparseIdeal
-     randomElementsFromIdeal
-     randomMonomial
-     squareFree
-     regSeq
-///
 
 
 doc ///

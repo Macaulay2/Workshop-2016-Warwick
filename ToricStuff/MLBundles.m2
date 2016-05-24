@@ -9,127 +9,115 @@ newPackage(
 	     },
     	Headline => "routines for working with toric Lazarsfeld-Mukai bundles",
 	AuxiliaryFiles => false, -- set to true if package comes with auxiliary files
-	PackageExports => {"ToricVectorBundles"},  -- loads and exports
+	PackageExports => {"ToricVectorBundles", "Polyhedra"},  -- loads and exports
 --	PackageImports => {"ToricVectorBundles"},  -- packages loaded for internal calculations
     	DebuggingMode => true		 -- set to true only during development
     	)
 
 -- Any symbols or functions that the user is to have access to
 -- must be placed in one of the following two lists
-export {"firstFunction", "secondFunction", "MyOption"}
+
+export { 
+    "MLBundle"
+    }
 exportMutable {}
 
-firstFunction = method(TypicalValue => String)
-firstFunction ZZ := String => n -> (
-	if n == 1
-	then "Hello, World!"
-	else "D'oh!"	
-	)
-   
--- A function with an optional argument
-secondFunction = method(
-     TypicalValue => ZZ,
-     Options => {MyOption => 0}
-     )
-secondFunction(ZZ,ZZ) := o -> (m,n) -> (
-     if not instance(o.MyOption,ZZ)
-     then error "The optional MyOption argument must be an integer";
-     m + n + o.MyOption
-     )
-secondFunction(ZZ,List) := o -> (m,n) -> (
-     if not instance(o.MyOption,ZZ)
-     then error "The optional MyOption argument must be an integer";
-     m + #n + o.MyOption
-     )
+MLBundle = method ();
+MLBundle Polyhedron := P -> ( 
+    L := transpose matrix ((latticePoints P)/entries/flatten); -- matrix of lattice points in columns
+    B := transpose matrix ((rays normalFan P)/entries/flatten);
+    C := (transpose L)*B;
+    F := normalFan P;
+    E := toricVectorBundle(rank source L,F);
+    E = addFiltration(E, apply(rank source C, i-> transpose matrix (C_i)));
+    f := matrix {apply(rank source L, i-> 1/1)};
+    return ker(E,f)
+    )
+  
+
 
 beginDocumentation()
-document { 
-	Key => PackageTemplate,
-	Headline => "an example Macaulay2 package",
-	EM "PackageTemplate", " is an example package which can
-	be used as a template for user packages."
-	}
-document {
-	Key => {firstFunction, (firstFunction,ZZ)},
-	Headline => "a silly first function",
-	Usage => "firstFunction n",
-	Inputs => {
-		"n" => ZZ => {}
-		},
-	Outputs => {
-		String => {}
-		},
-	"This function is provided by the package ", TO PackageTemplate, ".",
-	EXAMPLE {
-		"firstFunction 1",
-		"firstFunction 0"
-		}
-	}
-document {
-	Key => secondFunction,
-	Headline => "a silly second function",
-	"This function is provided by the package ", TO PackageTemplate, "."
-	}
-document {
-	Key => (secondFunction,ZZ,ZZ),
-	Headline => "a silly second function",
-	Usage => "secondFunction(m,n)",
-	Inputs => {
-	     "m" => {},
-	     "n" => {}
-	     },
-	Outputs => {
-	     {"The sum of ", TT "m", ", and ", TT "n", 
-	     ", and "}
-	},
-	EXAMPLE {
-		"secondFunction(1,3)",
-		"secondFunction(23213123,445326264, MyOption=>213)"
-		}
-	}
-document {
-     Key => MyOption,
-     Headline => "optional argument specifying a level",
-     TT "MyOption", " -- an optional argument used to specify a level",
-     PARA{},
-     "This symbol is provided by the package ", TO PackageTemplate, "."
-     }
-document {
-     Key => [secondFunction,MyOption],
-     Headline => "add level to result",
-     Usage => "secondFunction(...,MyOption=>n)",
-     Inputs => {
-	  "n" => ZZ => "the level to use"
-	  },
-     Consequences => {
-	  {"The value ", TT "n", " is added to the result"}
-	  },
-     "Any more description can go ", BOLD "here", ".",
-     EXAMPLE {
-	  "secondFunction(4,6,MyOption=>3)"
-	  },
-     SeeAlso => {
-	  "firstFunction"
-	  }
-     }
-TEST ///
-  assert(firstFunction 1 === "Hello, World!")
-  assert(secondFunction(1,3) === 4)
-  assert(secondFunction(1,3,MyOption=>5) === 9)
+
+doc ///
+Key  
+  MLBundles
+Headline 
+  routines for working with Mukai-Lazarsfeld bundles
+Description
+  Text 
+     Computes the ML bundle associated to the toric divisor associated to a polytope
 ///
-  
-       
+
+doc ///
+Key  
+  MLBundle
+  (MLBundle, Polyhedron)
+Headline 
+  creates Mukai-Lazarsfeld bundle
+Usage 
+  M = MLBundle(P) 
+Inputs  
+  P:Polyhedron 
+    the polytope corresponding to a polarised toric variety
+Outputs 
+  M:ToricVectorBundleKlyachko
+    the Lazarsfeld-Mukai bundle expressed as a toric vector bundle
+Description
+  Text 
+    The Mukai-Lazarsfeld bundle is the kernel of the evaluation map 
+    of the global sections of a globally generated line bundle. On a 
+    toric variety, it is a toric vector bundle. If the polarisation is very ample, 
+    these bundles can be used to compute the Betti numbers of the minimal 
+    free resolution of the coordinate ring. 
+     
+    This constructs the cotangent bundle on projective two space twisted by O(1). 
+  Example
+    P = convexHull matrix{{0,1,0},{0,0,1}};
+    M = MLBundle(P)
+    O = cotangentBundle projectiveSpaceFan 2
+    O = twist(O,{1,0,0})
+    areIsomorphic(O,M)
+  Text
+    This constructs the Mukai-Lazarsfeld bundle associated to an ample line bundle 
+    on the Hirzebruch surface F2. 
+  Example      
+    P = convexHull matrix{{0,1,0,2},{0,0,1,1}}
+    M = MLBundle(P)
+    details M
+    HH^1 exteriorPower(2,MLBundle(P))
+///
+
+-- testing the cotangent bundle on P2
+TEST ///
+P = convexHull matrix{{0,1,0},{0,0,1}};
+M = MLBundle(P);
+O = cotangentBundle projectiveSpaceFan 2;
+O = twist(O,{1,0,0});
+assert areIsomorphic(O,M)
+///
+
+-- testing the number of equations 
+TEST ///
+P = convexHull matrix{{0,1,0,2},{0,0,1,1}};
+M = MLBundle(P);
+M2 = exteriorPower(2,MLBundle(P))
+S=ZZ/101[x,y,z]
+L = apply (latticePoints P, i -> (flatten entries i)|{1})
+R = ZZ/101[vars(0..#L-1)];
+I= kernel map (S, R, apply (L, v -> S_v))
+assert (rank source mingens I == rank  HH^1 M2)
+///
+         
 end
 
 -- Here place M2 code that you find useful while developing this
 -- package.  None of it will be executed when the file is loaded,
--- because loading stops when the symbol "end" is encountered.
+-- because loading stops when the symbol "end" is encountered. 
+------------------------------------------------------------------------
 
-installPackage "PackageTemplate"
-installPackage("PackageTemplate", RemakeAllDocumentation=>true)
-check PackageTemplate
-
+uninstallPackage "MLBundles"
 restart
 needsPackage "MLBundles"
-loadPackage "ToricVectorBundles"
-loadPackage "NormalToricVarieties"
+check "MLBundles"
+installPackage "MLBundles"
+viewHelp
