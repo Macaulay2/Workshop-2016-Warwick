@@ -5,11 +5,24 @@
 --    trackPaths(targetSys,startSys,w.Points)
 --)
 
-searchSlice = method();
-searchSlice (WitnessSet):= w -> (
+searchSliceTranslate = w -> (
+    tol := 0.0001;
     costfun := (x) -> sliceCost(matrix {{1_CC,0,0,x}}, w);
-    xmin := goldenSearch (costfun, -5.0, 5.0, 0.001);
+    xmin := goldenSearch (costfun, -5.0, 5.0, tol);
     slcmin := matrix{{1_CC,0,0,xmin}};
+    return matrix2slice(slcmin,w)
+)
+
+searchSliceRotation = (w,startSlice) -> (
+    npoints := 20;
+    delta := 0.1;
+    tol := 0.0001;
+    costfun := (a) -> sliceCost(rotationOfSlice(a,startSlice), w);
+    amin := discretization1D (costfun, 0, 2*pi, npoints );
+    a := xmin - delta;
+    b := xmin + delta;
+    amin := goldenSearch (costfun, a, b, tol);
+    slcmin := rotationOfSlice(a,startSlice);
     return matrix2slice(slcmin,w)
 )
 
@@ -26,7 +39,7 @@ matrix2slice = (slcmat, w) -> (
 sliceCost = (slcmat, w) -> (
     slc := matrix2slice(slcmat,w);
     fsols := intersectSlice(w,slc);
-    cost := norm ( coordinates(fsols_0) / imaginaryPart );
+    cost := sum ( coordinates(fsols_0) / imaginaryPart / (x->x^2) );
     return cost;
 )
 
@@ -56,6 +69,14 @@ rotationOfSlice=(t,startSlice)-> (
     M3:=matrix M2;
     return startSlice*M3;
     )
+
+discretization1D=(F,a,b,n) -> (
+    range:=for i to n-1 list (b-a)*i/n;
+    functionValues := for x in range list F(x);
+    minValue:=min(functionValues);
+    minPos:=position(functionValues,a->(a==minValue)); 
+    return range_minPos;
+)
 
 discretization=(F,n,startSlice,w) -> (
     angles:=for i to n-1 list 2*pi*i/n;
@@ -87,7 +108,7 @@ goldenSearch( myFunction, .4, .7, .00001)
 
 -- Example: Circle
 R = CC[x,y];
-system = {x^2 + y^2 - 1};
+system = {x^2 + (y+2)^2 - 1};
 (w,ns) = topWitnessSet(system, 1);
 slc = searchSlice( w );
 solsRR = intersectSlice( w, slc );

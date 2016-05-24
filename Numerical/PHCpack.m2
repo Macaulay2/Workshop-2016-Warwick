@@ -20,7 +20,13 @@ newPackage(
     {Name => "Contributing Author: Taylor Brysiewicz",
      HomePage => "http://www.math.tamu.edu/~tbrysiewicz/"},
     {Name => "Contributing Author: Corey Harris",
-     HomePage => "http://www.coreyharris.name/"}
+     HomePage => "http://www.coreyharris.name/"},
+    {Name => "Contributing Author: Diego Cifuentes",
+     HomePage => "http://www.mit.edu/~diegcif/"},
+    {Name => "Contributing Author: Kaie Kubjas",
+     HomePage => "http://www.kaiekubjas.com/"},
+    {Name => "Contributing Author: Anna Seigal",
+     HomePage => "https://math.berkeley.edu/~seigal/"}
   },
   Headline => "Interface to PHCpack",
   Configuration => { 

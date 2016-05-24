@@ -83,13 +83,14 @@ else error "options not valid"
 )
 --Computing a tropical variety
 
-tropicalVariety = method(TypicalValue => Ideal,  Options => {
+tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	computeMultiplicities => true,
 	Prime => true
 	})
 tropicalVariety (Ideal) := o -> I  -> (
 	if (o.computeMultiplicities==true and o.Prime== true)
-	then  gfanTropicalTraverse gfanTropicalStartingCone I
+	then (F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
+	    tropicalCycle(F,F#"Multiplicities"))
 	else
 	(if o.computeMultiplicities==false 
 		then gfanTropicalBruteForce gfanBuchberger I
@@ -228,7 +229,7 @@ doc///
 	I:Ideal
 	    of polynomials
     Outputs
-        F:Ideal
+        F:TropicalCycle
     Description 
     	Text
 	   This method takes an ideal and computes the tropical variety associated to it. 
