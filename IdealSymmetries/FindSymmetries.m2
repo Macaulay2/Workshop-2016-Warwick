@@ -1,28 +1,29 @@
 PartString = method()
-PartString (List) := Partition -> (
-  Partition = replace(",","",toString(Partition));
-  substring(Partition, 1, #Partition - 2);
+PartString (BasicList) := Partition -> (
+  Partition = replace(",","",toString(toList Partition));
+  return substring(Partition, 1, #Partition - 2);
 )
 
-createNautyString = method(TypicalValue => List)
-createNautyString (List) := Polys -> (
+createNautyString = method(TypicalValue => BasicList)
+createNautyString (BasicList, BasicList) := Polys, Coefficients -> (
   n := #(Polys#0#0);
-  SystemAsLists := new MutableList from for i in 0..n list MutableList;
+  SystemAsLists := new MutableList from for i in 0..n list new MutableList;
   Monomials := new MutableList;
   Polynomials := new MutableList;
-  Variables := 1..n-1;
-  NewNodeRef := n+1;
-  TermToNode := new MutableHashTable;
+  Variables := toList(1..n-1);
+  NewNodeRef := n;
   SystemNode = NewNodeRef;
+  NewNodeRef = NewNodeRef+1;
+  TermToNode := new MutableHashTable;
 
   for i in 0..#Polys - 1 do (
     PolyNode := NewNodeRef;
-    Polynomials = Polynomials|{NewNodeRef};
-    SystemAsLists = SystemAsLists|{{SystemNode}};
+    Polynomials = append(Polynomials,NewNodeRef);
+    SystemAsLists = append(SystemAsLists,{SystemNode});
     NewNodeRef = NewNodeRef + 1;
     for j in 0..#(Polys#i) - 1 do (
       MonomialNode = NewNodeRef;
-      Monomials = Monomials|{MonomialNode};
+      Monomials = append(Monomials,MonomialNode);
       SystemAsLists#PolyNode = append(SystemAsLists#PolyNode,MonomialNode);
       SystemAsLists = append(SystemAsLists, new MutableList);
       NewNodeRef = NewNodeRef + 1;
@@ -63,20 +64,20 @@ createNautyString (List) := Polys -> (
   );
 
 
-  ReturnString := "c -a -m n=" + toString(#Polys) + " g ";
-  for Poly in Polys do (
+  ReturnString := "c -a -m n=" | toString(#SystemAsLists) | " g ";
+  for Poly in SystemAsLists do (
     for Term in Poly do (
-      ReturnString = ReturnString | toString(Term) + " ";
+      ReturnString = ReturnString | toString(Term) | " ";
     );
-    ReturnString = ReturnString | " ";
+    ReturnString = ReturnString | ";";
   );
   ReturnString = substring(ReturnString, 0, #ReturnString - 1) | ". f = [ 0 | " | toString(SystemNode) | " | ";
   ReturnString = ReturnString | PartString(Variables) | " | " | PartString(Monomials);
-  ReturnString = ReturnString | " | " | PartString(PolyPart) | " | ";
-  for Part in PowerList do (
+  ReturnString = ReturnString | " | " | PartString(Polynomials) | " | ";
+  for Part in PartList do (
     ReturnString = ReturnString | PartString(Part) | " | ";
   );
-  ReturnString = ReturnString | "] x @ b";
+  return ReturnString | "] x @ b";
 )
 
 
@@ -101,3 +102,15 @@ MakeConstIntoVar := Polys -> (
     return Polys
 )
 
+FindSymmetry := Polys-> (
+  CoefficientList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
+  TermList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
+  for i from 0 to #Polys - 1 do {
+    Poly = Polys#i;
+    for Term in listForm Poly do {
+      TermList#i = append(TermList#i,Term#0);
+      CoefficientList#i = append(CoefficientList#i,Term#0);
+    }
+  PolysAsLists := MakeConstIntoVar(TermList);
+  createNautyString(PolysAsLists, TermList)
+}

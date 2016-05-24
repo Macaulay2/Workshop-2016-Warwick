@@ -35,21 +35,22 @@ https://polymake.org/release_docs/2.12/tropical.html
 TropicalHypersurface
 TropicalPolytopes
 
-End of Monday status:
+Mid-Tuesday status:
 Diane and Kathlen:
 - defined new Type TropicalCycle
 - outline of methods
-- To do:  * documentation for tropicalCycle
-     	  * isWellDefined code and documentation
-	  * isBalanced code and documentation
+- To do:  * documentation for tropicalCycle.  HALF-DONE.  Needs example.
+     	  * isWellDefined code and documentation.  DOCUMENTATION DONE except for an example.
+	  * isBalanced code and documentation.  DOCUMENTATION DONE except for an example.
 	  * Add skeleton for stableIntersection
 
 Carlos and Paolo
 - defined and documented method tropicalPrevariety, 
 - deleted multiplicities from fan output
-- To do:  * add strategy choice
-	  * add valuations
-	  * define function isTropicalBasis
+- added strategy choice
+- To do:  
+          * add valuations
+          * define function isTropicalBasis
 	  * define function stableIntersection
 
 
