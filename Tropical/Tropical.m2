@@ -30,6 +30,7 @@ needsPackage "SimpleDoc"
 
 export {
   "tropicalCycle",
+  "isBalanced",
   "tropicalPrevariety",
   "MaximalCones",
   "Multiplicities"
@@ -116,7 +117,32 @@ doc///
     	B:Boolean
     Description
 	Text
-	    A TropicalCycle is well defined if the underlying Fan is pure, and the multiplicity function makes the fan balanced.
+    	    A TropicalCycle is well defined if the underlying Fan is
+    	    pure, and the multiplicity function makes the fan
+    	    balanced.
+      	Example
+	    1+1	    
+///
+
+doc///
+    Key
+	isBalanced
+    Headline
+	whether a tropical cycle is balanced
+    Usage
+    	isBalanced T
+    Inputs
+	T:TropicalCycle
+    Outputs
+    	B:Boolean
+    Description
+	Text
+	    A TropicalCycle is balanced if the underlying Fan,
+	    together with the multiplicity function makes the fan
+	    balanced.  See, for example, ???addTropicalBook Section
+	    3.4, for the mathematical definitions. 
+        Example
+	    1+1	    
 ///
 
 
