@@ -81,7 +81,8 @@ export {
   "toLaurentPolynomial",
   "topWitnessSet",
   "trackPaths",
-  "zeroFilter"
+  "zeroFilter",
+  "intersectSlice"
 }
 
 protect ErrorTolerance, protect Iterations,
@@ -1518,6 +1519,21 @@ zeroFilter (List,ZZ,RR) := (sols,k,tol) -> (
   -- OUT: list of solutions in sols where the k-th coordinate
   --      is less than the tolerance.
   return select(sols,t->isCoordinateZero(t,k,tol));
+)
+
+--------------------
+-- intersectSlice --
+--------------------
+
+intersectSlice = method(TypicalValue => List)
+intersectSlice (WitnessSet, List) := (w, slcRR) -> (
+  -- IN: w, a witness set;
+  --     slicRR, a list of linear equations.
+  -- OUT: solutions of the equations of the witness set w
+  --      which satisfy the list of linear equations.
+  startSys:=join(equations(w),slice(w));
+  targetSys := equations(w) | slcRR;
+  trackPaths(targetSys,startSys,w.Points)
 )
 
 --##########################################################################--

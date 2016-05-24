@@ -1,0 +1,61 @@
+-- -*- M2-comint -*- {* hash: -1010838168 *}
+--loading configuration for package "PHCpack" from file /Users/diego/Library/Application Support/Macaulay2/init-PHCpack.m2
+
+i1 : R = CC[x,y,z];
+
+i2 : f = { x^2 - y, x^3 - z };
+
+i3 : (w,ns) = topWitnessSet(f,1)
+*** variables in the ring : {x, y, z, zz1} ***
+
+o3 = (w, {})
+
+o3 : Sequence
+
+i4 : dim(w)
+
+o4 = 1
+
+i5 : degree(w)
+
+o5 = 3
+
+i6 : toString equations(w)
+
+o6 = {x^2-y+(-.298963+.954265*ii)*zz1, x^3-z+(.682068-.731289*ii)*zz1, zz1}
+
+i7 : toString slice(w)
+
+o7 = {(-.931382+.364042*ii)*x+(.393882-.919161*ii)*y+(.351567+.936163*ii)*z
+     +(.317388-.948296*ii)*zz1-.243084-.970005*ii}
+
+i8 : toString points(w)
+
+o8 = VerticalList{{1.30109-.005069*ii, 1.69282-.013191*ii,
+     2.20245-.025744*ii, -2.70332e-35+9.26937e-35*ii}, {-.128978-.560728*ii,
+     -.29778+.144643*ii, .119513+.148318*ii, 0}, {-.450107+1.25768*ii,
+     -1.37916-1.13218*ii, 2.04469-1.22495*ii, 2.30056e-32+3.19314e-32*ii}}
+
+i9 : R = CC[x,y,z]; f = { (x^2-y)*(x-2), (x^3 - z)*(y-2), (x*y - z)*(z-2) }
+
+        3     2              3      3                             2
+o10 = {x  - 2x  - x*y + 2y, x y - 2x  - y*z + 2z, x*y*z - 2x*y - z  + 2z}
+
+o10 : List
+
+i11 : (w,ns) = topWitnessSet(f,1);
+*** variables in the ring : {x, y, z, zz1} ***
+
+i12 : dim(w)
+
+o12 = 1
+
+i13 : degree(w)
+
+o13 = 3
+
+i14 : #ns
+
+o14 = 10
+
+i15 : 
