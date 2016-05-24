@@ -171,6 +171,9 @@ doc///
     Inputs
 	L:List
 	    of polynomials
+    Optional inputs
+        S:String
+	    Strategy (currently only "gfan")
     Outputs
 	F:List
 	    the intersection of the tropical hypersurfaces of polynomials in L
@@ -180,6 +183,7 @@ doc///
         Example
 	    QQ[x,y]
 	    tropicalPrevariety{x+y+1, x+y}
+            tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
 ///
 
 
