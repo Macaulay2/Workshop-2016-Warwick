@@ -99,6 +99,26 @@ tropicalVariety (Ideal,Boolean) := o -> (I,b)  -> (
 		     else print  " Cannot compute multiplicities if ideal not prime"  )))
 
 
+--Main function to call for tropicalVariety.  Makes no assumption on ideal
+tropicalVariety (Ideal) := o -> (I) ->(
+    if isHomogeneous(I) then return(tropicalVariety(I,true))
+    else (
+	--First homogenize
+    	R:=ring I;
+	KK:=coefficientRing R;
+--Next line needs to be fixed - AA is a "safe" variable	
+    	AA:= symbol AA;
+	S:=KK[{AA}|gens R];
+	I=substitute(I,S);
+	J:=homogenize(I,AA);
+	J=saturate(J,AA);
+	--Then compute tropical variety of homogenized ideal
+	T:=tropicalVariety(J,true);
+    	--Then remove lineality space
+    	return(T);
+    )
+)    
+
 stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
