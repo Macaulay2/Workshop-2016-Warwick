@@ -111,7 +111,9 @@ MakeConstIntoVar := Polys -> (
     return Polys
 )
 
-FindSymmetry = Polys-> (
+FindSymmetry = method()
+FindSymmetry Ideal := thisIdeal -> FindSymmetry first entries gens thisIdeal
+FindSymmetry List := Polys-> (
   CoefficientList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
   TermList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
   for i from 0 to #Polys - 1 do (
