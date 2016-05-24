@@ -142,3 +142,13 @@ length(l)
 needsPackage"Depth"
 viewHelp Depth
 ---------------------------------------------------------------------------------------
+restart
+
+S = ZZ/101[a..e]
+M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
+isHomogeneous M
+setRandomSeed 0
+codim ideal N
+tally apply(10, j->(
+	N = M*random(source M, S^{5:-5});
+time betti (res(coker N, FastNonminimal => true), Minimize => true)))
