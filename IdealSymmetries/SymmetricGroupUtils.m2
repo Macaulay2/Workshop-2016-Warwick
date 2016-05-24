@@ -1,6 +1,6 @@
 convertToCycles = method()
-converterToCycles (BasicList,ZZ) := (groupElement,n) -> (
-    toReturn := new MutableList from 1..n;
+convertToCycles (BasicList,ZZ) := (groupElement,n) -> (
+    toReturn := new MutableList from 0..n-1;
     for cycle in groupElement do (
         for i in 0..#cycle-1 do (
             toReturn#((cycle#i)-1) = (cycle#((i+1) % #cycle))-1;
@@ -9,6 +9,6 @@ converterToCycles (BasicList,ZZ) := (groupElement,n) -> (
     return toList toReturn;
 )
 
---print converterToCycles ({{1,2},{3,4}},4);
---print converterToCycles ({{1},{2,3,4}},5);
---print converterToCycles ({{2,3,4}},6);
+--print convertToCycles({{1,2},{3,4}},4);
+--print convertToCycles({{1},{2,3,4}},5);
+--print convertToCycles({{2,3,4}},6);
