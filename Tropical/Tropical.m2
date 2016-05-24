@@ -87,14 +87,17 @@ tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	computeMultiplicities => true,
 	Prime => true
 	})
-tropicalVariety (Ideal) := o -> I  -> (
-	if (o.computeMultiplicities==true and o.Prime== true)
-	then (F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
-	    tropicalCycle(F,F#"Multiplicities"))
+tropicalVariety (Ideal,Boolean) := o -> (I,b)  -> (
+    	if b==false then print "0"
 	else
-	(if o.computeMultiplicities==false 
-		then gfanTropicalBruteForce gfanBuchberger I
-		else print  " Cannot compute multiplicities if ideal not prime"  ))
+	       (if (o.computeMultiplicities==true and o.Prime== true)
+		then (F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
+	            tropicalCycle(F,F#"Multiplicities"))
+		else
+		    (if o.computeMultiplicities==false 
+		     then gfanTropicalBruteForce gfanBuchberger I
+		     else print  " Cannot compute multiplicities if ideal not prime"  )))
+
 
 stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
