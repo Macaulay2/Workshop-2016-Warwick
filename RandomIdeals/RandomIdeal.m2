@@ -295,9 +295,10 @@ idealFromShelling = method()
 idealFromShelling (Ring,List) := (S,P) -> (
     Delta := toList (0..numgens S - 1);
     V := vars S;
-    intersect apply(P, D -> monomialIdeal {V_(Delta - set D)})
+    monomialIdeal intersect apply(P, D -> monomialIdeal {V_(Delta - set D)})
     )
 
+randomShellableIdeal
 idealFromShelling List := P -> (
     n := (max flatten P)+1;
     x := symbol x;
@@ -668,6 +669,12 @@ doc ///
 	 randomShellableIdeal
 ///         
 
+TEST///
+setRandomSeed 0
+S = ZZ/101[a,b,c,d,e]
+I = randomShellableIdeal(S,2,3) 
+I == monomialIdeal (a, c*d*e)
+///
 
 TEST///
 assert(#randomShelling(5,2,6)==6)
