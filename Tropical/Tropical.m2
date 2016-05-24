@@ -30,7 +30,8 @@ export {
    "computeMultiplicities",
   "Prime",
   "stableIntersection",
-  "tropicalVariety"
+  "tropicalVariety",
+  "isTropicalBasis"
 }
 
 ------------------------------------------------------------------------------
@@ -80,6 +81,7 @@ if (o.Strategy=="gfan") then (
 scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
 else error "options not valid"
 )
+
 --Computing a tropical variety
 
 tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
@@ -94,6 +96,22 @@ tropicalVariety (Ideal) := o -> I  -> (
 	(if o.computeMultiplicities==false 
 		then gfanTropicalBruteForce gfanBuchberger I
 		else print  " Cannot compute multiplicities if ideal not prime"  ))
+
+--Check if a list of polynomials is a tropical basis for the ideal they generate
+
+isTropicalBasis = method(TypicalValue => Boolean,  Options => {
+	Strategy=> "gfan"
+	})
+
+isTropicalBasis (List) := o -> L -> (
+	if (o.Strategy=="gfan") then (gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+ 	 F:=gfanTropicalIntersection(L, gfanopt); 
+	if (toString substring(0,13, toString F#"GfanFileHeader")=="The following") then false
+	else if (toString substring(0,13, toString F#"GfanFileHeader")=="_application ") then true
+	else error "Algorithm fail"
+	)
+	else error "options not valid"
+	)
 
 stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
@@ -266,7 +284,31 @@ doc///
 ///
 
 
-
+doc///
+    Key
+	isTropicalBasis
+	(isTropicalBasis, List)
+	[tropicalPrevariety, Strategy]
+    Headline
+	check if a list of polynomials is a tropical basis for the ideal they generate
+    Usage
+	isTropicalBasis(L)
+	isTropicalBasis(L,Strategy=>S)
+    Inputs
+	L:List
+	    of polynomials        
+	Strategy=>String
+	    Strategy (currently only "gfan")
+    Outputs
+	F:Boolean
+	    whether the list of polynomials is a tropical basis for the ideal it generates
+    Description
+	Text
+	    This method checks if the intersection of the tropical hypersurfaces associated to the polynomials in the list equals the tropicalization of the variety corresponding to the ideal they generate.  
+        Example
+	    QQ[x,y]
+	    isTropicalBasis({x+y})
+///
 
 
 
