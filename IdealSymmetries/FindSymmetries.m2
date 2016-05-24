@@ -4,6 +4,8 @@ PartString (BasicList) := Partition -> (
   return substring(Partition, 1, #Partition - 2);
 )
 
+load "SymmetricGroupUtils.m2"
+
 createNautyString = method(TypicalValue => BasicList)
 createNautyString (BasicList, BasicList) := (Polys, Coefficients) -> (
   n := #(Polys#0#0);
@@ -153,7 +155,7 @@ FindSymmetry List := Polys-> (
     );
   );
   Permutations = toList Permutations;
-  return Permutations;
+  return apply(Permutations,a -> convertToCycles(a,NumberOfVariables));
 )
 
 parsePermutationStr = method()
@@ -184,7 +186,6 @@ parsePermutationStr (String, ZZ) := (PermStr, NumberOfVariables) -> (
 )
 
 dreadnautPath = prefixDirectory | currentLayout#"programs" | "dreadnaut";
-print dreadnautPath;
 -- Sends a command and retrieves the results into a list of lines.
 -- If ReadError is set to true and the command is successfully executed,
 -- then the data from stderr is returned (filterGraphs and removeIsomorphs
