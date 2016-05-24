@@ -33,7 +33,10 @@ export {
   "isBalanced",
   "tropicalPrevariety",
   "MaximalCones",
-  "Multiplicities"
+  "Multiplicities",
+   "computeMultiplicities",
+  "Prime",
+  "tropicalVariety"
 }
 
 ------------------------------------------------------------------------------
@@ -83,6 +86,19 @@ if (o.Strategy=="gfan") then (
 scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
 else error "options not valid"
 )
+--Computing a tropical variety
+
+tropicalVariety = method(TypicalValue => Ideal,  Options => {
+	"computeMultiplicities" => true,
+	"Prime" => true
+	})
+tropicalVariety (Ideal) := (I) -> Options >> o -> (
+	if (o.computeMultiplicities==true and o.Prime== true)
+	then  gfanTropicalTraverse gfanTropicalStartingCone I
+	else
+	(if o.computeMultiplicities==false 
+		then gfanTropicalBruteForce gfanBuchberger I
+		else print  " Cannot compute multiplicities if ideal not prime"  ))
 
 
 ------------------------------------------------------------------------------

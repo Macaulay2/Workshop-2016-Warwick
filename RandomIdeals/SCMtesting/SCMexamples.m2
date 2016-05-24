@@ -1,4 +1,5 @@
 needsPackage"RandomIdeal"
+needsPackage"Depth"
 
 --viewHelp RandomIdeal 
 
@@ -11,38 +12,44 @@ needsPackage"RandomIdeal"
 --     )
 
 RandomI=method()
-RandomI(ZZ):=(len)->(
-    local kk,S,m;
-kk=ZZ/101;
-S=kk[a..e];
-
---codim ideal(a^3,b^4+c^4,d^5)
---codim ideal(m)
-
-m = matrix{{a^3,b^4+c^4,d^5}};--codimension 2 or 3?
+RandomI(ZZ):=(len)->( --len is the length of the list of random ideals
+                      local kk,S,M,m;
+		      kk=ZZ/101;
+		      S=kk[a..g];
+		      --S=kk[a..e];
+		      --m = matrix{{a^3,b^4+c^4,d^5); --codimension 3 ideal
+		      M = matrix{{a^3,b^4+c^4,d^5,e^2+b*g}};--codimension 4 ideal
+		      m=codim(ideal M);
+		      print m;
 randomListOfList={};
 
-for i from 1 to 10 do(
-                      n=codim ideal(m)+1;--4;--+random (1,len);(is codimension of m +1)
-		      randomList=apply (n,i->4+random 2);
+for i from 1 to len do(
+                      n=m+1;--(is codimension of M+1)
+		      --randomList=apply (n,i->4+random 2);
+		      randomList=apply (n,i-> random(m+1,m+4));
 		      randomListOfList=randomListOfList|{randomList};
---		      );
-ListRandomIdeal=apply(randomListOfList,i->randomIdeal(i,m));
-return ListRandomIdeal;
+		      );
+ListRandomIdeal=apply(randomListOfList,i->randomIdeal(i,M));
+ListRandomCM={};
+for j from 0 to len-1 do (
+                       -- if (isCM(S^1/ListRandomIdeal_(j))==true) then ListRandomCM=ListRandomCM|{ListRandomIdeal_(j)}
+			--else print "not this one";
+			if (codim ListRandomIdeal_(j)==length res ListRandomIdeal_(j)) then
+			(ListRandomCM=ListRandomCM|{ListRandomIdeal_(j)};
+			    print "you got one!");
+			);
+return ListRandomCM;
 )		 
 end 
 
 restart
 load "SCMexamples.m2"
-RandomI(5)
-randomListOfList
-ListRandomIdeal
-l=RandomI(5);
+l=RandomI(100);
+length l
 betti res l_(2)
 tally apply(l,i->betti res i)
---cm means that the codimension of the ideal is  equal than the lenght of the resolution 
+--cm means that the codimension of the ideal is equal than the lenght of the resolution 
 koszul(gens l_(0))
-random 2
 
 --one generator more than the codimension (starting with codimension 4 or 5)
 
