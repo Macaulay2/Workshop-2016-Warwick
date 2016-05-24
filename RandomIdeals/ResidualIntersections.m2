@@ -272,7 +272,7 @@ profondeur Module := M -> (
     S0 := ring presentation S;
     r := F*map(S,S0);
     MM := pushForward(r,M);
-    error();
+--    error();
     numgens S0 - pdim MM)
 
 
@@ -295,7 +295,11 @@ apply(4, i->time pdim1(S^1/I^(i+1)))
 apply(4, i->elapsedTime res(S^1/I^(i+1)))
 apply(4, i->elapsedTime res(S^1/I^(i+1), FastNonminimal => true))
 time profondeur(S^1/I^4)
+time pdim (S^1/I^4)
 apply(4, i->elapsedTime depth(S^1/I^(i+1)))
+
+ker map(S,S,vars S)
+
 ///
 
 profondeur Ring := R -> profondeur R^1
