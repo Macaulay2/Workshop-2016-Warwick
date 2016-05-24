@@ -127,18 +127,18 @@ FindSymmetry List := Polys-> (
   NumberOfVariables = #(TermList#0#0) + 1;
 
   PolysAsLists := MakeConstIntoVar(TermList);
-  DreadnautStrs := callDreadnaut(createNautyString(PolysAsLists, CoefficientList)) - 1;
-  PermutationStrs := new MutableList;
+  DreadnautStrs := callDreadnaut(createNautyString(PolysAsLists, CoefficientList));
+  PermutationStrs := "";
   i := 1;
   while i < #DreadnautStrs do (
     DreadnautStr := DreadnautStrs#i;
-    if regex("orbits", DreadnautStr) != null then break;
+    if class regex("orbits", DreadnautStr) === class {} then break;
 
     if DreadnautStr#0 == "(" then (
       NewPermutationStr = DreadnautStr;
       for j from i + 1 to #DreadnautStrs - 1 do (
         TestDreadnautStr = DreadnautStrs#j;
-        if TestDreadnautStr#0 == "(" then (
+        if TestDreadnautStr#0 != " " then (
           i = j;
           break;
         );
@@ -148,7 +148,7 @@ FindSymmetry List := Polys-> (
       );
       TempPermutationStr = parsePermutationStr(NewPermutationStr, NumberOfVariables);
       if TempPermutationStr != "" then (
-        PermutationStrs = PermutationStrs | "***" | TempPermutationStr;
+        PermutationStrs = PermutationStrs | ";" | TempPermutationStr;
       );
     );
   );
@@ -158,9 +158,9 @@ FindSymmetry List := Polys-> (
 parsePermutationStr = method()
 parsePermutationStr (String, ZZ) := (PermStr, NumberOfVariables) -> (
   PermStr = substring(PermStr,1,#PermStr - 2);
-  PermStr = replace("(","", PermStr);
+  PermStr = replace("[(]","", PermStr);
   SplitCycles := separate(")", PermStr);
-  Result = "";
+  toReturn= "";
   for Cycle in SplitCycles do (
     SplitCycle = separate(" ", Cycle);
     CycleIsVarPermutation = true;
@@ -171,13 +171,14 @@ parsePermutationStr (String, ZZ) := (PermStr, NumberOfVariables) -> (
       );
     );
     if CycleIsVarPermutation then (
-      Result = Result | ";" | Cycle;
+      toReturn = toReturn | "(" | Cycle | ")";
     );
   );
-  return Result;
+  return toReturn;
 )
 
 dreadnautPath = prefixDirectory | currentLayout#"programs" | "dreadnaut";
+print dreadnautPath;
 -- Sends a command and retrieves the results into a list of lines.
 -- If ReadError is set to true and the command is successfully executed,
 -- then the data from stderr is returned (filterGraphs and removeIsomorphs
