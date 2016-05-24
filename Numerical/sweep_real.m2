@@ -63,10 +63,10 @@ discretization=(F,n,startSlice,w) -> (
     for i to n-1 do (
 	   newSlice:=rotationOfSlice(angles#i,startSlice);
 	   functionValues=append(functionValues,sliceCost(newSlice,w));
-    )
+    );
     minValue:=min(functionValues);
     minPosition:=position(functionValues,a->(a==minValue)); 
-    rotationOfSlice(angles#minPosition,startSlice);
+    return rotationOfSlice(angles#minPosition,startSlice);
 )
 
 -- Example: rank 3 matrices
