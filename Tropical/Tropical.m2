@@ -99,14 +99,46 @@ tropicalVariety (Ideal) := o -> I  -> (
 stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
-stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
+stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+	filename := temporaryFileName();
+	return filename;
 )    
 
 convertToPolymake = (T) ->(
-	str := "new Cycle<Min>";
---	str := tropicalMax;
+	str := "new Cycle<";
+	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
+	str = str|">(PROJECTIVE_VERTICES=>[[1";
+	rays := T#"Rays";
+	ray := rays#0;
+	rayDimension := #ray;
+	scan (rayDimension,i -> str = str|",0");
+	str = str|"]";
+	numberOfRays := #rays;
+	scan (numberOfRays,i -> (
+		ray = rays#i;
+		str = str|",[0";
+		scan (rayDimension,j -> str = str|","|ray#j);
+		str = str|"]";
+	));
+	str = str|"],MAXIMAL_POLYTOPES=>[";
+	maxCones := T#"MaximalCones";
+	numberOfMaxCones := #maxCones;
+	cone := maxCones#0;
+	scan (numberOfMaxCones,i -> (
+		cone = maxCones#i;
+		str = str|"[0";
+		scan (#cone,j -> str = str|","|(cone#j+1));
+		str = str|"],";
+	));
+--delete last comma
+	str = substring(0,#str-1,str);
+	str = str|"],WEIGHTS=>[";
+	mult := T#"Multiplicities";
+	scan (numberOfMaxCones,i -> str = str|mult#i|",");
+	str = substring(0,#str-1,str);
+	str = str | "]);";
 	return str
-) 
+)
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
