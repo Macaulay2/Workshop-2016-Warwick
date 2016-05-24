@@ -300,7 +300,8 @@ apply(4, i->elapsedTime depth(S^1/I^(i+1)))
 
 ker map(S,S,vars S)
 
-///
+vars S % vars S
+   ///
 
 profondeur Ring := R -> profondeur R^1
 
