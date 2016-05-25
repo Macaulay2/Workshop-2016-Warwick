@@ -4,17 +4,17 @@ at the Macaulay2 workshop at the University of Warwick, May 23-26, 2016.
 
 **members**
 
-* Diego Cifuentes
-* Kaie Kubjas
-* Anna Seigal
-* Jan Verschelde
+* [Diego Cifuentes](http://www.mit.edu/~diegcif/)
+* [Kaie Kubjas](http://www.kaiekubjas.com/)
+* [Anna Seigal](https://math.berkeley.edu/~seigal/)
+* [Jan Verschelde](http://www.math.uic.edu/~jan/)
 
 **files**
 
 - phc: current version of the executable program for Mac OS X
 - PHCpack.m2: latest development version of Macaulay2 package
-- PHCpack/PHCpackDoc.me: latest documentation of PHCpack.m2
-- sweep_real.m2: functions to search for real witness points 
+- PHCpack/PHCpackDoc.m2: the latest documentation of PHCpack.m2
+- sweep_real.m2: functions to search for a real slice
 
 **searching for a real slice**
 
@@ -26,14 +26,15 @@ at the Macaulay2 workshop at the University of Warwick, May 23-26, 2016.
 
 * For example, for a circle in the plane, the problem
   is to find a line that cuts the circle in two real points.
-  A real slice may not always exist.
+
+* A real slice may not always exist.
 
 * Varieties in numerical algebraic geometry are represented by witness sets.
-  Witness sets may be regarded as an alternative to Groebner basis.
+  Witness sets may be regarded as an alternative to Groebner bases.
   One can answer many questions about the variety with a witness set.
-  Path tracking gives us sample points on the variety.
+  Path tracking gives sample points on the variety.
 
 * Our problem can be reformulated as an optimization problem.
   The cost function we minimize is the norm of the imaginary
-  parts of the solutions on the slice.
+  parts of the coordinates of the solutions on the slice.
   Line search methods provide a heuristic method for this problem.
