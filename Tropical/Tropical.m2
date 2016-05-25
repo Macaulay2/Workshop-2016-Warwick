@@ -507,28 +507,20 @@ doc///
     Key
 	getRays
 	(getRays, Fan)
-	--(getRays, tropicalCycle)
         getCones
 	(getCones, Fan)
-	--(getCones, tropicalCycle)
 	getDim
 	(getDim, Fan)
-	--(getDim, tropicalCycle)
         getFVector
 	(getFVector, Fan)
-	--(getFVector, tropicalCycle)
 	getLinealitySpace
 	(getLinealitySpace, Fan)
-	--(getLinealitySpace, tropicalCycle)
         getMaximalCones
 	(getMaximalCones, Fan)
-	--(getMaximalCones, tropicalCycle)
 	getPure
 	(getPure, Fan)
-	--(getPure, tropicalCycle)
         getSimplicial
 	(getSimplicial, Fan)
-	--(getSimplicial, tropicalCycle)
     Headline
 	get the rays or do other stuff of a fan or a tropical cycle
     Usage
