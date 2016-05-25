@@ -498,8 +498,9 @@ doc///
 	Text
 	    This method checks if the intersection of the tropical hypersurfaces associated to the polynomials in the list equals the tropicalization of the variety corresponding to the ideal they generate.  
         Example
-	    QQ[x,y]
-	    isTropicalBasis({x+y})
+	    QQ[x,y,z]
+	    isTropicalBasis({x+y+z,2*x+3*y-z})
+	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
 ///
 
 
@@ -528,5 +529,6 @@ doc///
 TEST ///
     assert (1+1==2)
     assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
+    assert(R:=QQ[x,y,z]; isTropicalBasis({x+y+z,2*x+3*y-z}))
 ///    	    	
        
