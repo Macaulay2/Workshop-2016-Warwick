@@ -942,6 +942,34 @@ doc ///
       in the solver.
 ///;
 
+doc ///
+  Key
+    computingPrecision
+  Headline
+    flag to set the working precision
+  Description
+    Text
+      The default precision is double precision.
+
+      The user can change the working precision of solveSystem
+      to double double or quad double precision by setting the
+      flag to 2 or 4.
+///;
+
+doc ///
+  Key
+    [solveSystem,computingPrecision]
+  Headline
+    option to specify the working precision
+  Usage
+    solveSystem(...,computingPrecision=>ZZ)
+  Description
+    Text
+      Use {\tt computingPrecision=>2} for double double precision.
+
+      Use {\tt computingPrecision=>4} for quad double precision.
+///;
+
 -------------------------
 -- toLaurentPolynomial --
 -------------------------
@@ -1433,7 +1461,6 @@ doc ///
       X = transpose matrix {gens Rtwo | {1_CC}};
       slcRR = flatten entries (promote(slcmat,Rtwo) * X);
       fsols = intersectSlice(w,slcRR)
-      fSols/print
     
   SeeAlso
     topWitnessSet

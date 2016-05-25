@@ -8,7 +8,7 @@
 
 needsPackage"RandomIdeal"
 needsPackage"Depth"
-
+needsPackage"ResidualIntersections"
 
 -- This function will generate n random Monomial Ideals and check whether those are CM or not, print them out if they are CM, count the number of CM ideals, and finally return the ratio between the number of CM ideals and n.
 
@@ -75,8 +75,32 @@ CMBetti (ZZ,List) := (n,L) ->(
     	return null;
     )
 
+LicciTest = method()
+LicciTest (ZZ, List) := (n, L) ->(
+
+    local I;
+    local kk;
+    local S;
+        
+    kk=ZZ/1291;
+    S=kk[x_1..x_n];
+
+    setRandomSeed(currentTime());
+    I=randomMonomialIdeal(L,S);
+    
+    if (isLicci(I)==true) then(
+    	return betti res I
+	)
+    else
+    	return null;
+    )
+
 end
+
+
 
 restart
 load "CMtesting.m2"
-tally apply(2000,t-> CMBetti(6,{3,3,3,3,3,3}))
+L=for i from 1 to 6 list random(2,8)
+tally apply(1000,t-> LicciTest(6, L))
+--installPackage"RandomIdeal"

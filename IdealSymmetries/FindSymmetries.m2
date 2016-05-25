@@ -4,6 +4,8 @@ PartString (BasicList) := Partition -> (
   return substring(Partition, 1, #Partition - 2);
 )
 
+load "SymmetricGroupUtils.m2"
+
 createNautyString = method(TypicalValue => BasicList)
 createNautyString (BasicList, BasicList) := (Polys, Coefficients) -> (
   n := #(Polys#0#0);
@@ -111,7 +113,9 @@ MakeConstIntoVar := Polys -> (
     return Polys
 )
 
-FindSymmetry = Polys-> (
+FindSymmetry = method()
+FindSymmetry Ideal := thisIdeal -> FindSymmetry first entries gens thisIdeal
+FindSymmetry List := Polys-> (
   CoefficientList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
   TermList := new MutableList from for i in 0..#Polys - 1 list new MutableList;
   for i from 0 to #Polys - 1 do (
@@ -122,8 +126,65 @@ FindSymmetry = Polys-> (
     );
   );
   
+  NumberOfVariables = #(TermList#0#0) + 1;
+
   PolysAsLists := MakeConstIntoVar(TermList);
-  return createNautyString(PolysAsLists, CoefficientList);
+  DreadnautStrs := callDreadnaut(createNautyString(PolysAsLists, CoefficientList));
+  for i in DreadnautStrs do print i;
+  Permutations := new MutableList;
+  i := 1;
+  while i < #DreadnautStrs do (
+    DreadnautStr := DreadnautStrs#i;
+    if class regex("orbits", DreadnautStr) === class {} then break;
+
+    if DreadnautStr#0 == "(" then (
+      NewPermutationStr = DreadnautStr;
+      for j from i + 1 to #DreadnautStrs - 1 do (
+        TestDreadnautStr = DreadnautStrs#j;
+        if TestDreadnautStr#0 != " " then (
+          i = j;
+          break;
+        );
+        if TestDreadnautStr#0 == " " then (
+          NewPermutationStr = NewPermutationStr | substring(TestDreadnautStr,3,#TestDreadnautStr);
+        );
+      );
+      PossiblePermutation = parsePermutationStr(NewPermutationStr, NumberOfVariables);
+      if #PossiblePermutation != 0 then (
+        Permutations = append(Permutations, PossiblePermutation);
+      );
+    );
+  );
+  Permutations = toList Permutations;
+  print Permutations;
+  return apply(Permutations,a -> convertToCycles(a,NumberOfVariables));
+)
+
+parsePermutationStr = method()
+parsePermutationStr (String, ZZ) := (PermStr, NumberOfVariables) -> (
+  PermStr = substring(PermStr,1,#PermStr - 2);
+  PermStr = replace("[(]","", PermStr);
+  SplitCycles := separate(")", PermStr);
+  toReturn = new MutableList;
+  for Cycle in SplitCycles do (
+    SplitCycle = separate(" ", Cycle);
+    IntCycle = new MutableList;
+    for TermStr in SplitCycle do (
+      IntCycle = append(IntCycle, value TermStr);
+    );
+    CycleIsVarPermutation = true;
+    for Term in IntCycle do (
+      if Term > NumberOfVariables then (
+        CycleIsVarPermutation = false;
+        break;
+      );
+    );
+    if CycleIsVarPermutation then (
+      toReturn = append(toReturn, toList IntCycle);
+    );
+  );
+  toReturn = toList toReturn;
+  return toReturn;
 )
 
 dreadnautPath = prefixDirectory | currentLayout#"programs" | "dreadnaut";
