@@ -1465,3 +1465,104 @@ doc ///
   SeeAlso
     topWitnessSet
 ///;
+
+------------------
+-- realSlice1D  --
+------------------
+
+doc ///
+  Key 
+    realSlice1D
+    (realSlice1D, WitnessSet)
+  Headline
+    computes a real slice for a one dimensional witness set
+  Usage
+    slc = realSlice1D(w)
+  Inputs
+    w:WitnessSet
+      a witness set for a solution set
+  Outputs
+    slc:List
+      list of linear equations with the largest number of real solutions
+  Description
+    Text
+      
+      A real slice is a set of linear equations with the largest number
+      of real solutions of the equations for a given witness set.
+    
+    Example
+      R = CC[x,y,z];
+      twisted = {z^2-y, y*z-x, y^2-x*z};
+      (w, ns) = topWitnessSet(twisted, 1);
+      slc = realSlice1D(w);
+      solsRR = intersectSlice(w,slc)
+      for i to #solsRR-1 do print solsRR_i
+    
+  SeeAlso
+    intersectSlice
+///;
+
+doc ///
+  Key
+    searchNpoints
+  Headline
+    option of realSlice1D
+  Description
+    Text
+      Before the line search, a discretization of the range of the slices
+      is computed.  The value of searchNpoints sets the number of equidistant
+      points in this range of slices.
+///;
+
+doc ///
+  Key
+    [realSlice1D,searchNpoints]
+  Headline
+    option of realSlice1D
+  Usage
+    realSlice1D(...,searchNpoints=>Number)
+///;
+
+doc ///
+  Key
+    searchDelta
+  Headline
+    option of realSlice1D
+  Description
+    Text
+      In the line search we need to set the width of the search interval.
+      After a discretization, the golden section search method is applied
+      to the interval [p - searchDelta, p + searchDelta], where p is the
+      point where the minimum value after the discretization was found.
+///;
+
+doc ///
+  Key
+    [realSlice1D,searchDelta]
+  Headline
+    option of realSlice1D
+  Usage
+    realSlice1D(...,searchDelta=>Number)
+///;
+
+doc ///
+  Key
+    searchTolerance
+  Headline
+    option of realSlice1D
+  Description
+    Text
+      The golden section search method stops when the width of the current
+      interval which contains the minimum is smaller than searchTolerance.
+      For unimodal functions, searchTolerance will be the bound on the
+      accuracy of the location of the minimum.
+///;
+
+doc ///
+  Key
+    [realSlice1D,searchTolerance]
+  Headline
+    option of realSlice1D
+  Usage
+    realSlice1D(...,searchTolerance=>Number)
+///;
