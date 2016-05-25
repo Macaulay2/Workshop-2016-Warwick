@@ -214,14 +214,14 @@ getRays = method(TypicalValue => List)
 
 getRays (Fan) :=  F -> ( F#"Rays")
 
-getRays (tropicalCycle):= C->( getRays(C#"Fan"))
+getRays (TropicalCycle):= C->( getRays(C#"Fan"))
 
 
 getCones = method(TypicalValue => List)
 
 getCones (Fan) :=  F -> ( F#"Cones")
 
-getCones (tropicalCycle):= C->( getCones(C#"Fan"))
+getCones (TropicalCycle):= C->( getCones(C#"Fan"))
 
 
 getDim = method(TypicalValue => ZZ)
@@ -235,7 +235,7 @@ getFVector = method(TypicalValue => List)
 
 getFVector (Fan) :=  F -> ( F#"FVector")
 
-getFVector (tropicalCycle):= C->( getFVector(C#"Fan"))
+getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
 
 
 
@@ -245,7 +245,7 @@ getLinealitySpace = method(TypicalValue => List)
 
 getLinealitySpace (Fan) :=  F -> ( F#"LinealitySpace")
 
-getLinealitySpace (tropicalCycle):= C->( getLinealitySpace(C#"Fan"))
+getLinealitySpace (TropicalCycle):= C->( getLinealitySpace(C#"Fan"))
 
 
 
@@ -254,7 +254,7 @@ getMaximalCones = method(TypicalValue => List)
 
 getMaximalCones (Fan) :=  F -> ( F#"MaximalCones")
 
-getMaximalCones (tropicalCycle):= C->( getMaximalCones(C#"Fan"))
+getMaximalCones (TropicalCycle):= C->( getMaximalCones(C#"Fan"))
 
 
 
@@ -262,7 +262,7 @@ getPure = method(TypicalValue => Boolean)
 
 getPure (Fan) :=  F -> ( F#"Pure")
 
-getPure (tropicalCycle):= C->( getPure(C#"Fan"))
+getPure (TropicalCycle):= C->( getPure(C#"Fan"))
 
 
 
@@ -270,7 +270,7 @@ getSimplicial = method(TypicalValue => List)
 
 getSimplicial (Fan) :=  F -> ( F#"Simplicial")
 
-getSimplicial (tropicalCycle):= C->( getSimplicial(C#"Fan"))
+getSimplicial (TropicalCycle):= C->( getSimplicial(C#"Fan"))
 
 
 
