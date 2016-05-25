@@ -32,7 +32,15 @@ export {
   "stableIntersection",
   "tropicalVariety",
   "isTropicalBasis",
-  "convertToPolymake"
+  "convertToPolymake",
+  "getRays",
+  "getCones",
+  "getDim",
+  "getFVector",
+  "getLinealitySpace",
+  "getMaximalCones",
+  "getPure",
+  "getSimplicial"
 }
 
 --???check syntax - idea is that this is where we should define local symbols
@@ -193,6 +201,80 @@ convertToPolymake = (T) ->(
 	str = str | "]);";
 	return str
 )
+
+
+
+
+
+--functions to get stuff from fans and tropical cycles
+
+
+
+getRays = method(TypicalValue => List)
+
+getRays (Fan) :=  F -> ( F#"Rays")
+
+getRays (tropicalCycle):= C->( getRays(C#"Fan"))
+
+
+getCones = method(TypicalValue => List)
+
+getCones (Fan) :=  F -> ( F#"Cones")
+
+getCones (tropicalCycle):= C->( getCones(C#"Fan"))
+
+
+getDim = method(TypicalValue => ZZ)
+
+getDim (Fan) :=  F -> ( F#"Dim")
+
+getDim (tropicalCycle):= C->( getDim(C#"Fan"))
+
+
+getFVector = method(TypicalValue => List)
+
+getFVector (Fan) :=  F -> ( F#"FVector")
+
+getFVector (tropicalCycle):= C->( getFVector(C#"Fan"))
+
+
+
+
+
+getLinealitySpace = method(TypicalValue => List)
+
+getLinealitySpace (Fan) :=  F -> ( F#"LinealitySpace")
+
+getLinealitySpace (tropicalCycle):= C->( getLinealitySpace(C#"Fan"))
+
+
+
+
+getMaximalCones = method(TypicalValue => List)
+
+getMaximalCones (Fan) :=  F -> ( F#"MaximalCones")
+
+getMaximalCones (tropicalCycle):= C->( getMaximalCones(C#"Fan"))
+
+
+
+getPure = method(TypicalValue => Boolean)
+
+getPure (Fan) :=  F -> ( F#"Pure")
+
+getPure (tropicalCycle):= C->( getPure(C#"Fan"))
+
+
+
+getSimplicial = method(TypicalValue => List)
+
+getSimplicial (Fan) :=  F -> ( F#"Simplicial")
+
+getSimplicial (tropicalCycle):= C->( getSimplicial(C#"Fan"))
+
+
+
+
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
