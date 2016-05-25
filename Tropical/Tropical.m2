@@ -95,13 +95,17 @@ tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	})
 tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
     	if IsHomogIdeal==false then print "0"
+--Once tropicalVariety(I) is finished, send there to homogenize
 	else
+		--If ideal is prime, use following algorithm for speed
 	       (if (opt.computeMultiplicities==true and opt.Prime== true)
 		then (F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
 	            tropicalCycle(F,F#"Multiplicities"))
 		else
+		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
 		    (if opt.computeMultiplicities==false 
 		     then gfanTropicalBruteForce gfanBuchberger I
+		--Cannot currently compute multiplicities for non-prime ideals
 		     else print  " Cannot compute multiplicities if ideal not prime"  )))
 
 
