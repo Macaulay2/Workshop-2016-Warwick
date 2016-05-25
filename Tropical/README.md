@@ -52,6 +52,7 @@ Carlos and Paolo
           * add valuations
           * define function isTropicalBasis
 	  * define function stableIntersection
+	  * FIX isTropicalBasis: it needs a homogeneous ideal
 
 
 Sara and Ben
