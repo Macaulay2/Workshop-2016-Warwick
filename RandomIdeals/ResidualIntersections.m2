@@ -399,11 +399,11 @@ profondeur2 := M -> (
     numgens S0 - length res COK
 	)
     
-depth(Module) := ZZ => M -> (
+dd := M -> (
     --depth of a module with respect to the max ideal, via finite proj dim
     --gives error if the ultimate coeficient ring of R = ring M is not a field.
     R := ring M;
-    
+    if isHomogeneous M === false then print "-- Warning: This module is not homogeneous, computation may be incorrect.";
     if not isCommutative R then error"depth undefined for noncommutative rings";
     
     S := (flattenRing R)_0;
@@ -415,9 +415,8 @@ depth(Module) := ZZ => M -> (
     COK := prune coker(sub(m,S0) | (presentation S ** target m));
     
     numgens S0 - length res COK    
---    depth(ideal gens ring M,M)
-     )    
-    
+--    depth(ideal gens ring M,M) -- old method
+     )
     
     MM := pushF(r,M);
 --    print MM;
@@ -427,7 +426,9 @@ depth(Module) := ZZ => M -> (
 
 
 time profondeur(S^1/I^4)
-
+R = ZZ/101[x,y]
+J = ideal"x2-y3"
+time dd(R^1/J)
 time profondeur2(S^1/I^4)
 needsPackage"Depth"
 time depth(S^1/I^4)
