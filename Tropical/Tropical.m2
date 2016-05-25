@@ -424,5 +424,6 @@ doc///
 
 TEST ///
     assert (1+1==2)
+    assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
 ///    	    	
        
