@@ -18,7 +18,7 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-        PackageExports => {"PolyhedralObjects","gfanInterface2"},
+        PackageExports => {"Polyhedra","gfanInterface2"},
 	DebuggingMode => true
 )
 
