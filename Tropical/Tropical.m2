@@ -62,7 +62,12 @@ tropicalCycle = (F,mult)->(
 
 
 isBalanced = F->(
-    
+	filename := temporaryFileName();
+	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
+	runstring := "polymake "|filename;
+	run runstring;
+	result := get filename;
+	if (result=="1") then return true else return false;
 )
 
 isWellDefined TropicalCycle := Boolean =>
@@ -154,8 +159,11 @@ TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	filename := temporaryFileName();
-	filename << "$c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << close;
-	return filename;
+	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
+	runstring := "polymake "|filename;
+	run runstring;
+	result := get filename;
+	if (result=="1") then return true else return false;
 )    
 
 convertToPolymake = (T) ->(
