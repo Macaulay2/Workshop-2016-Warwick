@@ -300,7 +300,6 @@ pushNonLinear := opts -> (f,M) -> (				    -- this returns the presentation matr
     R := target f;
     assert( ring M === R );
     comp := PushforwardComputation{M,NonLinear};
-    viewHelp PushforwardComputation
 print"push1";    
     if not f.cache#?comp then (	       -- a bad place to cache the computation, because M may not get garbage-collected
 	S := source f;
@@ -380,16 +379,58 @@ n = 3
 c = 3
 m = n+c-1
 S = ZZ/101[x_1..x_(n*m)]
+I = minors(3, genericMatrix(S,x_1,3,5))
+M = S^1/I^3;
 
-isSurjective RingMap := f -> (
-    coker (sub(
-    )
+--isSurjective RingMap := f -> (
+--    return 0 == (vars target f)%(matrix f);
+--    )
 
+profondeur2 := M -> (
+    --profondeur of a module with respect to the max ideal, via finite proj dim
+    --gives error if the ultimate coeficient ring of R = ring M is not a field.
+    R := ring M;
+    if not isCommutative R then error"profondeur undefined for noncommutative rings";
+    S := (flattenRing R)_0;
+    if not isField coefficientRing S then error"input must be a module over an affine ring";
+    S0 := ring presentation S;
+    m := presentation M;
+    COK := prune coker(sub(m,S0) | (presentation S ** target m));
+    numgens S0 - length res COK
+	)
     
-I = minors(n, genericMatrix(S,x_1,m,n));
+depth(Module) := ZZ => M -> (
+    --depth of a module with respect to the max ideal, via finite proj dim
+    --gives error if the ultimate coeficient ring of R = ring M is not a field.
+    R := ring M;
+    
+    if not isCommutative R then error"depth undefined for noncommutative rings";
+    
+    S := (flattenRing R)_0;
+    
+    if not isField coefficientRing S then error"input must be a module over an affine ring";
+    
+    S0 := ring presentation S;
+    m := presentation M;
+    COK := prune coker(sub(m,S0) | (presentation S ** target m));
+    
+    numgens S0 - length res COK    
+--    depth(ideal gens ring M,M)
+     )    
+    
+    
+    MM := pushF(r,M);
+--    print MM;
+    print"after pushforward";
+--    error();
+    numgens S0 - pdim MM)
 
 
 time profondeur(S^1/I^4)
+
+time profondeur2(S^1/I^4)
+needsPackage"Depth"
+time depth(S^1/I^4)
 
 loadPackage ("Depth", Reload=>true)
 pdim1 = method()
