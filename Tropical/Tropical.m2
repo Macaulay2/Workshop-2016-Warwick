@@ -113,8 +113,8 @@ tropicalVariety (Ideal) := o -> (I) ->(
     	R:=ring I;
 	KK:=coefficientRing R;
 --Next line needs to be fixed - AA is a "safe" variable	
-    	AA:= symbol AA;
-	S:=KK[{AA}|gens R];
+    	AA:= local AA;
+	S:=KK(monoid[gens R | {AA}]);
 	I=substitute(I,S);
 	J:=homogenize(I,AA);
 	J=saturate(J,AA);
@@ -150,6 +150,7 @@ TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	filename := temporaryFileName();
+	filename << "$c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << close;
 	return filename;
 )    
 
