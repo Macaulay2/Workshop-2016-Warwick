@@ -99,6 +99,7 @@ M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);
 I=minors(3,M);
 f=flatten entries gens I;
 (w,ns) = topWitnessSet(f,2);
+
 -- slcmat = matrix applyTable (entries w.Slice, x->1_CC*realPart x);
 slcmat = realPartMatrix(w.Slice);
 R2 := ring w.Equations;
@@ -119,3 +120,15 @@ solsRR = intersectSlice( w, slc );
 
 slc = searchSliceRotation( w );
 solsRR = intersectSlice( w, slc );
+
+--Example: Rational normal curve
+R=CC[x,y,z]
+system={z^2-y,y*z-x,y^2-x*z}
+(w,ns) = topWitnessSet(system, 1);
+slc=searchSliceRotation(w)
+
+R=CC[x,y,z,w]
+system={z^2-y*w,y*z-x*w,x*z-w,y^2-w,x*y-z,x^2-y}
+(w,ns) = topWitnessSet(system, 1);
+--slc=searchSliceRotation(w)
+--solsRR = intersectSlice( w, slc );

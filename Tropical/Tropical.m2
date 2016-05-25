@@ -65,7 +65,8 @@ isBalanced = F->(
 isWellDefined TropicalCycle := Boolean =>
  F ->(
  -- Check that the fan is pure, and then call isBalanced   
-)        
+       if F#"Pure" then isBalanced(F) else false
+)      
 
 
 
@@ -120,14 +121,46 @@ isTropicalBasis (List) := o -> L -> (
 stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
-stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
+stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+	filename := temporaryFileName();
+	return filename;
 )    
 
 convertToPolymake = (T) ->(
-	str := "new Cycle<Min>";
---	str := tropicalMax;
+	str := "new Cycle<";
+	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
+	str = str|">(PROJECTIVE_VERTICES=>[[1";
+	rays := T#"Rays";
+	ray := rays#0;
+	rayDimension := #ray;
+	scan (rayDimension,i -> str = str|",0");
+	str = str|"]";
+	numberOfRays := #rays;
+	scan (numberOfRays,i -> (
+		ray = rays#i;
+		str = str|",[0";
+		scan (rayDimension,j -> str = str|","|ray#j);
+		str = str|"]";
+	));
+	str = str|"],MAXIMAL_POLYTOPES=>[";
+	maxCones := T#"MaximalCones";
+	numberOfMaxCones := #maxCones;
+	cone := maxCones#0;
+	scan (numberOfMaxCones,i -> (
+		cone = maxCones#i;
+		str = str|"[0";
+		scan (#cone,j -> str = str|","|(cone#j+1));
+		str = str|"],";
+	));
+--delete last comma
+	str = substring(0,#str-1,str);
+	str = str|"],WEIGHTS=>[";
+	mult := T#"Multiplicities";
+	scan (numberOfMaxCones,i -> str = str|mult#i|",");
+	str = substring(0,#str-1,str);
+	str = str | "]);";
 	return str
-) 
+)
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -253,39 +286,41 @@ doc///
 
 doc///
     Key
-	tropicalVariety	
-	(tropicalVariety, Ideal)
-	[tropicalVariety, computeMultiplicities]
-	[tropicalVariety, Prime]
+      tropicalVariety    
+      (tropicalVariety, Ideal, Boolean)
+      [tropicalVariety, computeMultiplicities]
+      [tropicalVariety, Prime]
 
     Headline
-	the tropical variety associated to an ideal
+      the tropical variety associated to an ideal
     Usage
-	tropicalVariety(I)
-	tropicalVariety(I,computeMultiplicities=>true)
-	tropicalVariety(I,Prime=>true)
+      tropicalVariety(I,b)
+      tropicalVariety(I,computeMultiplicities=>true)
+      tropicalVariety(I,Prime=>true)
     Inputs
-	I:Ideal
-	    of polynomials
-	computeMultiplicities =>Boolean
-	Prime=>Boolean
+      I:Ideal
+        of polynomials
+      b:Boolean
+        a boolean    
+      computeMultiplicities =>Boolean
+      Prime=>Boolean
     Outputs
         F:TropicalCycle
     Description 
-    	Text
-	   This method takes an ideal and computes the tropical variety associated to it. 
-	   By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
-	   In this case use optional inputs Prime=>false.
-	   By default it computes multiplicities but setting computeMultiplicities=>false
-	   turns this off to decrease computation time.
-	Example
-	   QQ[x,y,z]
-	   I=ideal(x+y+z)
-	   tropicalVariety(I)
-	   tropicalVariety(I,computeMultiplicities=>false)
-	   J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
-	   isPrime J
-           tropicalVariety(J,Prime=>false)
+       Text
+         This method takes an ideal and computes the tropical variety associated to it. 
+         By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
+         In this case use optional inputs Prime=>false.
+         By default it computes multiplicities but setting computeMultiplicities=>false
+         turns this off to decrease computation time.
+      Example
+       QQ[x,y,z]
+       I=ideal(x+y+z)
+       tropicalVariety(I,true)
+       tropicalVariety(I,true,computeMultiplicities=>false)
+       J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+       isPrime J
+       tropicalVariety(J,true,Prime=>false)
 
 ///
 
