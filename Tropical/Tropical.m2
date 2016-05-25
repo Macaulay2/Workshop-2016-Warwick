@@ -214,28 +214,28 @@ getRays = method(TypicalValue => List)
 
 getRays (Fan) :=  F -> ( F#"Rays")
 
-getRays (TropicalCycle):= C->( getRays(C#"Fan"))
+--getRays (TropicalCycle):= C->( getRays(C#"Fan"))
 
 
 getCones = method(TypicalValue => List)
 
 getCones (Fan) :=  F -> ( F#"Cones")
 
-getCones (TropicalCycle):= C->( getCones(C#"Fan"))
+--getCones (TropicalCycle):= C->( getCones(C#"Fan"))
 
 
 getDim = method(TypicalValue => ZZ)
 
 getDim (Fan) :=  F -> ( F#"Dim")
 
-getDim (tropicalCycle):= C->( getDim(C#"Fan"))
+--getDim (tropicalCycle):= C->( getDim(C#"Fan"))
 
 
 getFVector = method(TypicalValue => List)
 
 getFVector (Fan) :=  F -> ( F#"FVector")
 
-getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
+--getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
 
 
 
@@ -245,7 +245,7 @@ getLinealitySpace = method(TypicalValue => List)
 
 getLinealitySpace (Fan) :=  F -> ( F#"LinealitySpace")
 
-getLinealitySpace (TropicalCycle):= C->( getLinealitySpace(C#"Fan"))
+--getLinealitySpace (TropicalCycle):= C->( getLinealitySpace(C#"Fan"))
 
 
 
@@ -254,7 +254,7 @@ getMaximalCones = method(TypicalValue => List)
 
 getMaximalCones (Fan) :=  F -> ( F#"MaximalCones")
 
-getMaximalCones (TropicalCycle):= C->( getMaximalCones(C#"Fan"))
+--getMaximalCones (TropicalCycle):= C->( getMaximalCones(C#"Fan"))
 
 
 
@@ -262,7 +262,7 @@ getPure = method(TypicalValue => Boolean)
 
 getPure (Fan) :=  F -> ( F#"Pure")
 
-getPure (TropicalCycle):= C->( getPure(C#"Fan"))
+--getPure (TropicalCycle):= C->( getPure(C#"Fan"))
 
 
 
@@ -270,7 +270,7 @@ getSimplicial = method(TypicalValue => List)
 
 getSimplicial (Fan) :=  F -> ( F#"Simplicial")
 
-getSimplicial (TropicalCycle):= C->( getSimplicial(C#"Fan"))
+--getSimplicial (TropicalCycle):= C->( getSimplicial(C#"Fan"))
 
 
 
@@ -507,28 +507,28 @@ doc///
     Key
 	getRays
 	(getRays, Fan)
-	(getRays, tropicalCycle)
+	--(getRays, tropicalCycle)
         getCones
 	(getCones, Fan)
-	(getCones, tropicalCycle)
+	--(getCones, tropicalCycle)
 	getDim
 	(getDim, Fan)
-	(getDim, tropicalCycle)
+	--(getDim, tropicalCycle)
         getFVector
 	(getFVector, Fan)
-	(getFVector, tropicalCycle)
+	--(getFVector, tropicalCycle)
 	getLinealitySpace
 	(getLinealitySpace, Fan)
-	(getLinealitySpace, tropicalCycle)
+	--(getLinealitySpace, tropicalCycle)
         getMaximalCones
 	(getMaximalCones, Fan)
-	(getMaximalCones, tropicalCycle)
+	--(getMaximalCones, tropicalCycle)
 	getPure
 	(getPure, Fan)
-	(getPure, tropicalCycle)
+	--(getPure, tropicalCycle)
         getSimplicial
 	(getSimplicial, Fan)
-	(getSimplicial, tropicalCycle)
+	--(getSimplicial, tropicalCycle)
     Headline
 	get the rays or do other stuff of a fan or a tropical cycle
     Usage
