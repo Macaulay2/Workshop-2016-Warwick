@@ -113,8 +113,8 @@ tropicalVariety (Ideal) := o -> (I) ->(
     	R:=ring I;
 	KK:=coefficientRing R;
 --Next line needs to be fixed - AA is a "safe" variable	
-    	AA:= symbol AA;
-	S:=KK[{AA}|gens R];
+    	AA:= local AA;
+	S:=KK(monoid[gens R | {AA}]);
 	I=substitute(I,S);
 	J:=homogenize(I,AA);
 	J=saturate(J,AA);
