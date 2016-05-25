@@ -70,7 +70,7 @@ createNautyString (BasicList, BasicList) := (Polys, Coefficients) -> (
   );
 
 
-  ReturnString := "c -a -m n=" | toString(#SystemAsLists) | " g ";
+  ReturnString := "c +a -m n=" | toString(#SystemAsLists) | " g ";
   for Poly in SystemAsLists do (
     for Term in Poly do (
       ReturnString = ReturnString | toString(Term) | " ";
@@ -79,7 +79,6 @@ createNautyString (BasicList, BasicList) := (Polys, Coefficients) -> (
   );
   ReturnString = substring(ReturnString, 0, #ReturnString - 1) | ". f = [ 0 | " | toString(SystemNode) | " | ";
   ReturnString = ReturnString | PartString(Variables) | " | "; 
-  print peek CoeffToMonomialNode;
   for NodesWithSameCoefficient in values CoeffToMonomialNode do (
     ReturnString = ReturnString | PartString(NodesWithSameCoefficient) | " | ";
   );
@@ -127,40 +126,43 @@ FindSymmetry = Polys-> (
   return createNautyString(PolysAsLists, CoefficientList);
 )
 
-dreadnaut'path = prefixDirectory | currentLayout#"programs" | "dreadnaut";
+dreadnautPath = prefixDirectory | currentLayout#"programs" | "dreadnaut";
 -- Sends a command and retrieves the results into a list of lines.
 -- If ReadError is set to true and the command is successfully executed,
 -- then the data from stderr is returned (filterGraphs and removeIsomorphs
 -- use this).
 protect ReadError;
 callDreadnaut = method(Options => {ReadError => false})
-callDreadnaut (String, List) := List => opts -> (cmdStr, dataList) -> (
+callDreadnaut String := List => opts -> ourGraph -> (
     infn := temporaryFileName();
     erfn := temporaryFileName();
     -- output the data to a file
     o := openOut infn;
-    scan(graphToString \ dataList, d -> o << d << endl);
+    --scan(graphToString \ dataList, d -> o << d << endl);
+    o << ourGraph << endl;
     close o;
     -- try to harvest the lines
-    r := lines try get openIn ("!" | dreadnaut'path | " <" | infn | " 2>" | erfn)
+    r := lines try get openIn ("!" | dreadnautPath | " <" | infn | " 2>" | erfn)
     else (
         -- nauty errored, harvest the error
         e := last separate(":", first lines get openIn erfn);
         removeFile infn;
         removeFile erfn;
         -- special cases 
-        if e == " not found" then error("callDreadnaut: nauty could not be found on the path [" | dreadnaut'path | "].");
+        if e == " not found" then error("callDreadnaut: nauty could not be found on the path [" | dreadnautPath | "].");
         if e == "#q -V] [--keys] [-constraints -v] [ifile [ofile]]" then e = "invalid filter";
         error("callDreadnaut: nauty terminated with the error [", e, "].");
     );
     removeFile infn;
     -- If the method wants it, then read the stderr data instead.
+    {*
     if opts.ReadError then (
         r = lines try get openIn erfn else (
             removeFile erfn;
             error("callDreadnaut: nauty ran successfully, but no data was written to stderr as expected.  Report this to the package maintainer.");
         );
     );
+    *}
     removeFile erfn;
-    r
+    return r;
 )
