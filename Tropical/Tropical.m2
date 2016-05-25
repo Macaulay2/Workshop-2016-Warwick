@@ -123,6 +123,7 @@ TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	filename := temporaryFileName();
+	filename << "$c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << close;
 	return filename;
 )    
 
