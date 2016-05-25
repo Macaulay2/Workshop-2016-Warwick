@@ -521,22 +521,6 @@ doc///
 	(getPure, Fan)
         getSimplicial
 	(getSimplicial, Fan)
-    Headline
-	get the rays or do other stuff of a fan or a tropical cycle
-    Usage
-	getRays(F)
-	getRays(T)
-    Inputs
-	F:Fan
-	T:tropicalCycle        
-    Outputs
-	L:List
-	    the rays of F (resp. T)
-    Description
-	Text
-	    This method gets the rays (or does other stuff) of a fan or a tropical cycle.  
-        Example
-	    1+1
 ///
 
 
