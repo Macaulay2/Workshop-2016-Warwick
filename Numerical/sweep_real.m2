@@ -121,14 +121,29 @@ solsRR = intersectSlice( w, slc );
 slc = searchSliceRotation( w );
 solsRR = intersectSlice( w, slc );
 
---Example: Rational normal curve
+--Example: Twisted cubic
 R=CC[x,y,z]
 system={z^2-y,y*z-x,y^2-x*z}
 (w,ns) = topWitnessSet(system, 1);
-slc=searchSliceRotation(w)
+slc=searchSliceRotation(w);
+solsRR = intersectSlice(w,slc)
 
-R=CC[x,y,z,w]
-system={z^2-y*w,y*z-x*w,x*z-w,y^2-w,x*y-z,x^2-y}
-(w,ns) = topWitnessSet(system, 1);
---slc=searchSliceRotation(w)
---solsRR = intersectSlice( w, slc );
+--Example: Rational normal curve in dimension four
+R=CC[x,y,z,u];
+system={z^2-y*u,y*z-x*u,x*z-u,y^2-u,x*y-z,x^2-y};
+(w,ns) = topWitnessSet(system,1);
+slc=searchSliceRotation(w);
+solsRR = intersectSlice(w,slc)
+
+--Example:Hypersurface in dimension three
+R=CC[x,y,z];
+system={x^2+y^2+z^2};
+(w,ns) = topWitnessSet(system,2);
+slc=searchSliceRotation(w);
+solsRR = intersectSlice(w,slc)
+
+--Testing intersectSlice function
+startSlice=realPartMatrix(w.Slice);
+slcmat=rotationOfSlice(0.5,startSlice);
+slc=matrix2slice(slcmat,w);
+sol=intersectSlice(w,slc)
