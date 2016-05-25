@@ -27,6 +27,24 @@ searchSliceRotation = (w) -> (
     return matrix2slice(slcmin,w)
 )
 
+search2DSlice=(w) -> (
+    npoints := 20;
+    delta := 0.1;
+    tol := 0.0001;
+    startSlice := realPartMatrix(w.Slice);
+    costfun := (a,b) -> sliceCost(changeOfSlice2D(a,b,startSlice), w);
+    (min1,min2) := discretization2D (costfun, 0, 2*pi,0,2*pi, npoints );
+    a1:=min1-delta;
+    b1:=min1+delta;
+    a2:=min2-delta;
+    b2:=min2+delta;
+    (min1,min2):=alternatingMinimization(costfun,a1,b1,a2,b2,tol);
+    slcmin:=changeOfSlice2D(min1,min2,startSlice);
+    return matrix2slice(slcmin,w)
+    )
+
+
+
 matrix2slice = (slcmat, w) -> (
     R2 := ring w.Equations;
     X := transpose (vars(R2) | 1);
@@ -43,6 +61,23 @@ sliceCost = (slcmat, w) -> (
     cost := sum ( coordinates(fsols_0) / imaginaryPart / (x->x^2) );
     return cost;
 )
+
+--alternating minimization
+alternatingMinimization = (F,a1,b1,a2,b2,tol) -> (
+    cOld:=a1;
+    dOld:=a2;
+    c:=a1+random(RR)*(b1-a1);
+    d:=a2+random(RR)*(b2-a2);
+    while abs(c - cOld) > tol and abs(d - dOld) > tol do (
+	Fc:=(y)->F(c,y);
+	dOld=d;
+	d=goldenSearch(Fc,a2,b2,tol);
+	Fd:=(x)->F(x,d);
+	cOld=c;
+	c=goldenSearch(Fd,a1,b1,tol);
+	);
+    return (c,d);
+    )
 
 goldenSearch = (F,a,b,tol) -> (
     gr := (sqrt(5) - 1)/2;
@@ -71,12 +106,42 @@ rotationOfSlice=(t,startSlice)-> (
     return startSlice*M3;
     )
 
+changeOfSlice2D=(t1,t2,startSlice)-> (
+    c:=numColumns(startSlice);
+    rotMatrix1:=rotationMatrix2D(c,0,1,t1);
+    rotMatrix2:=rotationMatrix2D(c,1,2,t2);
+    row1:=startSlice^{0}*rotMatrix1;
+    row2:=startSlice^{1}*rotMatrix2;
+    return row1||row2;
+    )
+
+rotationMatrix2D=(c,i,j,t)-> (
+    M1:=id_(CC^c);
+    M2:=mutableMatrix M1;
+    M2_(i,i)=cos(t);
+    M2_(i,j)=-sin(t);
+    M2_(j,i)=sin(t);
+    M2_(j,j)=cos(t);
+    M3:=matrix M2;
+    return M3
+    )
+
 discretization1D=(F,a,b,n) -> (
     range:=for i to n-1 list a+(b-a)*i/n;
     functionValues := for x in range list F(x);
     minValue:=min(functionValues);
     minPos:=position(functionValues,a->(a==minValue)); 
     return range_minPos;
+)
+
+discretization2D=(F,a1,b1,a2,b2,n) -> (
+    range1:=for i to n-1 list a1+(b1-a1)*i/n;
+    range2:=for i to n-1 list a2+(b2-a2)*i/n;
+    functionValues := flatten for x in range1 list for y in range2 list F(x,y);
+    minValue:=min(functionValues);
+    posInList:=position(functionValues,a->(a==minValue));
+    minPos:=(posInList//n,posInList%n); 
+    return (range1_(minPos#0),range2_(minPos#1));
 )
 
 discretization=(F,n,startSlice,w) -> (
@@ -147,3 +212,6 @@ startSlice=realPartMatrix(w.Slice);
 slcmat=rotationOfSlice(0.5,startSlice);
 slc=matrix2slice(slcmat,w);
 sol=intersectSlice(w,slc)
+
+--Testing AM
+myFunction=(x,y)->sin(x)*sin(y)
