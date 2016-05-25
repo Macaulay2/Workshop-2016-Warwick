@@ -14,6 +14,7 @@ at the Macaulay2 workshop at the University of Warwick, May 23-26, 2016.
 - phc: current version of the executable program for Mac OS X
 - PHCpack.m2: latest development version of Macaulay2 package
 - PHCpack/PHCpackDoc.m2: the latest documentation of PHCpack.m2
+- circle.m2: our first script
 - sweep_real.m2: functions to search for a real slice
 
 **searching for a real slice**
