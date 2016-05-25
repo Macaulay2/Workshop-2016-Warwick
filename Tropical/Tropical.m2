@@ -27,13 +27,16 @@ export {
   "tropicalCycle",
   "isBalanced",
   "tropicalPrevariety",
-   "computeMultiplicities",
+  "computeMultiplicities",
   "Prime",
   "stableIntersection",
   "tropicalVariety",
   "isTropicalBasis",
   "convertToPolymake"
 }
+
+--???check syntax - idea is that this is where we should define local symbols
+protect Maclagan
 
 ------------------------------------------------------------------------------
 -- CODE
@@ -47,9 +50,9 @@ TropicalCycle.GlobalAssignHook = globalAssignFunction
 TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 
---basic operations on a toric cycle
+--basic operations on a tropical cycle
 
-
+--TODO make this a method
 tropicalCycle = (F,mult)->(
     if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
@@ -65,7 +68,7 @@ isBalanced = F->(
 isWellDefined TropicalCycle := Boolean =>
  F ->(
  -- Check that the fan is pure, and then call isBalanced   
-       if F#"Pure" then isBalanced(F) else false
+       if F#"Pure" then return(isBalanced(F)) else return(false);
 )      
 
 
@@ -78,10 +81,10 @@ tropicalPrevariety = method(TypicalValue => Fan,  Options => {
 	})
 
 tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
-if (o.Strategy=="gfan") then (
-  F:=gfanTropicalIntersection(L, gfanopt); G:=new Fan;
-scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
-else error "options not valid"
+    if (o.Strategy=="gfan") then (
+    	F:=gfanTropicalIntersection(L, gfanopt); G:=new Fan;
+    	scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
+    else error "options not valid"
 )
 
 --Computing a tropical variety
@@ -102,6 +105,26 @@ tropicalVariety (Ideal,Boolean) := o -> (I,b)  -> (
 		     else print  " Cannot compute multiplicities if ideal not prime"  )))
 
 
+--Main function to call for tropicalVariety.  Makes no assumption on ideal
+tropicalVariety (Ideal) := o -> (I) ->(
+    if isHomogeneous(I) then return(tropicalVariety(I,true,o))
+    else (
+	--First homogenize
+    	R:=ring I;
+	KK:=coefficientRing R;
+--Next line needs to be fixed - AA is a "safe" variable	
+    	AA:= symbol AA;
+	S:=KK[{AA}|gens R];
+	I=substitute(I,S);
+	J:=homogenize(I,AA);
+	J=saturate(J,AA);
+	--Then compute tropical variety of homogenized ideal
+	T:=tropicalVariety(J,true);
+    	--Then remove lineality space
+    	return(T);
+    )
+)    
+
 --Check if a list of polynomials is a tropical basis for the ideal they generate
 
 isTropicalBasis = method(TypicalValue => Boolean,  Options => {
@@ -109,14 +132,18 @@ isTropicalBasis = method(TypicalValue => Boolean,  Options => {
 	})
 
 isTropicalBasis (List) := o -> L -> (
-	if (o.Strategy=="gfan") then (gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
- 	 F:=gfanTropicalIntersection(L, gfanopt); 
-	if (toString substring(0,13, toString F#"GfanFileHeader")=="The following") then false
-	else if (toString substring(0,13, toString F#"GfanFileHeader")=="_application ") then true
-	else error "Algorithm fail"
+	if (o.Strategy=="gfan") then (
+	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+ 	    F:=gfanTropicalIntersection(L, gfanopt); 
+	    if (toString substring(0,13, toString F#"GfanFileHeader")=="The following") then false
+	    else (
+		if (toString substring(0,13, toString F#"GfanFileHeader")=="_application ") then true
+	        else error "Algorithm fail"
+		)
 	)
 	else error "options not valid"
 	)
+
 
 stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
