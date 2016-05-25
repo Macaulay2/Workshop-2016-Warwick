@@ -22,6 +22,10 @@ newPackage(
 )
 
 export {
+	"MutablePolyhedralObject",
+	"MutableCone",
+	"MutableFan",
+
 	"MarkedPolynomialList",
 	"markedPolynomialList",
 
@@ -79,6 +83,10 @@ export {
 --	"gfanVectorListListToString"", -- to make gfan input
 	"gfanVersion"
 }
+
+MutablePolyhedralObject = new Type of MutableHashTable
+MutableCone = new Type of MutableHashTable
+MutableFan = new Type of MutableHashTable
 
 gfanPath = gfanInterface2#Options#Configuration#"path"
 if gfanPath == "" then gfanPath = prefixDirectory | currentLayout#"programs"
@@ -446,11 +454,11 @@ gfanParseHeader List := (L) -> (
 	typeLine := L#typePosition;
 	typeWords := separate(" ", typeLine);
 	if #typeWords === 2 and typeWords#1 == "PolyhedralCone" then
-		Cone
+		MutableCone
 	else if #typeWords === 2 and (typeWords#1 == "PolyhedralFan" or typeWords#1 == "SymmetricFan") then
-		Fan
+		MutableFan
 	else
-		PolyhedralObject
+		MutablePolyhedralObject
 )
 
 gfanParseBlock = method(TypicalValue => List)
