@@ -1929,9 +1929,9 @@ gfanTropicalTraverse (List) := opts -> (L) -> (
 		| gfanMPLToString(first L)
 		| gfanMPLToString(last L)
 		| gfanVectorListToString(opts#"symmetry");
-<<input<<endl;
+
 	output := runGfanCommand("gfan _tropicaltraverse", opts, input);
-<<output;
+
 	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true )
 )
 

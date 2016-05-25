@@ -62,12 +62,7 @@ tropicalCycle = (F,mult)->(
 
 
 isBalanced = F->(
-	filename := temporaryFileName();
-	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
-	runstring := "polymake "|filename;
-	run runstring;
-	result := get filename;
-	if (result=="1") then return true else return false;
+    
 )
 
 isWellDefined TropicalCycle := Boolean =>
@@ -127,7 +122,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	I=substitute(I,S);
 	J:=homogenize(I,AA);
 	J=saturate(J,AA);
-	--Then compute tropical variety of homogenized ideal
+	--Then compute tropical variety of homogenized ideal calling the other function
 	T:=tropicalVariety(J,true);
     	--Then remove lineality space
     	return(T);
@@ -159,11 +154,8 @@ TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	filename := temporaryFileName();
-	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
-	runstring := "polymake "|filename;
-	run runstring;
-	result := get filename;
-	if (result=="1") then return true else return false;
+	filename << "$c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << close;
+	return filename;
 )    
 
 convertToPolymake = (T) ->(
@@ -327,6 +319,7 @@ doc///
 doc///
     Key
       tropicalVariety    
+      (tropicalVariety, Ideal)
       (tropicalVariety, Ideal, Boolean)
       [tropicalVariety, computeMultiplicities]
       [tropicalVariety, Prime]
@@ -334,16 +327,19 @@ doc///
     Headline
       the tropical variety associated to an ideal
     Usage
-      tropicalVariety(I,b)
+      tropicalVariety(I)
+      tropicalVariety(I,IsHomogIdeal)
       tropicalVariety(I,computeMultiplicities=>true)
       tropicalVariety(I,Prime=>true)
     Inputs
       I:Ideal
         of polynomials
-      b:Boolean
-        a boolean    
+      IsHomogIdeal:Boolean
+        a boolean that ensures whether the ideal is already homogeneous   
       computeMultiplicities =>Boolean
+        a boolean that confirms whether the multiplicities will be computed
       Prime=>Boolean
+        a boolean that ensures whether the ideal is already prime
     Outputs
         F:TropicalCycle
     Description 
@@ -352,15 +348,22 @@ doc///
          By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
          In this case use optional inputs Prime=>false.
          By default it computes multiplicities but setting computeMultiplicities=>false
-         turns this off to decrease computation time.
+         turns this off.
+	 The ideal I is not assumed to be homogeneous but with tropicalVariety(I,true)
+	 the user can confirm it is homogeneous to the function does not check it.
+	 
+	 
       Example
        QQ[x,y,z]
-       I=ideal(x+y+z)
-       tropicalVariety(I,true)
-       tropicalVariety(I,true,computeMultiplicities=>false)
-       J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
-       isPrime J
-       tropicalVariety(J,true,Prime=>false)
+       --I=ideal(x+y+1) 
+       --tropicalVariety(I)
+       --tropicalVariety(I,computeMultiplicities=>false)  
+       J=ideal(x+y+z)
+       tropicalVariety(J,true)
+       tropicalVariety(J,true,computeMultiplicities=>false)
+       K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+       isPrime K
+       tropicalVariety(K,true,Prime=>false)
 
 ///
 
@@ -421,5 +424,6 @@ doc///
 
 TEST ///
     assert (1+1==2)
+    assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
 ///    	    	
        
