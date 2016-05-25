@@ -1,6 +1,3 @@
-needsPackage "PolyhedralObjects"
-needsPackage "gfanInterface2"
-
 newPackage(
     	"Tropical",
 	Version => "0.1",
@@ -21,22 +18,21 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
+        PackageExports => {"PolyhedralObjects","gfanInterface2"},
 	DebuggingMode => true
 )
 
-needsPackage "PolyhedralObjects"
-needsPackage "gfanInterface2"
-needsPackage "SimpleDoc"
-
 export {
+  "TropicalCycle",
   "tropicalCycle",
   "isBalanced",
   "tropicalPrevariety",
-  "MaximalCones",
-  "Multiplicities",
    "computeMultiplicities",
   "Prime",
-  "tropicalVariety"
+  "stableIntersection",
+  "tropicalVariety",
+  "isTropicalBasis",
+  "convertToPolymake"
 }
 
 ------------------------------------------------------------------------------
@@ -55,9 +51,9 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 
 tropicalCycle = (F,mult)->(
-    if #F.MaximalCones != #mult then error("The multiplicity list has the wrong length");
+    if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
-    T.Multiplicities = mult;
+    T#"Multiplicities" = mult;
     return T
 )    
 
@@ -69,14 +65,15 @@ isBalanced = F->(
 isWellDefined TropicalCycle := Boolean =>
  F ->(
  -- Check that the fan is pure, and then call isBalanced   
-)        
+       if F#"Pure" then isBalanced(F) else false
+)      
 
 
 
 
 
 --Computing a tropical prevariety
-tropicalPrevariety = method(TypicalValue => List,  Options => {
+tropicalPrevariety = method(TypicalValue => Fan,  Options => {
 	Strategy=> "gfan"
 	})
 
@@ -86,27 +83,84 @@ if (o.Strategy=="gfan") then (
 scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
 else error "options not valid"
 )
+
 --Computing a tropical variety
 
-tropicalVariety = method(TypicalValue => Ideal,  Options => {
+tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	computeMultiplicities => true,
 	Prime => true
 	})
-tropicalVariety (Ideal) := o -> I  -> (
-	if (o.computeMultiplicities==true and o.Prime== true)
-	then  gfanTropicalTraverse gfanTropicalStartingCone I
+tropicalVariety (Ideal,Boolean) := o -> (I,b)  -> (
+    	if b==false then print "0"
 	else
-	(if o.computeMultiplicities==false 
-		then gfanTropicalBruteForce gfanBuchberger I
-		else print  " Cannot compute multiplicities if ideal not prime"  ))
+	       (if (o.computeMultiplicities==true and o.Prime== true)
+		then (F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
+	            tropicalCycle(F,F#"Multiplicities"))
+		else
+		    (if o.computeMultiplicities==false 
+		     then gfanTropicalBruteForce gfanBuchberger I
+		     else print  " Cannot compute multiplicities if ideal not prime"  )))
+
+
+--Check if a list of polynomials is a tropical basis for the ideal they generate
+
+isTropicalBasis = method(TypicalValue => Boolean,  Options => {
+	Strategy=> "gfan"
+	})
+
+isTropicalBasis (List) := o -> L -> (
+	if (o.Strategy=="gfan") then (gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+ 	 F:=gfanTropicalIntersection(L, gfanopt); 
+	if (toString substring(0,13, toString F#"GfanFileHeader")=="The following") then false
+	else if (toString substring(0,13, toString F#"GfanFileHeader")=="_application ") then true
+	else error "Algorithm fail"
+	)
+	else error "options not valid"
+	)
 
 stableIntersection = method(TypicalValue =>
-(TropicalCycle,TropicalCycle), Options => {Strategy=>"atint"})
+TropicalCycle, Options => {Strategy=>"atint"})
 
-stableIntersection (TropicalCycle, TropicalCycle) := (F,G) -> (
-    
-    return T;
+stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+	filename := temporaryFileName();
+	return filename;
 )    
+
+convertToPolymake = (T) ->(
+	str := "new Cycle<";
+	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
+	str = str|">(PROJECTIVE_VERTICES=>[[1";
+	rays := T#"Rays";
+	ray := rays#0;
+	rayDimension := #ray;
+	scan (rayDimension,i -> str = str|",0");
+	str = str|"]";
+	numberOfRays := #rays;
+	scan (numberOfRays,i -> (
+		ray = rays#i;
+		str = str|",[0";
+		scan (rayDimension,j -> str = str|","|ray#j);
+		str = str|"]";
+	));
+	str = str|"],MAXIMAL_POLYTOPES=>[";
+	maxCones := T#"MaximalCones";
+	numberOfMaxCones := #maxCones;
+	cone := maxCones#0;
+	scan (numberOfMaxCones,i -> (
+		cone = maxCones#i;
+		str = str|"[0";
+		scan (#cone,j -> str = str|","|(cone#j+1));
+		str = str|"],";
+	));
+--delete last comma
+	str = substring(0,#str-1,str);
+	str = str|"],WEIGHTS=>[";
+	mult := T#"Multiplicities";
+	scan (numberOfMaxCones,i -> str = str|mult#i|",");
+	str = substring(0,#str-1,str);
+	str = str | "]);";
+	return str
+)
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -122,7 +176,19 @@ doc ///
 ///
 
 
-
+doc ///
+    Key 
+    	TropicalCycle
+    Headline
+    	a Type for working with tropical cycles
+    Description
+    	Text
+    	   This is the main type for tropical cycles.  A TropicalCycle
+    	   consists of a Fan with an extra HashKey Multiplicities,
+	   which is the list of multiplicities on the maximal cones,
+	   listed in the order that the maximal cones appear in the
+	   MaximalCones list.
+///	   
 
 doc ///
     Key
@@ -205,7 +271,7 @@ doc///
 	Strategy=>String
 	    Strategy (currently only "gfan")
     Outputs
-	F:List
+	F:Fan
 	    the intersection of the tropical hypersurfaces of polynomials in L
     Description
 	Text
@@ -220,31 +286,96 @@ doc///
 
 doc///
     Key
-	tropicalVariety
+      tropicalVariety    
+      (tropicalVariety, Ideal, Boolean)
+      [tropicalVariety, computeMultiplicities]
+      [tropicalVariety, Prime]
+
     Headline
-	the tropical variety associated to an ideal
+      the tropical variety associated to an ideal
     Usage
-	tropicalVariety(I)
+      tropicalVariety(I,b)
+      tropicalVariety(I,computeMultiplicities=>true)
+      tropicalVariety(I,Prime=>true)
     Inputs
-	I:Ideal
-	    of polynomials
+      I:Ideal
+        of polynomials
+      b:Boolean
+        a boolean    
+      computeMultiplicities =>Boolean
+      Prime=>Boolean
     Outputs
-        F:Ideal
+        F:TropicalCycle
     Description 
-    	Text
-	   This method takes an ideal and computes the tropical variety associated to it.
-	Example
-	    QQ[x,y,z]
-	   I=ideal(x+y+z)
-	   tropicalVariety(I)
-	   tropicalVariety(I,computeMultiplicities=>false)
-	   J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
-           tropicalVariety(I,Prime=>false)
+       Text
+         This method takes an ideal and computes the tropical variety associated to it. 
+         By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
+         In this case use optional inputs Prime=>false.
+         By default it computes multiplicities but setting computeMultiplicities=>false
+         turns this off to decrease computation time.
+      Example
+       QQ[x,y,z]
+       I=ideal(x+y+z)
+       tropicalVariety(I,true)
+       tropicalVariety(I,true,computeMultiplicities=>false)
+       J=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+       isPrime J
+       tropicalVariety(J,true,Prime=>false)
 
 ///
 
 
+doc///
+    Key
+	stableIntersection
+	(stableIntersection,TropicalCycle,TropicalCycle)
+    Headline
+    	computes the stable intersection of two tropical varieties
+    Usage
+	stableIntersection(F,G)
+    Inputs
+	F:TropicalCycle
+	  a tropical cycle
+  	G:TropicalCycle
+  	  another tropical cycle
+    Outputs
+        T:TropicalCycle
+	  a tropical cycle
+    Description 
+    	Text
+	    This computes the stable intersection of two tropical
+	    cycles.  For details on the definition of stable
+	    intersection, see, for example, Section 3.6 of TROPICALBOOK.
+	Example
+    	    1+1
+///
 
+
+doc///
+    Key
+	isTropicalBasis
+	(isTropicalBasis, List)
+	[tropicalPrevariety, Strategy]
+    Headline
+	check if a list of polynomials is a tropical basis for the ideal they generate
+    Usage
+	isTropicalBasis(L)
+	isTropicalBasis(L,Strategy=>S)
+    Inputs
+	L:List
+	    of polynomials        
+	Strategy=>String
+	    Strategy (currently only "gfan")
+    Outputs
+	F:Boolean
+	    whether the list of polynomials is a tropical basis for the ideal it generates
+    Description
+	Text
+	    This method checks if the intersection of the tropical hypersurfaces associated to the polynomials in the list equals the tropicalization of the variety corresponding to the ideal they generate.  
+        Example
+	    QQ[x,y]
+	    isTropicalBasis({x+y})
+///
 
 
 
