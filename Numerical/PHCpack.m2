@@ -1,8 +1,8 @@
 
 newPackage(
   "PHCpack",
-  Version => "1.7", 
-  Date => "8 May 2016",
+  Version => "1.8", 
+  Date => "25 May 2016",
   Authors => {
     {Name => "Elizabeth Gross",
      Email => "egross7@uic.edu",
@@ -20,7 +20,13 @@ newPackage(
     {Name => "Contributing Author: Taylor Brysiewicz",
      HomePage => "http://www.math.tamu.edu/~tbrysiewicz/"},
     {Name => "Contributing Author: Corey Harris",
-     HomePage => "http://www.coreyharris.name/"}
+     HomePage => "http://www.coreyharris.name/"},
+    {Name => "Contributing Author: Diego Cifuentes",
+     HomePage => "http://www.mit.edu/~diegcif/"},
+    {Name => "Contributing Author: Kaie Kubjas",
+     HomePage => "http://www.kaiekubjas.com/"},
+    {Name => "Contributing Author: Anna Seigal",
+     HomePage => "https://math.berkeley.edu/~seigal/"}
   },
   Headline => "Interface to PHCpack",
   Configuration => { 
@@ -82,12 +88,16 @@ export {
   "topWitnessSet",
   "trackPaths",
   "zeroFilter",
-  "intersectSlice"
+  "intersectSlice",
+  "searchDelta",
+  "searchNpoints",
+  "searchTolerance",
+  "realSlice1D"
 }
 
 protect ErrorTolerance, protect Iterations,
 protect Bits, protect ResidualTolerance, 
-protect Append 
+protect Append
 
 --##########################################################################--
 -- GLOBAL VARIABLES 
@@ -1536,6 +1546,134 @@ intersectSlice (WitnessSet, List) := (w, slcRR) -> (
   trackPaths(targetSys,startSys,w.Points)
 )
 
+
+-----------------------------------
+-- line search with golden ratio --
+-----------------------------------
+
+goldenSearch = (F,a,b,tol) -> (
+-- Applies the golden section search method
+-- to minimize a unimodal function F over [a,b].
+-- IN: F, a function in one variable;
+--     a, the left bound of the search interval;
+--     b, the right bound of the search interval;
+--     tol, tolerance on the approximate minimum.
+-- OUT: if F is unimodal (it has a unique minimum),
+--      then the value x on return approximates
+--      the minimum with respect to the tolerance tol.
+-- EXAMPLE: myFunction = (x) -> (1-x)*sin((3*x)^3)
+--          goldenSearch( myFunction, .4, .7, 1.0e-4)
+    gr := (sqrt(5) - 1)/2;
+    c := b - gr * (b - a);
+    d := a + gr * (b - a);
+    while abs(c - d) > tol do (
+        Fc := F(c);
+        Fd := F(d);
+        if Fc < Fd then ( b = d;)
+        else ( a = c;);
+        c = b - gr * (b - a);
+        d = a + gr * (b - a);
+    );
+    return (b + a) / 2;
+)
+
+-----------------------------------------------------------
+-- convert coefficients of matrix to list of polynomials --
+-----------------------------------------------------------
+
+matrix2slice = (slcmat, w) -> (
+-- Given a witness set w and a matrix of coefficients
+-- for a set of hyperplanes, uses the ring of w.Equations
+-- to return the list representation of the hyperplanes
+-- with coefficients in slcmat.
+-- IN: slcmat, a matrix of coefficients of hyperplanes;
+--     w, a witness set.
+-- OUT: a list of linear equations with coefficient
+--      from sclmat and variables from w.Equations.
+    R2 := ring w.Equations;
+    X := transpose (vars(R2) | 1);
+    slc := flatten entries (promote(slcmat,R2) * X);
+    return slc;
+)
+
+-------------------------
+-- the cost of a slice --
+-------------------------
+
+sliceCost = (slcmat, w) -> (
+-- Returns the norm of the imaginary parts of the solutions
+-- that satisfy w.Equations on the slices with coefficient
+-- in the matrix slcmat.
+-- IN: sclmat, a matrix of coefficients of hyperplanes;
+--     w, a witness set.
+-- OUT: sum of the squares of the imaginary parts of the coordinates
+--      of the witness points on the hyperplanes defined by sclmat.
+    slc := matrix2slice(slcmat,w);
+    fsols := intersectSlice(w,slc);
+    cost := sum ( coordinates(fsols_0) / imaginaryPart / (x->x^2) );
+    return cost;
+)
+
+realPartMatrix = (m) -> matrix applyTable (entries m, x->1_CC*realPart x)
+
+rotationOfSlice = (t,startSlice) -> (
+-- Returns a rotation of the coefficients of startSlice
+-- about the angle t.
+-- IN: t, an angle;
+--     startSlice, a matrix with coefficients of the slice.
+-- OUT: new slice, rotated from startSlice with angle t.
+    c := numColumns(startSlice);
+    M1 := id_(CC^c);
+    M2 := mutableMatrix M1;
+    M2_(0,0) = cos(t);
+    M2_(0,1) = -sin(t);
+    M2_(1,0) = sin(t);
+    M2_(1,1) = cos(t);
+    M3 := matrix M2;
+    return startSlice*M3;
+)
+--
+discretization1D = (F,a,b,n) -> (
+-- Evaluates the function F over n+1 equidistant points
+-- in the interval [a,b], including a and b, and returns 
+-- the point where F takes the minimal value.
+-- IN: F, a function in one variable;
+--     a, left bound of the interval [a,b];
+--     b, right bound of the interval [a,b];
+--     n, number of points in the interval [a,b].
+-- OUT: the point in the n equidistant points in [a,b]
+--      where F takes its minimal value.
+    range := for i to n list a+(b-a)*i/n;
+    functionValues := for x in range list F(x);
+    minValue := min(functionValues);
+    minPos := position(functionValues,a->(a==minValue)); 
+    return range_minPos;
+)
+-----------------
+-- realSlice1D --
+-----------------
+realSlice1D = method(TypicalValue => List, 
+  Options => {searchNpoints => 20,
+              searchDelta => 0.1,
+              searchTolerance => 1.0e-4})
+realSlice1D(WitnessSet) := o -> (w) -> (
+-- Starting from the given one dimensional witness set,
+-- applies line search to find a real slice.
+-- IN: w, a witness set;
+--     searchNpoints (optional), number of points in the discretization;
+--     searchDelta (optional), 2*searchDelta is width of search interval;
+--     searchTolerance (optional), tolerance for the line search method.
+-- OUT: a slice where the number of real solutions was maximal.
+    startSlice := realPartMatrix(w.Slice);
+    costfun := (a) -> sliceCost(rotationOfSlice(a,startSlice), w);
+    amin := discretization1D (costfun, 0, 2*pi, o.searchNpoints );
+    a := amin - o.searchDelta;
+    b := amin + o.searchDelta;
+    amin = goldenSearch(costfun, a, b, o.searchTolerance);
+    slcmin := rotationOfSlice(amin, startSlice);
+    return matrix2slice(slcmin, w)
+)
+
 --##########################################################################--
 -- DOCUMENTATION
 --##########################################################################--
@@ -1543,10 +1681,6 @@ intersectSlice (WitnessSet, List) := (w, slcRR) -> (
 beginDocumentation()
 
 load "./PHCpack/PHCpackDoc.m2";
-
-
-
-
 
 --##########################################################################--
 -- TESTS

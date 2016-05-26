@@ -52,6 +52,7 @@ Carlos and Paolo
           * add valuations
           * define function isTropicalBasis
 	  * define function stableIntersection
+	  * FIX isTropicalBasis: it needs a homogeneous ideal
 
 
 Sara and Ben
@@ -63,5 +64,19 @@ To do:
 	-homogeneous and not homogeneous
 	-multiplicities in the case of brute force
 	-tropicalCycle output
+
+
+Answered questions:
+==========================
+tropicalVariety:
+-testing if an ideal is homogeneous is not expensive so it could be used in tropicalVariety
+-homogenize computes only the homogenization of the generators
+TESTS:
+-include the examples in the tests as easy tests
+-include "boundary" examples like empty fan 
+stableIntersection:
+-use directly polymake without calling the interface with Polymake since it is not stable yet
+PREFIX BUGS
+-Jeff and Nathan are working on it
 
 	  

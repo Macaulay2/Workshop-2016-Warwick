@@ -48,18 +48,19 @@ W = makeWA(QQ[x,y]); f = y^2 - x^3
 
 A = AnnFs {f}
 RA = ring A
-NRA = newRing(RA,Weights=>{0,0,0,1,1,1},Weights=>{0,0,1,0,0,1})
-G = sub(gbw(A,{0,0,0,1,1,1}),NRA)
+NRA = newRing(RA,Weights=>{0,0,1,1,1,1})
+G = sub(gbw(A,{0,0,1,1,1,1}),NRA)
 use NRA
 s = - NRA_5*NRA_2
 m = 1
 m = 2
 m = 3 
-
+m = 4
+m = 5 
 --monomials in a K-operator of s-degree m
 B = flatten for i to m list ((ideal s^(m-i))*sum(i+1,j->(ideal {dx,dy})^j))_*
 
-B' = apply(B, b->b % G)
-fakeR = (coefficientRing NRA)[x,y][NRA_2,NRA_3,NRA_4,NRA_5]
-CM = last coefficients matrix {apply(B',b'->sub(b',fakeR))}
+B' = apply(B, b->b % G);
+fakeR = (coefficientRing NRA)[x,y][NRA_2,NRA_3,NRA_4,NRA_5];
+CM = last coefficients matrix {apply(B',b'->sub(b',fakeR))};
 syz CM

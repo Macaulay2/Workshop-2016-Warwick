@@ -66,7 +66,13 @@ Description
   Text 
     The Mukai-Lazarsfeld bundle is the kernel of the evaluation map 
     of the global sections of a globally generated line bundle. On a 
-    toric variety, it is a toric vector bundle. If the polarisation is very ample, 
+    toric variety, it is a toric vector bundle. Originally, these bundles 
+    have been used 
+    by Lazarsfeld to find Brill-Noether general curves and by Mukai in the 
+    classification of Fano manifolds. Green and Lazarsfeld have established 
+    a connection of these bundles with Koszul cohomology groups if the first 
+    cohomology of the line bundle is non-zero.  In particular, if the 
+    polarisation is very ample, 
     these bundles can be used to compute the Betti numbers of the minimal 
     free resolution of the coordinate ring. 
      

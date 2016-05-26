@@ -5,13 +5,45 @@
 --    trackPaths(targetSys,startSys,w.Points)
 --)
 
-searchSlice = method();
-searchSlice (WitnessSet):= w -> (
+searchSliceTranslate = w -> (
+    tol := 0.0001;
     costfun := (x) -> sliceCost(matrix {{1_CC,0,0,x}}, w);
-    xmin := goldenSearch (costfun, -5.0, 5.0, 0.001);
+    xmin := goldenSearch (costfun, -5.0, 5.0, tol);
     slcmin := matrix{{1_CC,0,0,xmin}};
     return matrix2slice(slcmin,w)
 )
+
+searchSliceRotation = (w) -> (
+    npoints := 20;
+    delta := 0.1;
+    tol := 0.0001;
+    startSlice := realPartMatrix(w.Slice);
+    costfun := (a) -> sliceCost(rotationOfSlice(a,startSlice), w);
+    amin := discretization1D (costfun, 0, 2*pi, npoints );
+    a := amin - delta;
+    b := amin + delta;
+    amin = goldenSearch (costfun, a, b, tol);
+    slcmin := rotationOfSlice(a,startSlice);
+    return matrix2slice(slcmin,w)
+)
+
+search2DSlice=(w) -> (
+    npoints := 20;
+    delta := 0.1;
+    tol := 0.0001;
+    startSlice := realPartMatrix(w.Slice);
+    costfun := (a,b) -> sliceCost(changeOfSlice2D(a,b,startSlice), w);
+    (min1,min2) := discretization2D (costfun, 0, 2*pi,0,2*pi, npoints );
+    a1:=min1-delta;
+    b1:=min1+delta;
+    a2:=min2-delta;
+    b2:=min2+delta;
+    (min1,min2):=alternatingMinimization(costfun,a1,b1,a2,b2,tol);
+    slcmin:=changeOfSlice2D(min1,min2,startSlice);
+    return matrix2slice(slcmin,w)
+    )
+
+
 
 matrix2slice = (slcmat, w) -> (
     R2 := ring w.Equations;
@@ -26,9 +58,26 @@ matrix2slice = (slcmat, w) -> (
 sliceCost = (slcmat, w) -> (
     slc := matrix2slice(slcmat,w);
     fsols := intersectSlice(w,slc);
-    cost := norm ( coordinates(fsols_0) / imaginaryPart );
+    cost := sum ( coordinates(fsols_0) / imaginaryPart / (x->x^2) );
     return cost;
 )
+
+--alternating minimization
+alternatingMinimization = (F,a1,b1,a2,b2,tol) -> (
+    cOld:=a1;
+    dOld:=a2;
+    c:=a1+random(RR)*(b1-a1);
+    d:=a2+random(RR)*(b2-a2);
+    while abs(c - cOld) > tol and abs(d - dOld) > tol do (
+	Fc:=(y)->F(c,y);
+	dOld=d;
+	d=goldenSearch(Fc,a2,b2,tol);
+	Fd:=(x)->F(x,d);
+	cOld=c;
+	c=goldenSearch(Fd,a1,b1,tol);
+	);
+    return (c,d);
+    )
 
 goldenSearch = (F,a,b,tol) -> (
     gr := (sqrt(5) - 1)/2;
@@ -57,6 +106,44 @@ rotationOfSlice=(t,startSlice)-> (
     return startSlice*M3;
     )
 
+changeOfSlice2D=(t1,t2,startSlice)-> (
+    c:=numColumns(startSlice);
+    rotMatrix1:=rotationMatrix2D(c,0,1,t1);
+    rotMatrix2:=rotationMatrix2D(c,1,2,t2);
+    row1:=startSlice^{0}*rotMatrix1;
+    row2:=startSlice^{1}*rotMatrix2;
+    return row1||row2;
+    )
+
+rotationMatrix2D=(c,i,j,t)-> (
+    M1:=id_(CC^c);
+    M2:=mutableMatrix M1;
+    M2_(i,i)=cos(t);
+    M2_(i,j)=-sin(t);
+    M2_(j,i)=sin(t);
+    M2_(j,j)=cos(t);
+    M3:=matrix M2;
+    return M3
+    )
+
+discretization1D=(F,a,b,n) -> (
+    range:=for i to n-1 list a+(b-a)*i/n;
+    functionValues := for x in range list F(x);
+    minValue:=min(functionValues);
+    minPos:=position(functionValues,a->(a==minValue)); 
+    return range_minPos;
+)
+
+discretization2D=(F,a1,b1,a2,b2,n) -> (
+    range1:=for i to n-1 list a1+(b1-a1)*i/n;
+    range2:=for i to n-1 list a2+(b2-a2)*i/n;
+    functionValues := flatten for x in range1 list for y in range2 list F(x,y);
+    minValue:=min(functionValues);
+    posInList:=position(functionValues,a->(a==minValue));
+    minPos:=(posInList//n,posInList%n); 
+    return (range1_(minPos#0),range2_(minPos#1));
+)
+
 discretization=(F,n,startSlice,w) -> (
     angles:=for i to n-1 list 2*pi*i/n;
     functionValues:={};
@@ -69,13 +156,17 @@ discretization=(F,n,startSlice,w) -> (
     return rotationOfSlice(angles#minPosition,startSlice);
 )
 
+realPartMatrix = (m) -> matrix applyTable (entries m, x->1_CC*realPart x)
+
 -- Example: rank 3 matrices
 R=CC[a,b,c,d];
 M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);
 I=minors(3,M);
 f=flatten entries gens I;
 (w,ns) = topWitnessSet(f,2);
-slcmat = matrix applyTable (entries w.Slice, x->1_CC*realPart x);
+
+-- slcmat = matrix applyTable (entries w.Slice, x->1_CC*realPart x);
+slcmat = realPartMatrix(w.Slice);
 R2 := ring w.Equations;
 X := transpose (vars(R2) | 1);
 slcRR = flatten entries (promote(slcmat,R2) * X);
@@ -87,8 +178,40 @@ goldenSearch( myFunction, .4, .7, .00001)
 
 -- Example: Circle
 R = CC[x,y];
-system = {x^2 + y^2 - 1};
+system = {x^2 + (y+2)^2 - 1};
 (w,ns) = topWitnessSet(system, 1);
-slc = searchSlice( w );
+slc = searchSliceTranslate( w );
 solsRR = intersectSlice( w, slc );
 
+slc = searchSliceRotation( w );
+solsRR = intersectSlice( w, slc );
+
+--Example: Twisted cubic
+R=CC[x,y,z]
+system={z^2-y,y*z-x,y^2-x*z}
+(w,ns) = topWitnessSet(system, 1);
+slc=searchSliceRotation(w);
+solsRR = intersectSlice(w,slc)
+
+--Example: Rational normal curve in dimension four
+R=CC[x,y,z,u];
+system={z^2-y*u,y*z-x*u,x*z-u,y^2-u,x*y-z,x^2-y};
+(w,ns) = topWitnessSet(system,1);
+slc=searchSliceRotation(w);
+solsRR = intersectSlice(w,slc)
+
+--Example:Hypersurface in dimension three
+R=CC[x,y,z];
+system={x^2+y^2+z^2};
+(w,ns) = topWitnessSet(system,2);
+slc=searchSliceRotation(w);
+solsRR = intersectSlice(w,slc)
+
+--Testing intersectSlice function
+startSlice=realPartMatrix(w.Slice);
+slcmat=rotationOfSlice(0.5,startSlice);
+slc=matrix2slice(slcmat,w);
+sol=intersectSlice(w,slc)
+
+--Testing AM
+myFunction=(x,y)->sin(x)*sin(y)
