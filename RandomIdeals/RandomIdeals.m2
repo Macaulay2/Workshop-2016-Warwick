@@ -210,6 +210,9 @@ randomBinomialIdeal(List, Ring) := Ideal => (L,S)->(
      trim ideal apply(L, d->randomMonomial(d,S)-random(kk)*randomMonomial(d,S))
      )
 
+///
+///
+
 randomSparseIdeal = method(TypicalValue => Ideal)
 randomSparseIdeal(Matrix, ZZ, ZZ) := Ideal => (B,s,n) -> (
      -- B is a 1xt matrix of monomials
@@ -368,7 +371,7 @@ randomShelling(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomShelling(numgens
 
 randomEdgeIdeal = method()
 randomEdgeIdeal(ZZ,ZZ) := (n,t) -> (
-    	    local x;
+    	    x:=symbol x;
     	    G:=randomGraph(QQ[x_1..x_n],t);
 	    (G, edgeIdeal(G))
 		)
@@ -383,7 +386,7 @@ randomEdgeIdeal(8, 5)
 
 randomBinomialEdgeIdeal = method();
 randomBinomialEdgeIdeal(ZZ,ZZ) := (n, t) -> ( 
-    local x;
+    x := symbol x;
     G := randomGraph(QQ[x_1..x_n], t); 
     E := apply(edges G, i -> apply(i, j -> index j+1));
     return (binomialEdgeIdeal(E), G)
@@ -392,13 +395,8 @@ randomBinomialEdgeIdeal(ZZ,ZZ) := (n, t) -> (
 
 --test
 TEST///
-restart
-load "RandomGraphIdeals.m2"
-(randomBinomialEdgeIdeal(7, 4))_0 
-(ideal(x_6*y_7-x_7*y_6,-x_6*y_1+x_1*y_6,-x_3*y_5+x_5*y_3,-x_5*y_4+x_4*y_5)
-    ,new Graph from {ring => QQ[x_1, x_2, x_3, x_4, x_5, x_6, x_7], vertices =>
-     {x_1, x_2, x_3, x_4, x_5, x_6, x_7}, edges => {{x_6, x_7}, {x_1, x_6}, {x_3, x_5}, {x_4, x_5}}})
-
+randomBinomialEdgeIdeal(7, 4)
+randomGraph
 ///
 
 --Random toric edge ideal 
@@ -406,8 +404,8 @@ load "RandomGraphIdeals.m2"
 
 randomToricEdgeIdeal = method();
 randomToricEdgeIdeal(ZZ,ZZ) := (n, t) -> (
-    local e;
-    local x;
+    e := local e;
+    x := local x;
     R := QQ[x_1..x_n];
     S := QQ[e_1..e_t];
     G := randomGraph(R,t);
