@@ -150,7 +150,7 @@ isTropicalBasis = method(TypicalValue => Boolean,  Options => {
 
 isTropicalBasis (List) := o -> L -> (
 	if (o.Strategy=="gfan") then (
-	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false}; if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneous polynomials yet";
  	    F:=gfanTropicalIntersection(L, gfanopt); 
 	    if (toString substring(0,13, toString F#"GfanFileHeader")=="The following") then false
 	    else (
