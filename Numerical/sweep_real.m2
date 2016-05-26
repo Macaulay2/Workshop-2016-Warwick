@@ -27,8 +27,9 @@ searchSliceRotation = (w) -> (
     return matrix2slice(slcmin,w)
 )
 
-search2DSlice=(w) -> (
-    npoints := 20;
+--search for a 2-dimensional slice
+searchSlice2D=(w) -> (
+    npoints := 10;
     delta := 0.1;
     tol := 0.0001;
     startSlice := realPartMatrix(w.Slice);
@@ -38,7 +39,7 @@ search2DSlice=(w) -> (
     b1:=min1+delta;
     a2:=min2-delta;
     b2:=min2+delta;
-    (min1,min2):=alternatingMinimization(costfun,a1,b1,a2,b2,tol);
+    (min1,min2)=alternatingMinimization(costfun,a1,b1,a2,b2,tol);
     slcmin:=changeOfSlice2D(min1,min2,startSlice);
     return matrix2slice(slcmin,w)
     )
@@ -159,7 +160,7 @@ discretization=(F,n,startSlice,w) -> (
 realPartMatrix = (m) -> matrix applyTable (entries m, x->1_CC*realPart x)
 
 -- Example: rank 3 matrices
-R=CC[a,b,c,d];
+R=CC[x,y,z,u];
 M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);
 I=minors(3,M);
 f=flatten entries gens I;
@@ -202,9 +203,9 @@ solsRR = intersectSlice(w,slc)
 
 --Example:Hypersurface in dimension three
 R=CC[x,y,z];
-system={x^2+y^2+z^2};
+system={x^2+y^2-z};
 (w,ns) = topWitnessSet(system,2);
-slc=searchSliceRotation(w);
+slc=searchSlice2D(w);
 solsRR = intersectSlice(w,slc)
 
 --Testing intersectSlice function
