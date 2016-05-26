@@ -233,6 +233,8 @@ depth(Module) := ZZ => M -> (
     if not isField coefficientRing S then error"input must be a module over an affine ring";
     S0 := ring presentation S;
         
+--    if isField coefficientRing S0 then return codim ideal vars R;
+            
     m := presentation M;    
     mm := (presentation S ** sub(target m, S0)) |sub(m,S0);
     numgens S0 - length res coker mm
@@ -275,9 +277,10 @@ depth(Ideal,Ideal) := ZZ => (I,A) -> (
 
 -----------------------------------------------------------------------------
 
-depth(Ideal,PolynomialRing) := ZZ => (I,A) -> (
-     if isField coefficientRing A then codim I else depth(I,module A)
-     ) -- if we can compute dimensions over ZZ, then we can remove this if-then statement
+-- Depriciated Code (Branden Stone)
+--depth(Ideal,PolynomialRing) := ZZ => (I,A) -> (
+--     if isField coefficientRing A then codim I else depth(I,module A)
+--     ) -- if we can compute dimensions over ZZ, then we can remove this if-then statement
 
 -----------------------------------------------------------------------------
 
