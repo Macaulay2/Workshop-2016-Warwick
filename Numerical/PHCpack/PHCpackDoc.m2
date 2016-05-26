@@ -1613,7 +1613,7 @@ doc ///
       R = CC[x,y,z];
       paraboloid = {z - x^2 - y^2};
       (w, ns) = topWitnessSet(paraboloid, 2);
-      slc = realSlice2D(w, searcNpoints=>5);
+      slc = realSlice2D(w, searchNpoints=>5);
       solsRR = intersectSlice(w,slc)
       for i to #solsRR-1 do print solsRR_i
     
