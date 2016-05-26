@@ -123,7 +123,7 @@ searchSlice1D(WitnessSet) := o -> (w) -> (
     a := amin - o.delta;
     b := amin + o.delta;
     amin = goldenSearch(costfun, a, b, o.tol);
-    slcmin := rotationOfSlice(a, startSlice);
+    slcmin := rotationOfSlice(amin, startSlice);
     return matrix2slice(slcmin, w)
 )
 --

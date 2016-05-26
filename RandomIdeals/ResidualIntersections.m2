@@ -13,15 +13,16 @@ newPackage ( "ResidualIntersections",
 	{Name => "Jay Yang",
 	    Email => "jkelleyy@gmail.com"}
 	},
-    PackageExports => {"RandomIdeal"},
+    PackageExports => {"RandomIdeal", "Depth"},
     Headline => "Package for studying conditions associated to Residual Intersection theory",
     Reload => true,
     DebuggingMode => true
     )
 
 export {
+    	"profondeur",
 	"isLicci",
-	"minimalRegularSequence",
+--	"homogeneousRegularSequence",
 	"linkageBound",
 	"UseNormalModule",
 	"genericResidual",
@@ -124,7 +125,7 @@ if numgens I <= c then return ideal(1_(ring I));
 --n :=numcols sgens;
 --rsgens  := sgens * random(source sgens, source sgens);
 --regseq := ideal rsgens_{n-c..n-1};
-regseq := minimalRegularSequence(c,I);
+regseq := homogeneousRegularSequence(c,I);
 trim(regseq : I)
 )
 randomLink Ideal := I->randomLink(codim I, I)
@@ -139,8 +140,8 @@ if opts.UseNormalModule == false then
 )
 
 {*
-minimalRegularSequence = method()
-minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
+homogeneousRegularSequence = method()
+homogeneousRegularSequence(ZZ,Ideal) := (c,I) ->(
 if numgens I == c then return I;
     --takes care of I = 0 and I principal;
 sgens := sort gens I;
@@ -157,11 +158,11 @@ while c'<c do(
     );
 J
 )
-minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
-*}
+homogeneousRegularSequence Ideal := I -> homogeneousRegularSequence(codim I, I)
 
-minimalRegularSequence = method()
-minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
+
+homogeneousRegularSequence = method()
+homogeneousRegularSequence(ZZ,Ideal) := (c,I) ->(
 if numgens I == c then return I;
     --takes care of I = 0 and I principal;
 sgens := sort gens I;
@@ -184,7 +185,7 @@ for i from 0 to n-1 do(
 	c' = c'';
 	if c' ==c then break));
 J)
-minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
+homogeneousRegularSequence Ideal := I -> homogeneousRegularSequence(codim I, I)
 
 ///
 restart
@@ -192,13 +193,13 @@ loadPackage "ResidualIntersections"
 S = ZZ/101[a,b,c]
 I = ideal"cb,b2,ab,a2"
 codim I 
-minimalRegularSequence(codim I, I)
+homogeneousRegularSequence(codim I, I)
      I = ideal"cb,b2,a2"
-     minimalRegularSequence I     
+     homogeneousRegularSequence I     
      I = ideal"ab,ac,bc"
-     minimalRegularSequence( I)
+     homogeneousRegularSequence( I)
 ///
-
+*}
 isLicci = method(Options => {UseNormalModule =>false, Verbose =>false})
 isLicci(ZZ, ZZ, Ideal) := opts -> (b,c,I) -> (
     --I homogeneous ideal
@@ -270,16 +271,59 @@ profondeur Module := M -> (
     (S,F) := flattenRing R;
     if not isField coefficientRing S then error"input must be a module over an affine ring";
     S0 := ring presentation S;
-    r := F*map(S,S0);
-    MM := pushForward(r,M);
---    error();
-    numgens S0 - pdim MM)
+    r := presentation S;
+    m := presentation M;
+    mm := substitute(m, S0); 
+    MM := coker(mm | r**target mm);
+    error();
+    numgens S0 - pdim MM
+    
+    )
 
+profondeur Ring := R -> profondeur(R^1)
 
 ///
 restart
-loadPackage ("Depth", Reload=>true)
+--loadPackage ("Depth", Reload=>true)
 debug loadPackage ("ResidualIntersections", Reload=>true)
+
+S = ZZ/101[x_1..x_6]
+m0=map(S^1,S^1,1)
+pdim coker m0
+I =minors(2, genericSymmetricMatrix(S,x_1,3))
+C = koszul mingens I
+H = HH_4 C
+pH = prune H
+pdim H
+profondeur H
+profondeur pH
+
+pdim Module := M-> length res  minimalPresentation M
+
+S = ZZ/101[x]
+N = coker map(S^1,S^1,1)
+trim N
+
+pdim N
+trim N ==trim M
+res trim M
+res trim N
+M = subquotient(map(S^1,S^1,1),map(S^1,S^1,1))
+M == N
+res M
+trim M
+pdim M
+res trim M
+
+f = map (S^1,S^1,1)
+M = coker f
+N= subquotient(f,f)
+assert(M==N)
+assert (res M == res N)
+assert (res trim M == res trim N)
+
+
+
 
 pdim1 = method()
 pdim1 Module := M ->(
@@ -289,10 +333,14 @@ c = 3
 m = n+c-1
 S = ZZ/101[x_1..x_(n*m)]
 I = minors(n, genericMatrix(S,x_1,m,n));
+profondeur(S^1/I^4)
+
 apply(4, i->elapsedTime pdim(S^1/I^(i+1)))
 apply(4, i->time pdim1(S^1/I^(i+1)))
 
 apply(4, i->elapsedTime res(S^1/I^(i+1)))
+apply(4, i->elapsedTime profondeur(S^1/I^(i+1)))
+
 apply(4, i->elapsedTime res(S^1/I^(i+1), FastNonminimal => true))
 time profondeur(S^1/I^4)
 time pdim (S^1/I^4)
@@ -306,10 +354,13 @@ vars S % vars S
 profondeur Ring := R -> profondeur R^1
 
 koszulDepth = method()
-koszulDepth(Ideal) := I -> (
+koszulDepth Ideal := I -> (
     if I==0 then return {};
-    C := koszul mingens I;
-    for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
+    J := trim I;
+    m := numgens J;
+    C := koszul gens J;
+    c := codim J;
+    for i in 0..m-c-1 list profondeur prune HH_i(C)
     )
 
 koszulDepth(ZZ,Ideal) := (k,I) -> (
@@ -321,22 +372,46 @@ koszulDepth(ZZ,Ideal) := (k,I) -> (
 
 isStronglyCM = method()
 isStronglyCM(Ideal) := I -> (
-    d := dim I;
-    all(koszulDepth I,i -> i==d)
+    J := trim I;
+    c := codim J;
+    d := dim J;
+    m := numgens J;
+    C := koszul gens J;
+    kd := apply(m-c, i->profondeur HH_i(C)); 
+    --note that if H_0 is CM then we don't have to check H_(m-c), the canonical module.
+    all(kd, i -> i==d)
     )
+TEST///
+--isStronglyCM
+--koszulDepth
+
+restart
+loadPackage "ResidualIntersections"
+S = kk[vars(0..7)]
+m = genericMatrix(S,S_0,2,3)
+I = minors(2,m)
+assert(hasSlidingDepth(3,I) == true)
+assert(koszulDepth I == {6})
+assert(isStronglyCM(I) == true)
+m = genericMatrix(S,S_0,2,4)
+I = minors(2,m)
+assert(isStronglyCM(I) == false)
+assert(koszulDepth I == {5,0,2})
+assert(hasSlidingDepth(1,I) == false)
+I = minors(2,genericSymmetricMatrix(S,S_0,3))
+assert(isStronglyCM I == false)
+hasSlidingDepth(,I)
+///
 
 hasSlidingDepth = method()
 
 hasSlidingDepth(ZZ,Ideal) := (k,I) -> (
     d := dim I;
     s := numColumns(mingens I)-codim I;
-    all(k+1, i -> (koszulDepth(s-i,I))>=d-i)
+    if k >= s then k;
+    all(k, i -> (koszulDepth(s-i-1,I))>=d-i-1)
     )
 
-hasSlidingDepth(Ideal) := I -> (
-    s := numColumns(mingens I)-codim I;
-    hasSlidingDepth(s,I)
-    )
 
 -------------------------------------
 -- G_s Code
@@ -541,24 +616,6 @@ doc ///
 
 
 ------------------------------------------------------------
--- DOCUMENTATION minimalRegularSequence
-------------------------------------------------------------
-doc ///
-   Key
-    minimalRegularSequence
-    (minimalRegularSequence,ZZ,Ideal)
-    (minimalRegularSequence,Ideal)
-   Headline
-    Finds a maximal regular sequence of minimal degree in an ideal
-   Usage
-    J=minimalRegularSequence(n,I)
-    J=minimalRegularSequence(I)
-   Inputs
-    n:ZZ
-    I:Ideal
-///
-
-------------------------------------------------------------
 -- DOCUMENTATION maxGs
 ------------------------------------------------------------
 
@@ -687,17 +744,19 @@ doc ///
       I:MonomialIdeal
    Outputs
       L:List
-         a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
-	 The range of values is {\tt codim I} + 1 and the dimension of the ring + 1.
+         a list of integers {\tt s} such that {\tt I} localized at any prime of 
+	 codimension {\tt s-1} in the ambient ring has at most s generators.
+	 The range of values is from {\tt codim I} + 1 to the dimension of the ring + 1.
    Description
       Text
-         For each {\tt s} computes the maximum over all monomial primes {\tt P} with codimension {\tt s-1} 
+         For each {\tt s} computes the maximum, over all monomial primes {\tt P} with codimension {\tt s-1} 
+	 in the ambient ring,
 	 of the minimal size of a generating set of {\tt I} localized at {\tt P}.  If this number is 
 	 less than {\tt s}, then {\tt s} is included in the list.
       Text
-         The values {\tt s} returned are candidates for {\tt I} possibly being an {\tt s}-rsidual intersection.
+         The values {\tt s} returned are the numbers such that an {\tt s}-residual intersection of I exists.
       Example
-         R = QQ[a,b,c];
+         R = ZZ/101[a,b,c];
 	 I = monomialIdeal{a*b,b*c^2}
 	 residualCodims I
    SeeAlso
@@ -724,9 +783,10 @@ doc ///
          true if {\tt I} is Strongly Cohen Macaulay
    Description
       Text
-         Checks whether {\tt I} is Strongly Cohen Macaulay. We compute the depths of the Koszul homology by using {\tt koszulDepth} and compares it to {\tt codim I}.
+         {\tt I} is Strongly Cohen Macaulay if each Koszul homology module is Cohen-Macaulay.
+	 The routine computes the Koszul homology with {\tt koszulDepth}.
       Example
-         R = QQ[x_1..x_5];
+         R = ZZ/101[x_1..x_5];
 	 I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
          isStronglyCM I
    SeeAlso
@@ -778,12 +838,10 @@ doc ///
 doc ///
    Key
       hasSlidingDepth
-      (hasSlidingDepth,Ideal)
       (hasSlidingDepth,ZZ,Ideal)
    Headline
       Checks if an ideal has the sliding depth property
    Usage
-      b = hasSlidingDepth I
       b = hasSlidingDepth(k,I)
    Inputs
       I:Ideal
@@ -793,17 +851,21 @@ doc ///
          true if {\tt I} has sliding depth
    Description
       Text
-         This computes whether the ideal {\tt I} has sliding depth.
+         Determines whether the ideal {\tt I} has sliding depth for k steps
       Text
-         For an ideal $I$ with minimal generating set ${\bf f}=(f_1,\ldots,f_n)$, we say $I$
-         has k-sliding depth if for all $i\leq k$ we have $depth(H_{n-codim(I)-i}({\bf f}))\geq dim I - i$.
-         Note that since $H_{n-codim(I)}({\bf f})$ is the canonical module which always has
-         depth equal to $dim I$, every ideal has 0-sliding depth. We say that a module has
-         sliding depth without a parameter if it has $(n-codim(I))$-sliding depth
+         Let K be the Koszul complex on a minimal set of generators of I.
+	 We say $I$ has k-sliding depth if for all $i\leq k$ we have 
+	 $depth(H_{n-codim(I)-i}(K) \geq dim I - i$.
+         Note that if I is perfect then  $H_{n-codim(I)}(K)$ is the canonical module,
+	 which is Cohen-Macaulay so that I has 0-sliding depth. 
       Example
          R = QQ[x_1..x_6];
+	 I = minors(2, genericSymmetricMatrix(R,x_1,3))
+	 c = codim I
+	 m = numgens I
+	 apply (m+1, i-> koszulDepth(i,I))
+    	 hasSlidingDepth(m-c,I)
 	 I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
-         hasSlidingDepth I
          hasSlidingDepth(1,I)
          hasSlidingDepth(2,I)
    SeeAlso

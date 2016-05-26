@@ -219,14 +219,14 @@ getRays = method(TypicalValue => List)
 
 getRays (Fan) :=  F -> ( F#"Rays")
 
---getRays (tropicalCycle):= C->( getRays(C#"Fan"))
+--getRays (TropicalCycle):= C->( getRays(C#"Fan"))
 
 
 getCones = method(TypicalValue => List)
 
 getCones (Fan) :=  F -> ( F#"Cones")
 
---getCones (tropicalCycle):= C->( getCones(C#"Fan"))
+--getCones (TropicalCycle):= C->( getCones(C#"Fan"))
 
 
 getDim = method(TypicalValue => ZZ)
@@ -240,7 +240,7 @@ getFVector = method(TypicalValue => List)
 
 getFVector (Fan) :=  F -> ( F#"FVector")
 
---getFVector (tropicalCycle):= C->( getFVector(C#"Fan"))
+--getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
 
 
 
@@ -250,7 +250,7 @@ getLinealitySpace = method(TypicalValue => List)
 
 getLinealitySpace (Fan) :=  F -> ( F#"LinealitySpace")
 
---getLinealitySpace (tropicalCycle):= C->( getLinealitySpace(C#"Fan"))
+--getLinealitySpace (TropicalCycle):= C->( getLinealitySpace(C#"Fan"))
 
 
 
@@ -259,7 +259,7 @@ getMaximalCones = method(TypicalValue => List)
 
 getMaximalCones (Fan) :=  F -> ( F#"MaximalCones")
 
---getMaximalCones (tropicalCycle):= C->( getMaximalCones(C#"Fan"))
+--getMaximalCones (TropicalCycle):= C->( getMaximalCones(C#"Fan"))
 
 
 
@@ -267,7 +267,7 @@ getPure = method(TypicalValue => Boolean)
 
 getPure (Fan) :=  F -> ( F#"Pure")
 
---getPure (tropicalCycle):= C->( getPure(C#"Fan"))
+--getPure (TropicalCycle):= C->( getPure(C#"Fan"))
 
 
 
@@ -275,7 +275,7 @@ getSimplicial = method(TypicalValue => List)
 
 getSimplicial (Fan) :=  F -> ( F#"Simplicial")
 
---getSimplicial (tropicalCycle):= C->( getSimplicial(C#"Fan"))
+--getSimplicial (TropicalCycle):= C->( getSimplicial(C#"Fan"))
 
 
 
@@ -503,8 +503,30 @@ doc///
 	Text
 	    This method checks if the intersection of the tropical hypersurfaces associated to the polynomials in the list equals the tropicalization of the variety corresponding to the ideal they generate.  
         Example
-	    QQ[x,y]
-	    isTropicalBasis({x+y})
+	    QQ[x,y,z]
+	    isTropicalBasis({x+y+z,2*x+3*y-z})
+	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
+///
+
+
+doc///
+    Key
+	getRays
+	(getRays, Fan)
+        getCones
+	(getCones, Fan)
+	getDim
+	(getDim, Fan)
+        getFVector
+	(getFVector, Fan)
+	getLinealitySpace
+	(getLinealitySpace, Fan)
+        getMaximalCones
+	(getMaximalCones, Fan)
+	getPure
+	(getPure, Fan)
+        getSimplicial
+	(getSimplicial, Fan)
 ///
 
 
@@ -512,5 +534,6 @@ doc///
 TEST ///
     assert (1+1==2)
     assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
+    assert(R:=QQ[x,y,z]; isTropicalBasis({x+y+z,2*x+3*y-z}))
 ///    	    	
        
