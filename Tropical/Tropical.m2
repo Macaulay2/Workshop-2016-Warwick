@@ -68,7 +68,7 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 tropicalCycle = method(TypicalValue => TropicalCycle)
 
-tropicalCycle (Fan, String) := (F,mult)->(
+tropicalCycle (Fan, List) := (F,mult)->(
     if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
     T#"Multiplicities" = mult;
@@ -381,7 +381,7 @@ doc ///
 doc ///
     Key
 	tropicalCycle
-	(tropicalCycle, Fan, String)
+	(tropicalCycle, Fan, List)
     Headline
     	constructs a TropicalCycle from a Fan and a multiplicity function
     Usage
