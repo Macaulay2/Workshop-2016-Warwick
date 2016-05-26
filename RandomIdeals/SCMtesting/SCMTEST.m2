@@ -34,33 +34,31 @@ RandomI(ZZ):=(len)->( --len is the length of the list of random ideals
 		      --M=matrix{{a^3,b^4,c^5}};
 		      ---------------------------------
 		      --all not CM and not SCM
-		      --S=kk[a..e];
-		      --M = matrix{{a^3,b^4+c^4,d^5}}; --codimension 3 ideal
-		      --S=kk[a..e];
-		      --M = matrix{{a^3,b^4+c^4,d^5}}; --codimension 3 ideal
+      		      S=kk[a..e];
+		      M = matrix{{a^3,b^4+c^4,d^5}}; --codimension 3 ideal
 		      ---------------------------------
 		      --all CM and SCM (not on Magda machine!)
 		      --S=kk[a..d]; 
 		      --M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
 		      ---------------------------------
 		      --computation very long, the first elements are not CM
-		      --S=kk[a..e]; 
-		      --M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
+--		      S=kk[a..e]; 
+--		      M = matrix{{a^3,b^4+c^4,d^5,c^2+b*c}};--codimension 4 ideal
+		      setRandomSeed(currentTime());
 		      IM=ideal M;
 		      if(codim IM==length res IM) then <<"Starting from a CM ideal of codimension "<< codim IM <<endl
 		      else <<"Starting from a non CM ideal of codimension "<< codim IM <<endl;
 		      if (isStronglyCM(IM)==true) then <<"Starting from a SCM ideal of codimension "<< codim IM <<endl
 		      else <<"Starting from a non SCM ideal of codimension "<< codim IM <<endl;
-randomListOfList={};
-
-for i from 1 to len do(
-                      n=codim IM+1;
-		      randomList=apply (n,i->n+random 2);
-		      --randomList=apply (n,i-> random(m+1,m+4));
-		      randomListOfList=randomListOfList|{randomList};
-		      );
-ListRandomIdeal=apply(randomListOfList,i->randomIdeal(i,M));
-return unique ListRandomIdeal;
+		      randomListOfList={};
+		      for i from 1 to len do(
+                      	  n=codim IM+1;
+		          randomList=apply (n,i->n+random 2);
+			  --randomList=apply (n,i-> random(m+1,m+4));
+		      	  randomListOfList=randomListOfList|{randomList};
+		      	  );
+		      ListRandomIdeal=apply(randomListOfList,i->randomIdeal(i,M));
+		      return unique ListRandomIdeal;
 )
 
 CMtest=method()
@@ -98,6 +96,7 @@ restart
 load "SCMTEST.m2"
 l=RandomI(50);
 length l
+time tally apply(l, i-> betti (res(i, FastNonminimal => true ), Minimize => true))
 lCM=CMtest(l,50);
 lSCM=SCMtest(l,50);
 -----------------------------------------------------------------------------------

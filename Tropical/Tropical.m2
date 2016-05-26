@@ -1,3 +1,7 @@
+--TODO: min/max
+--TODO: implement (unstable) intersection
+--TODO: implement different strategies
+--TODO: implement valuation fields
 newPackage(
     	"Tropical",
 	Version => "0.1",
@@ -32,7 +36,6 @@ export {
   "stableIntersection",
   "tropicalVariety",
   "isTropicalBasis",
-  "convertToPolymake",
   "getRays",
   "getCones",
   "getDim",
@@ -63,12 +66,10 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 --basic operations on a tropical cycle
 
---TODO make this a method
-
-
+--TODO change to the following: TropicalCycle should not inherit from Fan, but it should have a fan and multiplicities as hash entries
 tropicalCycle = method(TypicalValue => TropicalCycle)
 
-tropicalCycle (Fan, String) := (F,mult)->(
+tropicalCycle (Fan, List) := (F,mult)->(
     if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
     T#"Multiplicities" = mult;
@@ -76,11 +77,10 @@ tropicalCycle (Fan, String) := (F,mult)->(
 )    
 
 
-
-
 isBalanced = method(TypicalValue => Boolean)
 
 isBalanced (TropicalCycle):= F->(
+-- parse object into a polymake script, run polymake and get result back from the same file (which got overwritten by polymake)
 	filename := temporaryFileName();
 	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
 	runstring := "polymake "|filename;
@@ -215,31 +215,59 @@ stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+-- does not work yet! Problems with intersection in atint (polymake)
+
+-- TODO: rewrite complety after Polyhedra is done and gfanInterface2 got adapted to Polyhedra
 	filename := temporaryFileName();
-	filename << "$c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << close;
-	return filename;
+	--ugly declaration of helping strings
+	openingStr := "\"_type SymmetricFan\\n\\nAMBIENT_DIM\\n\";";
+	dimStr := "\"\\n\\nDIM\\n\";";
+	linDimStr := "\"\\n\\nLINEALITY_DIM\\n\";";
+	raysStr := "\"\\n\\nRAYS\\n\";";
+	nRaysStr := "\"\\nN_RAYS\\n\";";
+	linSpaceStr := "\"\\n\\nLINEALITY_SPACE\\n\";";
+	orthLinStr := "\"\\n\\nORTH_LINEALITY_SPACE\\n\";";
+	fStr := "\"\\n\\nF_VECTOR\\n\";";
+	simpStr := "\"\\n\\nSIMPLICIAL\\n\";";
+	pureStr := "\"\\n\\nPURE\\n\";";
+	coneStr := "\"\\n\\nCONES\\n\";";
+	maxConeStr := "\"MAXIMAL_CONES\\n\";";
+	weightStr := "\"\\nMULTIPLICITIES\\n\";";
+	filename << "use application 'tropical';" << "my $c = "|convertToPolymake(F) << "my $d = "|convertToPolymake(G) << "my $i = intersect($c,$d);" << "use strict;" << "my $filename = '" << filename << "';" << "open(my $fh, '>', $filename);" << "print $fh " << openingStr << "print $fh $i->AMBIENT_DIM;" << "print $fh " << dimStr << "print $fh $i->DIM;" << "print $fh " << linDimStr << "print $fh $i->LINEALITY_DIM;" << "print $fh " << raysStr << "print $fh $i->RAYS;" << "print $fh " << nRaysStr << "print $fh $i->N_RAYS;" << "print $fh " << linSpaceStr << "print $fh $i->LINEALITY_SPACE;" << "print $fh " << orthLinStr << "print $fh $i->ORTH_LINEALITY_SPACE;" << "print $fh " << fStr << "print $fh $i->F_VECTOR;" << "print $fh " << simpStr << "print $fh $i->SIMPLICIAL;" << "print $fh " << pureStr << "print $fh $i->PURE;" << "print $fh " << coneStr << "my $cones = $i->CONES;" << "$cones =~ s/['\\>','\\<']//g;" << "print $fh $cones;" << "print $fh " << maxConeStr << "print $fh $i->MAXIMAL_CONES;" << "print $fh " << weightStr << "print $fh $i->WEIGHTS;" << "close $fh;" << close;
+	runstring := "polymake "|filename;
+	run runstring;
+	result := get filename;
+	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
 )    
 
 convertToPolymake = (T) ->(
+-- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
+--
+--check if given cycle is empty
+	if (T#"Dim" < 0) then (return "new Cycle<Min>(PROJECTIVE_VERTICES=>[],MAXIMAL_POLYTOPES=>[],WEIGHTS=>[]);";) else (
+--if not empty, check if min- or max-convention is used
 	str := "new Cycle<";
 	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
-	str = str|">(PROJECTIVE_VERTICES=>[[1";
 	rays := T#"Rays";
-	ray := rays#0;
-	rayDimension := #ray;
-	scan (rayDimension,i -> str = str|",0");
-	str = str|"]";
 	numberOfRays := #rays;
+	ambientDim := T#"AmbientDim";
+--convert to polymake convection of rays: 1) add origin of the form (1,0,...,0)
+	str = str|">(PROJECTIVE_VERTICES=>[[1";
+	local ray;
+	scan (ambientDim,i -> str = str|",0");
+	str = str|"]";
+--2) add overy ray with a leading 0
 	scan (numberOfRays,i -> (
 		ray = rays#i;
 		str = str|",[0";
-		scan (rayDimension,j -> str = str|","|ray#j);
+		scan (ambientDim,j -> str = str|","|ray#j);
 		str = str|"]";
 	));
+--every cone must now also be spanned by the origin
 	str = str|"],MAXIMAL_POLYTOPES=>[";
 	maxCones := T#"MaximalCones";
 	numberOfMaxCones := #maxCones;
-	cone := maxCones#0;
+	local cone;
 	scan (numberOfMaxCones,i -> (
 		cone = maxCones#i;
 		str = str|"[0";
@@ -249,11 +277,13 @@ convertToPolymake = (T) ->(
 --delete last comma
 	str = substring(0,#str-1,str);
 	str = str|"],WEIGHTS=>[";
+--the multiplicities stay unchanged
 	mult := T#"Multiplicities";
 	scan (numberOfMaxCones,i -> str = str|mult#i|",");
 	str = substring(0,#str-1,str);
 	str = str | "]);";
-	return str
+	return str;
+	)
 )
 
 
@@ -261,8 +291,7 @@ convertToPolymake = (T) ->(
 
 
 --functions to get stuff from fans and tropical cycles
-
-
+--TODO: uncomment getters after TropicalCycle does not inherit from Fan any longer
 
 getRays = method(TypicalValue => List)
 
@@ -381,7 +410,7 @@ doc ///
 doc ///
     Key
 	tropicalCycle
-	(tropicalCycle, Fan, String)
+	(tropicalCycle, Fan, List)
     Headline
     	constructs a TropicalCycle from a Fan and a multiplicity function
     Usage

@@ -71,7 +71,7 @@ export {
 	"gfanTropicalTraverse", -- done!
 	"gfanTropicalWeilDivisor", -- v0.4
 	"gfanFunctions", -- for testing purposes
---	"gfanParsePolyhedralFan", -- for external use
+	"gfanParsePolyhedralFan", -- for external use
 --	"gfanRingToString", -- to make gfan input
 --	"gfanPolynomialListToString",  -- to make gfan input
 --	"gfanVectorToString", -- to make gfan input
