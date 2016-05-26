@@ -108,8 +108,8 @@ I = minors(2, genericMatrix(S,x_1,3,3))
 M = S^1/I;
 J = (ideal vars S)^2;
 
-time depth(J,M)
-time dIM(J,M)
+time depth(J,M) -- used 308.183 seconds
+time dIM(J,M) -- used 254.367 seconds
 time depth M
 
 restart
