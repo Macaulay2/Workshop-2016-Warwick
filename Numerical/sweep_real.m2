@@ -1,3 +1,4 @@
+needsPackage "PHCpack"
 
 --intersectSlice = (w,slcRR) -> (
 --    startSys:=join(equations(w),slice(w));
@@ -159,6 +160,8 @@ discretization=(F,n,startSlice,w) -> (
 
 realPartMatrix = (m) -> matrix applyTable (entries m, x->1_CC*realPart x)
 
+end -----------------------------------------------------------------
+
 -- Example: rank 3 matrices
 R=CC[x,y,z,u];
 M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);
@@ -202,6 +205,7 @@ slc=searchSliceRotation(w);
 solsRR = intersectSlice(w,slc)
 
 --Example:Hypersurface in dimension three
+load "sweep_real.m2"
 R=CC[x,y,z];
 system={x^2+y^2-z};
 (w,ns) = topWitnessSet(system,2);
