@@ -36,7 +36,7 @@ Koperator RingElement := RingElement => (f) -> (
   L := select(flatten entries gens G, isKoperator);
   if #L == 0 then error "Koperator not found.";
 
-  W' := (coefficientRing W)[take(gens W, n)][drop(gens W, n)];
+  W' := (coefficientRing W)[take(gens W, n)][drop(gens W, n), Join => false];
   L' := apply(L, l -> sub(l, W'));
   idx := minPosition(apply(L', degree));
   return L'#idx;
