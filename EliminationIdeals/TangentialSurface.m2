@@ -40,9 +40,9 @@ end
 restart
 load "TangentialSurface.m2"
 --------------rational curve--------------------------------
-kk=ZZ/101;
+kk=QQ;
 A=kk[t,x,y,z];
-J=rationalCurve(7);
+J=rationalCurve(4);
 elapsedTime Surf=TangentialSurface(J);
 <<endl<<endl<<"degree tangential surface "<<degree Surf<<endl<<endl;
 --------------random curve-----------------------------------
@@ -51,7 +51,7 @@ needsPackage "RandomSpaceCurves"
 load "TangentialSurface.m2"
 kk=ZZ/20011;
 A=kk[t,x,y,z];
-J=curve(6,4,A);
+J=curve(6,1,A);
 elapsedTime Surf=TangentialSurface(J);
 <<endl<<endl<<"degree tangential surface "<<degree Surf<<endl<<endl;
 -------------------------------------------------------------
