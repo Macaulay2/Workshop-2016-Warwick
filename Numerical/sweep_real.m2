@@ -1,3 +1,4 @@
+needsPackage "PHCpack"
 
 --intersectSlice = (w,slcRR) -> (
 --    startSys:=join(equations(w),slice(w));
@@ -13,22 +14,19 @@ searchSliceTranslate = w -> (
     return matrix2slice(slcmin,w)
 )
 
-searchSliceRotation = (w) -> (
+realSlice1Dnew = (w) -> (
     npoints := 20;
-    delta := 0.1;
     tol := 0.0001;
     startSlice := realPartMatrix(w.Slice);
     costfun := (a) -> sliceCost(rotationOfSlice(a,startSlice), w);
-    amin := discretization1D (costfun, 0, 2*pi, npoints );
-    a := amin - delta;
-    b := amin + delta;
-    amin = goldenSearch (costfun, a, b, tol);
-    slcmin := rotationOfSlice(a,startSlice);
+    amin = lineSearch (costfun, 0, 2*pi, tol, npoints);
+    slcmin := rotationOfSlice(amin,startSlice);
     return matrix2slice(slcmin,w)
 )
 
-search2DSlice=(w) -> (
-    npoints := 20;
+--search for a 2-dimensional slice
+searchSlice2D=(w) -> (
+    npoints := 10;
     delta := 0.1;
     tol := 0.0001;
     startSlice := realPartMatrix(w.Slice);
@@ -38,7 +36,7 @@ search2DSlice=(w) -> (
     b1:=min1+delta;
     a2:=min2-delta;
     b2:=min2+delta;
-    (min1,min2):=alternatingMinimization(costfun,a1,b1,a2,b2,tol);
+    (min1,min2)=alternatingMinimization(costfun,a1,b1,a2,b2,tol);
     slcmin:=changeOfSlice2D(min1,min2,startSlice);
     return matrix2slice(slcmin,w)
     )
@@ -78,6 +76,15 @@ alternatingMinimization = (F,a1,b1,a2,b2,tol) -> (
 	);
     return (c,d);
     )
+
+lineSearch = (F,a,b,tol,npoints) -> (
+    delta := (b-a)/(2*npoints);
+    xmin := discretization1D (F, a, b, npoints );
+    a = max( xmin - delta, a);
+    b = min( xmin + delta, b);
+    xmin = goldenSearch (F, a, b, tol);
+    return xmin;
+)
 
 goldenSearch = (F,a,b,tol) -> (
     gr := (sqrt(5) - 1)/2;
@@ -158,8 +165,10 @@ discretization=(F,n,startSlice,w) -> (
 
 realPartMatrix = (m) -> matrix applyTable (entries m, x->1_CC*realPart x)
 
+end -----------------------------------------------------------------
+
 -- Example: rank 3 matrices
-R=CC[a,b,c,d];
+R=CC[x,y,z,u];
 M=matrix for i to 2 list for j to 3 list random(1,R)+random(0,R);
 I=minors(3,M);
 f=flatten entries gens I;
@@ -183,28 +192,29 @@ system = {x^2 + (y+2)^2 - 1};
 slc = searchSliceTranslate( w );
 solsRR = intersectSlice( w, slc );
 
-slc = searchSliceRotation( w );
+slc = realSlice1Dnew( w );
 solsRR = intersectSlice( w, slc );
 
 --Example: Twisted cubic
 R=CC[x,y,z]
 system={z^2-y,y*z-x,y^2-x*z}
 (w,ns) = topWitnessSet(system, 1);
-slc=searchSliceRotation(w);
+slc=realSlice1Dnew(w);
 solsRR = intersectSlice(w,slc)
 
 --Example: Rational normal curve in dimension four
 R=CC[x,y,z,u];
 system={z^2-y*u,y*z-x*u,x*z-u,y^2-u,x*y-z,x^2-y};
 (w,ns) = topWitnessSet(system,1);
-slc=searchSliceRotation(w);
+slc=realSlice1Dnew(w);
 solsRR = intersectSlice(w,slc)
 
 --Example:Hypersurface in dimension three
+load "sweep_real.m2"
 R=CC[x,y,z];
-system={x^2+y^2+z^2};
+system={x^2+y^2-z};
 (w,ns) = topWitnessSet(system,2);
-slc=searchSliceRotation(w);
+slc=searchSlice2D(w);
 solsRR = intersectSlice(w,slc)
 
 --Testing intersectSlice function

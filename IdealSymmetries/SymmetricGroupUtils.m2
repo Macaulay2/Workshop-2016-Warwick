@@ -1,5 +1,8 @@
 convertToCycles = method()
 convertToCycles (BasicList,ZZ) := (groupElement,n) -> (
+    -- Converts a list of lists representing a symmetric group
+    -- element sigma in cycle notation, to a list x such that 
+    -- sigma sends i to x#i
     toReturn := new MutableList from 0..n-1;
     for cycle in groupElement do (
         for i in 0..#cycle-1 do (
