@@ -542,7 +542,7 @@ doc///
 TEST ///
     assert (1+1==2)
     assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
-    assert(R:=QQ[x,y,z]; isTropicalBasis({x+y+z,2*x+3*y-z}))
+    assert(R:=QQ[x,y,z]; not isTropicalBasis({x+y+z,2*x+3*y-z}))
     assert(
 	try(runstring:= "polymake  use application 'tropical';"; R:=QQ[x,y,z,t]; isBalanced tropicalVariety 		   (ideal {6*x^2+3*x*y+8*y^2+x*z+6*y*z+3*z^2+2*x*t+5*z*t+3*t^2,5*x^2+x*y+8*y^2+x*z+4*y*z+9*z^2+5*x*t+8*y*t+z*t}, true)) 
 	else print "POLYMAKE NOT FOUND: COULD NOT TEST"; true)
