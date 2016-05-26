@@ -14,17 +14,13 @@ searchSliceTranslate = w -> (
     return matrix2slice(slcmin,w)
 )
 
-searchSliceRotation = (w) -> (
+realSlice1Dnew = (w) -> (
     npoints := 20;
-    delta := 0.1;
     tol := 0.0001;
     startSlice := realPartMatrix(w.Slice);
     costfun := (a) -> sliceCost(rotationOfSlice(a,startSlice), w);
-    amin := discretization1D (costfun, 0, 2*pi, npoints );
-    a := amin - delta;
-    b := amin + delta;
-    amin = goldenSearch (costfun, a, b, tol);
-    slcmin := rotationOfSlice(a,startSlice);
+    amin = lineSearch (costfun, 0, 2*pi, tol, npoints);
+    slcmin := rotationOfSlice(amin,startSlice);
     return matrix2slice(slcmin,w)
 )
 
@@ -80,6 +76,15 @@ alternatingMinimization = (F,a1,b1,a2,b2,tol) -> (
 	);
     return (c,d);
     )
+
+lineSearch = (F,a,b,tol,npoints) -> (
+    delta := (b-a)/(2*npoints);
+    xmin := discretization1D (F, a, b, npoints );
+    a = max( xmin - delta, a);
+    b = min( xmin + delta, b);
+    xmin = goldenSearch (F, a, b, tol);
+    return xmin;
+)
 
 goldenSearch = (F,a,b,tol) -> (
     gr := (sqrt(5) - 1)/2;
@@ -187,21 +192,21 @@ system = {x^2 + (y+2)^2 - 1};
 slc = searchSliceTranslate( w );
 solsRR = intersectSlice( w, slc );
 
-slc = searchSliceRotation( w );
+slc = realSlice1Dnew( w );
 solsRR = intersectSlice( w, slc );
 
 --Example: Twisted cubic
 R=CC[x,y,z]
 system={z^2-y,y*z-x,y^2-x*z}
 (w,ns) = topWitnessSet(system, 1);
-slc=searchSliceRotation(w);
+slc=realSlice1Dnew(w);
 solsRR = intersectSlice(w,slc)
 
 --Example: Rational normal curve in dimension four
 R=CC[x,y,z,u];
 system={z^2-y*u,y*z-x*u,x*z-u,y^2-u,x*y-z,x^2-y};
 (w,ns) = topWitnessSet(system,1);
-slc=searchSliceRotation(w);
+slc=realSlice1Dnew(w);
 solsRR = intersectSlice(w,slc)
 
 --Example:Hypersurface in dimension three

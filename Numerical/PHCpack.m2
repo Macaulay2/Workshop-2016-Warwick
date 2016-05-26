@@ -1551,6 +1551,15 @@ intersectSlice (WitnessSet, List) := (w, slcRR) -> (
 -- line search with golden ratio --
 -----------------------------------
 
+lineSearch = (F,a,b,tol,npoints) -> (
+    delta := (b-a)/(2*npoints);
+    xmin := discretization1D (F, a, b, npoints );
+    a = max( xmin - delta, a);
+    b = min( xmin + delta, b);
+    xmin = goldenSearch (F, a, b, tol);
+    return xmin;
+)
+
 goldenSearch = (F,a,b,tol) -> (
 -- Applies the golden section search method
 -- to minimize a unimodal function F over [a,b].
@@ -1666,12 +1675,9 @@ realSlice1D(WitnessSet) := o -> (w) -> (
 -- OUT: a slice where the number of real solutions was maximal.
     startSlice := realPartMatrix(w.Slice);
     costfun := (a) -> sliceCost(rotationOfSlice(a,startSlice), w);
-    amin := discretization1D (costfun, 0, 2*pi, o.searchNpoints );
-    a := amin - o.searchDelta;
-    b := amin + o.searchDelta;
-    amin = goldenSearch(costfun, a, b, o.searchTolerance);
-    slcmin := rotationOfSlice(amin, startSlice);
-    return matrix2slice(slcmin, w)
+    amin := lineSearch (costfun, 0, 2*pi, o.searchTolerance, o.searchNpoints);
+    slcmin := rotationOfSlice(amin,startSlice);
+    return matrix2slice(slcmin,w)
 )
 
 --##########################################################################--
