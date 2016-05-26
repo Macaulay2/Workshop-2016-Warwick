@@ -58,6 +58,21 @@ dIM(Ideal,Module) := ZZ => (J,M) -> (
     
      if dim M === 0 then  return 0;
      if (ideal vars ring M) === J then return depth M;
+     if dim J === 0 then return depth M;     
+
+--     if dim M === 0 then  return 0; -- quick test for detph 0
+     
+     
+    R := ring M;
+    S := (flattenRing R)_0;
+
+    S0 := ring presentation S;
+        
+    m := presentation M;    
+    mm := (presentation S ** sub(target m, S0)) |sub(m,S0);
+
+--    numgens S0 - length res coker mm
+
       
      R := ring J;
      
@@ -101,10 +116,10 @@ else (
     )
 )
 
- 
+
 ///
 --------------------------------------------------------
--- New Methods
+-- New Methods in Depth.m2
 -- * depth M
 -- * dIM(J,M), soon to be new depth(J,M)
 -- * homogeneousRegularSequence
@@ -143,7 +158,7 @@ M = S^1/I;
 J = (ideal vars S)^2;
 
 time depth(J,M) -- used 308.183 seconds with J = (ideal vars S)^2;
-time dIM(J,M) -- used 254.367 seconds with J = (ideal vars S)^2;
+time dIM(J,M) -- used 0.006662 seconds
 
 restart
 loadPackage("Depth", Reload => true)
