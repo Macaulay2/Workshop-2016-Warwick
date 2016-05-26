@@ -70,8 +70,11 @@ doc ///
       Configuration=>{"path"=>"C:/cygwin/PHC/","PHCexe"=>"./phc"}) 
 
     {\bf 2.} If the package SimpleDoc is not found when 
-   installing {\tt PHCpack.m2}, see questions and answers 6, 7, and 8 
-   on the Macaulay2 web site.
+    installing {\tt PHCpack.m2}, see questions and answers 6, 7, and 8 
+    on the Macaulay2 web site.
+
+    {\bf 3.} The current version 1.8 of PHCpack.m2 was developed with version 
+    1.9 of Macaulay2 and with version 2.4.17 of phc.
 ///;
 
 -------------
@@ -463,8 +466,9 @@ doc ///
   Usage
     mv = mixedVolume(S) 
     (mv,sv) = mixedVolume(S,StableMixedVolume => true)  
-    (mv,q,qsols) = mixedVolume(S,StartSystem => true)     
-    (mv,sv,q,qsols) = mixedVolume(S,StableMixedVolume => true, StartSystem => true)
+    (mv,q,qsols) = mixedVolume(S,StartSystem => true)
+    (mv,sv,q,qsols) = mixedVolume(S,StableMixedVolume => true,StartSystem => true)
+    (mv,q,qsols) = mixedVolume(S,StartSystem => true,numThreads=4)
   Inputs
     S:List
       whose entries are the polynomials of a square system
@@ -537,6 +541,64 @@ doc ///
     StartSystem
 ///;
 
+-- general options
+
+doc ///
+  Key
+    randomSeed
+  Headline
+    seed for the random number generators
+  Description
+    Text
+      To avoid singularities during complex path following,
+      the homotopy methods use a random constant.
+      Different runs with solveSystem, trackPaths,
+      or mixedVolume (with StartSystem set to true) may
+      therefore lead to the solutions listed in a different order.
+      Fixing the value of randomSeed leads to reproducible runs.
+///;
+
+doc ///
+  Key
+    computingPrecision
+  Headline
+    flag to switch to double double or quad double precision
+  Description
+    Text
+      By default, all computations occur in hardward double precision.
+      While this precision could be large enough to obtain accurate
+      results, for larger problems, one may need to increase the
+      precision to double double or to quad double precision.
+      
+      Setting the value of computingPrecision to 2 changes the
+      precision in the path trackers to double double.
+
+      Setting the value of computingPrecision to 4 changes the
+      precision in the path trackers to quad double.
+
+      To compensate for the cost overhead of the higher precision,
+      it is useful to run the multithreaded versions of the path
+      trackers, see the option numThreads.
+///;
+
+doc ///
+  Key
+    interactive
+  Headline
+    flag to run phc -p or phc -m in interactive mode
+  Description
+    Text
+      There are too many options for the path trackers in phc -p
+      to wrap them properly within the trackPaths() method.
+      With interactive turned on, the user can tune all parameters
+      of the path trackers, in the same way as running phc -p.
+
+      The option interactive is also supported to run the
+      polyhedral homotopies to solve random coefficient systems
+      with phc -c, in the mixedVolume function with the option
+      StartSystem set to true.
+///;
+
 -- options for mixedVolume
 
 doc ///
@@ -597,6 +659,27 @@ doc ///
 
       The output file of {\tt phc} contains timings for the mixed volume
       and provides details about the mixed-cell configuration.
+///;
+
+doc ///
+  Key
+    [mixedVolume,numThreads]
+  Headline
+    option to set the number of threads when solving a start system
+  Usage
+    solveSystem(...,StartSystems=>true,numThreads=>ZZ)
+  Description
+    Text
+      Use {\tt numThreads=>4} to run the path trackers with 4 threads.
+///;
+
+doc ///
+  Key
+    [mixedVolume,interactive]
+  Headline
+    option to switch to the interactive mode of phc -m
+  Usage
+    solveSystem(...,interactive=>true)
 ///;
 
 -------------------
@@ -858,6 +941,9 @@ doc ///
   Usage
     solveSystem(S)
     solveSystem(S,Verbose=>true)
+    solveSystem(S,numThreads=>4)
+    solveSystem(S,computingPrecision=>2)
+    solveSystem(S,randomSeed=>12345)
   Inputs
     S:List
       contains a zero-dimensional system of polynomials with complex
@@ -968,6 +1054,30 @@ doc ///
       Use {\tt computingPrecision=>2} for double double precision.
 
       Use {\tt computingPrecision=>4} for quad double precision.
+///;
+
+doc ///
+  Key
+    [solveSystem,numThreads]
+  Headline
+    option to set the number of threads
+  Usage
+    solveSystem(...,numThreads=>ZZ)
+  Description
+    Text
+      Use {\tt numThreads=>4} to run the path trackers with 4 threads.
+///;
+
+doc ///
+  Key
+    [solveSystem,randomSeed]
+  Headline
+    option to set the seed of the random number generators
+  Usage
+    solveSystem(...,randomSeed=>ZZ)
+  Description
+    Text
+      Use {\tt randomSeed=>12345} to set the seed to 12345.
 ///;
 
 -------------------------
@@ -1322,19 +1432,6 @@ doc ///
     Option to follow the progress of the multithreaded path tracker.
   Usage
     trackPaths(...,seeProgress=>Boolean)
-///;
-
-doc ///
-  Key
-    interactive
-  Headline
-    flag to run phc -p in interactive mode
-  Description
-    Text
-      There are too many options for the path trackers in phc -p
-      to wrap them properly within the trackPaths() method.
-      With interactive turned on, the user can tune all parameters
-      of the path trackers, in the same way as running phc -p.
 ///;
 
 doc ///
