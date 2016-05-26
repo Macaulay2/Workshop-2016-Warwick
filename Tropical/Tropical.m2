@@ -242,22 +242,28 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 
 convertToPolymake = (T) ->(
 -- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
+--
+--check if given cycle is empty
 	if (T#"Dim" < 0) then (return "new Cycle<Min>(PROJECTIVE_VERTICES=>[],MAXIMAL_POLYTOPES=>[],WEIGHTS=>[]);";) else (
+--if not empty, check if min- or max-convention is used
 	str := "new Cycle<";
 	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
 	rays := T#"Rays";
 	numberOfRays := #rays;
 	ambientDim := T#"AmbientDim";
+--convert to polymake convection of rays: 1) add origin of the form (1,0,...,0)
 	str = str|">(PROJECTIVE_VERTICES=>[[1";
 	local ray;
 	scan (ambientDim,i -> str = str|",0");
 	str = str|"]";
+--2) add overy ray with a leading 0
 	scan (numberOfRays,i -> (
 		ray = rays#i;
 		str = str|",[0";
 		scan (ambientDim,j -> str = str|","|ray#j);
 		str = str|"]";
 	));
+--every cone must now also be spanned by the origin
 	str = str|"],MAXIMAL_POLYTOPES=>[";
 	maxCones := T#"MaximalCones";
 	numberOfMaxCones := #maxCones;
@@ -271,6 +277,7 @@ convertToPolymake = (T) ->(
 --delete last comma
 	str = substring(0,#str-1,str);
 	str = str|"],WEIGHTS=>[";
+--the multiplicities stay unchanged
 	mult := T#"Multiplicities";
 	scan (numberOfMaxCones,i -> str = str|mult#i|",");
 	str = substring(0,#str-1,str);
