@@ -364,7 +364,7 @@ koszulDepth Ideal := I -> (
     )
 
 koszulDepth(ZZ,Ideal) := (k,I) -> (
-    if I==0 then return -1;
+    if I==0 then return {};
     C := koszul mingens I;
     profondeur HH_k(C)
     )
@@ -995,6 +995,7 @@ loadPackage "RandomIdeal"
 installPackage ("RandomIdeal")
 
 uninstallPackage "ResidualIntersections"
+restart
 installPackage ("ResidualIntersections", UserMode=>true)
 check "ResidualIntersections"
 viewHelp ResidualIntersections
