@@ -99,29 +99,39 @@ else (
 
  
 ///
-uninstallPackage"Depth"
 restart
 loadPackage("Depth", Reload => true)
-
+    	    
 S = ZZ/101[x_1..x_(9)]
 I = minors(2, genericMatrix(S,x_1,3,3))
 M = S^1/I;
 J = (ideal vars S)^2;
+ring M
 
 time depth(J,M) -- used 308.183 seconds with J = (ideal vars S)^2;
 time dIM(J,M) -- used 254.367 seconds with J = (ideal vars S)^2;
 time depth M
 
 restart
-S = ZZ/101[x_1..x_(9)]
-I = minors(2, genericMatrix(S,x_1,3,3))
-M = S^1/I;
-J = (ideal vars S)^2;
+loadPackage("Depth", Reload => true)
 
-time C = resolution((ring J)^1/J,LengthLimit=>6)
-time b = C.dd;
-time complete b;
+S = ZZ/101[x_1..x_(15)]
+I = minors(3, genericMatrix(S,x_1,3,5))
+M = (S/I)^1;
+J = (ideal vars (S/I))^1;
+ring J === ring M
 
+T = ZZ/101[a,b,c]
+I = ideal"a,b"
+S = T/I
+M = (S)^1
+
+J = (ideal vars S)^1
+ring J
+ring M
+ring N^1
+time dIM(J,M)
+depth(J,M)
 
 Ext(ZZ, Module, Module) := Module => opts -> (i,M,N) -> (
      R := ring M;
