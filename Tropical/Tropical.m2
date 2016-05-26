@@ -103,7 +103,7 @@ tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => fa
     if (o.Strategy=="gfan") then (
     	F:=gfanTropicalIntersection(L, gfanopt); 
 --remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle)
-        remove(F,"Multiplicities")
+        remove(F,"Multiplicities");
         return F)
     else error "options not valid"
 )
