@@ -87,12 +87,14 @@ isWellDefined TropicalCycle := Boolean =>
 
 
 
-
 --Computing a tropical prevariety
+
+--in the future, more strategies not dependent on "gfan" will be available
 tropicalPrevariety = method(TypicalValue => Fan,  Options => {
 	Strategy=> "gfan"
 	})
 
+--remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle) 
 tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
     if (o.Strategy=="gfan") then (
     	F:=gfanTropicalIntersection(L, gfanopt); G:=new Fan;
@@ -144,10 +146,12 @@ tropicalVariety (Ideal) := o -> (I) ->(
 
 --Check if a list of polynomials is a tropical basis for the ideal they generate
 
+--Current Strategy is using 'gfan'
 isTropicalBasis = method(TypicalValue => Boolean,  Options => {
 	Strategy=> "gfan"
 	})
 
+--Under current version of 'gfan', the information is kept in #GfanFileHeader
 isTropicalBasis (List) := o -> L -> (
 	if (o.Strategy=="gfan") then (
 	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false}; if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneous polynomials yet";
