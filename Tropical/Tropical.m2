@@ -64,7 +64,11 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 --basic operations on a tropical cycle
 
 --TODO make this a method
-tropicalCycle = (F,mult)->(
+
+
+tropicalCycle = method(TypicalValue => TropicalCycle)
+
+tropicalCycle (Fan, String) := (F,mult)->(
     if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
     T#"Multiplicities" = mult;
@@ -72,7 +76,11 @@ tropicalCycle = (F,mult)->(
 )    
 
 
-isBalanced = F->(
+
+
+isBalanced = method(TypicalValue => Boolean)
+
+isBalanced (TropicalCycle):= F->(
 	filename := temporaryFileName();
 	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
 	runstring := "polymake "|filename;
@@ -80,6 +88,10 @@ isBalanced = F->(
 	result := get filename;
 	if (result=="1") then return true else return false;    
 )
+
+
+
+
 
 isWellDefined TropicalCycle := Boolean =>
  F ->(
@@ -343,6 +355,7 @@ doc ///
 doc ///
     Key
 	tropicalCycle
+	(tropicalCycle, Fan, String)
     Headline
     	constructs a TropicalCycle from a Fan and a multiplicity function
     Usage
@@ -366,6 +379,7 @@ doc ///
 doc///
     Key
 	isBalanced
+	(isBalanced, TropicalCycle)
     Headline
 	whether a tropical cycle is balanced
     Usage
