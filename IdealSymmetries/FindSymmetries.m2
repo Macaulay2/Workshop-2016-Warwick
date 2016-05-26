@@ -130,7 +130,7 @@ FindSymmetry List := Polys-> (
 
   PolysAsLists := MakeConstIntoVar(TermList);
   DreadnautStrs := callDreadnaut(createNautyString(PolysAsLists, CoefficientList));
-  for i in DreadnautStrs do print i;
+  --for i in DreadnautStrs do print i;
   Permutations := new MutableList;
   i := 1;
   while i < #DreadnautStrs do (
