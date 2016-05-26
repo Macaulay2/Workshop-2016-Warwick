@@ -101,9 +101,10 @@ tropicalPrevariety = method(TypicalValue => Fan,  Options => {
 tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
 --using strategy gfan
     if (o.Strategy=="gfan") then (
-    	F:=gfanTropicalIntersection(L, gfanopt); G:=new Fan;
+    	F:=gfanTropicalIntersection(L, gfanopt); 
 --remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle)
-    	scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
+        remove(F,"Multiplicities")
+        return G
     else error "options not valid"
 )
 
