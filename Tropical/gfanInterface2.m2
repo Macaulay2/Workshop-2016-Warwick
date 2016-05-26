@@ -17,15 +17,11 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-	PackageExports => {"Polyhedra"},
+	PackageExports => {"PolyhedralObjects"},
 	DebuggingMode => true
 )
 
 export {
-	"MutablePolyhedralObject",
-	"MutableCone",
-	"MutableFan",
-
 	"MarkedPolynomialList",
 	"markedPolynomialList",
 
@@ -83,10 +79,6 @@ export {
 --	"gfanVectorListListToString"", -- to make gfan input
 	"gfanVersion"
 }
-
-MutablePolyhedralObject = new Type of MutableHashTable
-MutableCone = new Type of MutableHashTable
-MutableFan = new Type of MutableHashTable
 
 gfanPath = gfanInterface2#Options#Configuration#"path"
 if gfanPath == "" then gfanPath = prefixDirectory | currentLayout#"programs"
@@ -397,7 +389,6 @@ gfanParseBool String := (s) -> s == "true\n"
 gfanParseBoolInteger = method()
 gfanParseBoolInteger String := (s) -> s == "1\n"
 
-
 ------------------------------------------
 -- Gfan Parsing Polymake-style data
 ------------------------------------------
@@ -445,7 +436,7 @@ gfanParsePolyhedralFan String := o -> s -> (
 		P#"GfanFileRawBlocks" = rawBlocks;
 		);
    	if gfanKeepFiles and o#?"GfanFileName" and o#"GfanFileName" =!= null then P#"GfanFileName" = o#"GfanFileName";
-        P
+	P
 )
 
 gfanParseHeader = method(TypicalValue => Type)
@@ -454,11 +445,11 @@ gfanParseHeader List := (L) -> (
 	typeLine := L#typePosition;
 	typeWords := separate(" ", typeLine);
 	if #typeWords === 2 and typeWords#1 == "PolyhedralCone" then
-		MutableCone
+		Cone
 	else if #typeWords === 2 and (typeWords#1 == "PolyhedralFan" or typeWords#1 == "SymmetricFan") then
-		MutableFan
+		Fan
 	else
-		MutablePolyhedralObject
+		PolyhedralObject
 )
 
 gfanParseBlock = method(TypicalValue => List)

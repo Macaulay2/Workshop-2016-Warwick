@@ -18,7 +18,7 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-        PackageExports => {"Polyhedra","gfanInterface2"},
+        PackageExports => {"PolyhedralObjects","gfanInterface2"},
 	DebuggingMode => true
 )
 
@@ -70,7 +70,12 @@ tropicalCycle = (F,mult)->(
 
 
 isBalanced = F->(
-    
+	filename := temporaryFileName();
+	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
+	runstring := "polymake "|filename;
+	run runstring;
+	result := get filename;
+	if (result=="1") then return true else return false;    
 )
 
 isWellDefined TropicalCycle := Boolean =>
@@ -214,28 +219,28 @@ getRays = method(TypicalValue => List)
 
 getRays (Fan) :=  F -> ( F#"Rays")
 
-getRays (tropicalCycle):= C->( getRays(C#"Fan"))
+--getRays (tropicalCycle):= C->( getRays(C#"Fan"))
 
 
 getCones = method(TypicalValue => List)
 
 getCones (Fan) :=  F -> ( F#"Cones")
 
-getCones (tropicalCycle):= C->( getCones(C#"Fan"))
+--getCones (tropicalCycle):= C->( getCones(C#"Fan"))
 
 
 getDim = method(TypicalValue => ZZ)
 
 getDim (Fan) :=  F -> ( F#"Dim")
 
-getDim (tropicalCycle):= C->( getDim(C#"Fan"))
+--getDim (tropicalCycle):= C->( getDim(C#"Fan"))
 
 
 getFVector = method(TypicalValue => List)
 
 getFVector (Fan) :=  F -> ( F#"FVector")
 
-getFVector (tropicalCycle):= C->( getFVector(C#"Fan"))
+--getFVector (tropicalCycle):= C->( getFVector(C#"Fan"))
 
 
 
@@ -245,7 +250,7 @@ getLinealitySpace = method(TypicalValue => List)
 
 getLinealitySpace (Fan) :=  F -> ( F#"LinealitySpace")
 
-getLinealitySpace (tropicalCycle):= C->( getLinealitySpace(C#"Fan"))
+--getLinealitySpace (tropicalCycle):= C->( getLinealitySpace(C#"Fan"))
 
 
 
@@ -254,7 +259,7 @@ getMaximalCones = method(TypicalValue => List)
 
 getMaximalCones (Fan) :=  F -> ( F#"MaximalCones")
 
-getMaximalCones (tropicalCycle):= C->( getMaximalCones(C#"Fan"))
+--getMaximalCones (tropicalCycle):= C->( getMaximalCones(C#"Fan"))
 
 
 
@@ -262,7 +267,7 @@ getPure = method(TypicalValue => Boolean)
 
 getPure (Fan) :=  F -> ( F#"Pure")
 
-getPure (tropicalCycle):= C->( getPure(C#"Fan"))
+--getPure (tropicalCycle):= C->( getPure(C#"Fan"))
 
 
 
@@ -270,7 +275,7 @@ getSimplicial = method(TypicalValue => List)
 
 getSimplicial (Fan) :=  F -> ( F#"Simplicial")
 
-getSimplicial (tropicalCycle):= C->( getSimplicial(C#"Fan"))
+--getSimplicial (tropicalCycle):= C->( getSimplicial(C#"Fan"))
 
 
 
