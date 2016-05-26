@@ -24,8 +24,6 @@ newPackage(
      DebuggingMode => false
      )
 
--- Bart Snapp is not maintaining this code, so others are welcome to suggest improvements.
-
 --=========================================================================--
      
 export{
@@ -56,22 +54,25 @@ depth(Module) := ZZ => M -> (
     --depth of a module with respect to the max ideal, via finite proj dim
     --gives error if the ultimate coeficient ring of R = ring M is not a field.
     R := ring M;
-    
-    if not isCommutative R then error"depth undefined for noncommutative rings";
-    
     S := (flattenRing R)_0;
-    
+    if not isCommutative R then error"depth undefined for noncommutative rings";
     if not isField coefficientRing S then error"input must be a module over an affine ring";
-    
     S0 := ring presentation S;
-    m := presentation M;
-    COK := prune coker(sub(m,S0) | (presentation S ** target m));
-    
-    numgens S0 - length res COK    
+        
+    m := presentation M;    
+    mm := (presentation S ** sub(target m, S0)) |sub(m,S0);
+    numgens S0 - length res coker mm
 --    depth(ideal gens ring M,M)
      )    
 
+///
+restart
+loadPackage("Depth", Reload =>true)
 
+T = ZZ/101[a,b,c]
+M = (T/ideal vars T)^1
+depth M
+///
 -----------------------------------------------------------------------------
 
 depth(Ideal,Ring) := ZZ => (I,A) -> (
@@ -651,12 +652,12 @@ TEST///
      B = A/b;
      setRandomSeed 0
      assert(numcols regularSequence(B,Attempts=>1,Maximal=>false) == 6)
-     assert(depth B == 8)
+     assert(depth B == dim B)
      A = ZZ/5051[x, y, z];
      I = ideal (x, x*y, y*z);
      assert (0==regularSequence(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)- matrix {{88*y*z, -34*x}})
 ///
-///
+TEST///
      S = ZZ/101[a,b,c,d]
      K = koszul vars S
      apply(numgens S, i-> depth coker K.dd_(i+1))
@@ -668,10 +669,21 @@ TEST///
      homogeneousRegularSequence 
      homogeneousRegularSequence(I, Density => .1, Attempts => 1000, Verbose => true)
 ///
+TEST///
+S = QQ[a..e]
+m = ideal gens S
+assert(depth (S^1/m) == 0)
+depth QuotientRing := A -> depth (A^1)
+assert (depth (S/m) == 0)
+assert(depth(S^1/m) == 0)
+assert(depth( (S/m)^1) ==0)
+///
 
 end--
+
 uninstallPackage "Depth"
 restart
 installPackage "Depth"
-viewHelp Depth
 check Depth
+
+viewHelp Depth
