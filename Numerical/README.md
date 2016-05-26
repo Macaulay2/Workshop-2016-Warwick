@@ -17,6 +17,7 @@ at the Macaulay2 workshop at the University of Warwick, May 23-26, 2016.
 - circle.m2: our first script
 - sweep_real.m2: functions to search for a real slice
 - realSlice.m2: functions with documentation interleaved with tests
+- realSlice2D.m2 : to prepare for two dimensional witness sets
 
 **searching for a real slice**
 

@@ -20,9 +20,7 @@ newPackage ( "ResidualIntersections",
     )
 
 export {
-    	"profondeur",
 	"isLicci",
---	"homogeneousRegularSequence",
 	"linkageBound",
 	"UseNormalModule",
 	"genericResidual",
@@ -41,7 +39,7 @@ depthsOfPowers = method()
 depthsOfPowers(ZZ,ZZ,Ideal) := (s,c,I) ->(
     --c should be codim I
     S := ring I;
-    apply(s-c+1, j->profondeur(S^1/I^(j+1)))
+    apply(s-c+1, j->depth(S^1/I^(j+1)))
     )
 depthsOfPowers(ZZ,Ideal) := (s,I) -> depthsOfPowers(s,codim I, I)
 
@@ -238,36 +236,38 @@ installPackage("RandomIdeal")
      
      (codim I)*(degree I)
 ///
+
+{*
 --depth but faster
-profondeur = method()
-profondeur(Ideal, Module) := (I,M) ->(
+depth = method()
+depth(Ideal, Module) := (I,M) ->(
     --requires R to be an affine ring (eg NOT ZZ[x])
     R := ring M;
     d := max(1,dim M); -- d=0 causes a crash
-    if not isCommutative R then error"profondeur undefined for noncommutative rings";
+    if not isCommutative R then error"depth undefined for noncommutative rings";
     F := M**dual res (R^1/I, LengthLimit => d);
     i := 0;
     while HH_i F == 0 do i=i-1;
     -i)
 
-{*
-profondeur Module := M -> (
-    --profondeur of a module with respect to the max ideal, via finite proj dim
+
+depth Module := M -> (
+    --depth of a module with respect to the max ideal, via finite proj dim
     --gives error if the ultimate coeficient ring of R = ring M is not a field.
     R := ring M;
-    if not isCommutative R then error"profondeur undefined for noncommutative rings";
+    if not isCommutative R then error"depth undefined for noncommutative rings";
     (S,F) := flattenRing R;
     if not isField coefficientRing S then error"input must be a module over an affine ring";
     S0 := ring presentation S;
     r := F*map(S,S0);
     MM := pushForward(r,M);
     numgens S0 - pdim MM)
-*}
-profondeur Module := M -> (
-    --profondeur of a module with respect to the max ideal, via finite proj dim
+
+depth Module := M -> (
+    --depth of a module with respect to the max ideal, via finite proj dim
     --gives error if the ultimate coeficient ring of R = ring M is not a field.
     R := ring M;
-    if not isCommutative R then error"profondeur undefined for noncommutative rings";
+    if not isCommutative R then error"depth undefined for noncommutative rings";
     (S,F) := flattenRing R;
     if not isField coefficientRing S then error"input must be a module over an affine ring";
     S0 := ring presentation S;
@@ -275,13 +275,12 @@ profondeur Module := M -> (
     m := presentation M;
     mm := substitute(m, S0); 
     MM := coker(mm | r**target mm);
-    error();
     numgens S0 - pdim MM
     
     )
 
-profondeur Ring := R -> profondeur(R^1)
-
+depth Ring := R -> depth(R^1)
+*}
 ///
 restart
 --loadPackage ("Depth", Reload=>true)
@@ -295,8 +294,8 @@ C = koszul mingens I
 H = HH_4 C
 pH = prune H
 pdim H
-profondeur H
-profondeur pH
+depth H
+depth pH
 
 pdim Module := M-> length res  minimalPresentation M
 
@@ -333,16 +332,16 @@ c = 3
 m = n+c-1
 S = ZZ/101[x_1..x_(n*m)]
 I = minors(n, genericMatrix(S,x_1,m,n));
-profondeur(S^1/I^4)
+depth(S^1/I^4)
 
 apply(4, i->elapsedTime pdim(S^1/I^(i+1)))
 apply(4, i->time pdim1(S^1/I^(i+1)))
 
 apply(4, i->elapsedTime res(S^1/I^(i+1)))
-apply(4, i->elapsedTime profondeur(S^1/I^(i+1)))
+apply(4, i->elapsedTime depth(S^1/I^(i+1)))
 
 apply(4, i->elapsedTime res(S^1/I^(i+1), FastNonminimal => true))
-time profondeur(S^1/I^4)
+time depth(S^1/I^4)
 time pdim (S^1/I^4)
 apply(4, i->elapsedTime depth(S^1/I^(i+1)))
 
@@ -351,7 +350,7 @@ ker map(S,S,vars S)
 vars S % vars S
    ///
 
-profondeur Ring := R -> profondeur R^1
+depth Ring := R -> depth R^1
 
 koszulDepth = method()
 koszulDepth Ideal := I -> (
@@ -360,13 +359,13 @@ koszulDepth Ideal := I -> (
     m := numgens J;
     C := koszul gens J;
     c := codim J;
-    for i in 0..m-c-1 list profondeur prune HH_i(C)
+    for i in 0..m-c-1 list depth prune HH_i(C)
     )
 
 koszulDepth(ZZ,Ideal) := (k,I) -> (
-    if I==0 then return -1;
+    if I==0 then return {};
     C := koszul mingens I;
-    profondeur HH_k(C)
+    depth HH_k(C)
     )
 
 
@@ -377,7 +376,7 @@ isStronglyCM(Ideal) := I -> (
     d := dim J;
     m := numgens J;
     C := koszul gens J;
-    kd := apply(m-c, i->profondeur HH_i(C)); 
+    kd := apply(m-c, i->depth HH_i(C)); 
     --note that if H_0 is CM then we don't have to check H_(m-c), the canonical module.
     all(kd, i -> i==d)
     )
@@ -995,6 +994,7 @@ loadPackage "RandomIdeal"
 installPackage ("RandomIdeal")
 
 uninstallPackage "ResidualIntersections"
+restart
 installPackage ("ResidualIntersections", UserMode=>true)
 check "ResidualIntersections"
 viewHelp ResidualIntersections
