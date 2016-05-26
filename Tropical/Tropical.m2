@@ -406,8 +406,10 @@ doc///
 	Text
 	    This method intersects a list of tropical hypersurfaces. The input is a list of polynomials whose 		    tropicalizations give the hypersurfaces.
         Example
+	    QQ[x_1,x_2,x_3,x_4]
+            L={x_1+x_2+x_3+x_4, x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,  x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2, x_1*x_2*x_3*x_4-1}
+	    tropicalPrevariety L
 	    QQ[x,y]
-	    tropicalPrevariety{x+y+1, x+y}
             tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
 ///
 
