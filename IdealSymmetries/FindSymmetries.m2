@@ -107,7 +107,7 @@ makeConstIntoVar := polys -> (
 )
 
 findSymmetry = method()
-findSymmetry Ideal := thisIdeal -> FindSymmetry first entries gens thisIdeal
+findSymmetry Ideal := thisIdeal -> findSymmetry first entries gens thisIdeal
 findSymmetry List := polys-> (
     -- This is the main function. It is called on a list of polynomials and 
     -- returns a list of generators of the symmetry group.
