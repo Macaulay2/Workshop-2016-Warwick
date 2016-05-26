@@ -1,4 +1,4 @@
-L = {
+initialList = {
   {{0,0,0},{1,0,0},{0,1,0},{0,0,1}},
   {{0,0,0},{2,0,0},{0,2,0},{0,0,2}},
   {{0,0,0},{1,0,0},{0,1,0},{1,1,0},{0,0,1},{1,0,1}},
@@ -118,31 +118,30 @@ toricDivisor Polyhedron := ToricDivisor => P -> (
   sum(n, i -> C_i * X_i)
   )
 
-code(symbol *, QQ, ToricDivisor)
-
-isLatticePolytope P
-
 end
 restart
 needsPackage "NormalToricVarieties";
 needs "fewLatticePoints3d.m2";
-P = convexHull transpose matrix L#0
-X = normalToricVariety P;
-isSmooth X
-D = toricDivisor P
-variety D
-rays X
-X_4
 
-toricDivisor P
-peek P
-code(normalToricVariety, Polyhedron)
-code(normalFan, Polyhedron)
-peek normalFan P
-halfspaces P
-rays normalFan P
-
-for v in L list (
+L = for v in initialList list (
   P := convexHull transpose matrix v;
   X := normalToricVariety P;
-  if isSmooth X then continue else X)
+  if isSmooth X then #latticePoints P 
+  else error "expected all of the polytopes to be smooth");
+max L
+
+
+for i to #initialList-1 do (
+  P := convexHull transpose matrix initialList#i;
+  X := normalToricVariety P;
+  D := toricDivisor P;
+  << dim X << "," << i << ",{" << rays X << "," <<  max X << "}," << entries vector D  << endl;)
+
+
+  
+ X = smoothFanoToricVariety(3,2)
+ rays X
+ max X
+PP1  = projectiveSpace 1
+rays PP1
+max PP1

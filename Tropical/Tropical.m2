@@ -32,11 +32,22 @@ export {
   "stableIntersection",
   "tropicalVariety",
   "isTropicalBasis",
-  "convertToPolymake"
+  "convertToPolymake",
+  "getRays",
+  "getCones",
+  "getDim",
+  "getFVector",
+  "getLinealitySpace",
+  "getMaximalCones",
+  "getPure",
+  "getSimplicial"
 }
 
 --???check syntax - idea is that this is where we should define local symbols
-protect Maclagan
+--protect Maclagan
+
+
+
 
 ------------------------------------------------------------------------------
 -- CODE
@@ -62,7 +73,12 @@ tropicalCycle = (F,mult)->(
 
 
 isBalanced = F->(
-    
+	filename := temporaryFileName();
+	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
+	runstring := "polymake "|filename;
+	run runstring;
+	result := get filename;
+	if (result=="1") then return true else return false;    
 )
 
 isWellDefined TropicalCycle := Boolean =>
@@ -74,16 +90,21 @@ isWellDefined TropicalCycle := Boolean =>
 
 
 
-
 --Computing a tropical prevariety
+
 tropicalPrevariety = method(TypicalValue => Fan,  Options => {
+--in the future, more strategies not dependent on "gfan" will be available
 	Strategy=> "gfan"
 	})
 
+ 
 tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+--using strategy gfan
     if (o.Strategy=="gfan") then (
-    	F:=gfanTropicalIntersection(L, gfanopt); G:=new Fan;
-    	scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
+    	F:=gfanTropicalIntersection(L, gfanopt); 
+--remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle)
+        remove(F,"Multiplicities");
+        return F)
     else error "options not valid"
 )
 
@@ -131,17 +152,20 @@ tropicalVariety (Ideal) := o -> (I) ->(
 
 --Check if a list of polynomials is a tropical basis for the ideal they generate
 
+--Current Strategy is using 'gfan'
 isTropicalBasis = method(TypicalValue => Boolean,  Options => {
 	Strategy=> "gfan"
 	})
 
 isTropicalBasis (List) := o -> L -> (
 	if (o.Strategy=="gfan") then (
-	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false}; if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneous polynomials yet";
  	    F:=gfanTropicalIntersection(L, gfanopt); 
+--Under current version of 'gfan', the information is only kept in #GfanFileHeader, checking the first 13 characters.
 	    if (toString substring(0,13, toString F#"GfanFileHeader")=="The following") then false
 	    else (
 		if (toString substring(0,13, toString F#"GfanFileHeader")=="_application ") then true
+--In case something has changed in 'gfan' or 'gfanInterface'
 	        else error "Algorithm fail"
 		)
 	)
@@ -193,6 +217,80 @@ convertToPolymake = (T) ->(
 	str = str | "]);";
 	return str
 )
+
+
+
+
+
+--functions to get stuff from fans and tropical cycles
+
+
+
+getRays = method(TypicalValue => List)
+
+getRays (Fan) :=  F -> ( F#"Rays")
+
+--getRays (TropicalCycle):= C->( getRays(C#"Fan"))
+
+
+getCones = method(TypicalValue => List)
+
+getCones (Fan) :=  F -> ( F#"Cones")
+
+--getCones (TropicalCycle):= C->( getCones(C#"Fan"))
+
+
+getDim = method(TypicalValue => ZZ)
+
+getDim (Fan) :=  F -> ( F#"Dim")
+
+--getDim (tropicalCycle):= C->( getDim(C#"Fan"))
+
+
+getFVector = method(TypicalValue => List)
+
+getFVector (Fan) :=  F -> ( F#"FVector")
+
+--getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
+
+
+
+
+
+getLinealitySpace = method(TypicalValue => List)
+
+getLinealitySpace (Fan) :=  F -> ( F#"LinealitySpace")
+
+--getLinealitySpace (TropicalCycle):= C->( getLinealitySpace(C#"Fan"))
+
+
+
+
+getMaximalCones = method(TypicalValue => List)
+
+getMaximalCones (Fan) :=  F -> ( F#"MaximalCones")
+
+--getMaximalCones (TropicalCycle):= C->( getMaximalCones(C#"Fan"))
+
+
+
+getPure = method(TypicalValue => Boolean)
+
+getPure (Fan) :=  F -> ( F#"Pure")
+
+--getPure (TropicalCycle):= C->( getPure(C#"Fan"))
+
+
+
+getSimplicial = method(TypicalValue => List)
+
+getSimplicial (Fan) :=  F -> ( F#"Simplicial")
+
+--getSimplicial (TropicalCycle):= C->( getSimplicial(C#"Fan"))
+
+
+
+
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -309,8 +407,10 @@ doc///
 	Text
 	    This method intersects a list of tropical hypersurfaces. The input is a list of polynomials whose 		    tropicalizations give the hypersurfaces.
         Example
+	    QQ[x_1,x_2,x_3,x_4]
+            L={x_1+x_2+x_3+x_4, x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,  x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2, x_1*x_2*x_3*x_4-1}
+	    tropicalPrevariety L
 	    QQ[x,y]
-	    tropicalPrevariety{x+y+1, x+y}
             tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
 ///
 
@@ -416,13 +516,41 @@ doc///
 	Text
 	    This method checks if the intersection of the tropical hypersurfaces associated to the polynomials in the list equals the tropicalization of the variety corresponding to the ideal they generate.  
         Example
-	    QQ[x,y]
-	    isTropicalBasis({x+y})
+	    QQ[x,y,z]
+	    isTropicalBasis({x+y+z,2*x+3*y-z})
+	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
+///
+
+
+doc///
+    Key
+	getRays
+	(getRays, Fan)
+        getCones
+	(getCones, Fan)
+	getDim
+	(getDim, Fan)
+        getFVector
+	(getFVector, Fan)
+	getLinealitySpace
+	(getLinealitySpace, Fan)
+        getMaximalCones
+	(getMaximalCones, Fan)
+	getPure
+	(getPure, Fan)
+        getSimplicial
+	(getSimplicial, Fan)
 ///
 
 
 
 TEST ///
     assert (1+1==2)
+    assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
+    assert(R:=QQ[x,y,z]; not isTropicalBasis({x+y+z,2*x+3*y-z}))
+--The following two tests are commented until their functions can work in a computer without polymake
+    --assert(isBalanced tropicalVariety (ideal {6*x^2+3*x*y+8*y^2+x*z+6*y*z+3*z^2+2*x*t+5*z*t+3*t^2,5*x^2+x*y+8*y^2+x*z+4*y*z+9*z^2+5*x*t+8*y*t+z*t}, true)) 
+    --assert(R:=QQ[x,y,z,t]; I=ideal(x+y+z+t); J=ideal(4*x+y-2*z+5*t); 
+	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
 ///    	    	
        

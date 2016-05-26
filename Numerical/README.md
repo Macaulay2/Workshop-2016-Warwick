@@ -16,6 +16,7 @@ at the Macaulay2 workshop at the University of Warwick, May 23-26, 2016.
 - PHCpack/PHCpackDoc.m2: the latest documentation of PHCpack.m2
 - circle.m2: our first script
 - sweep_real.m2: functions to search for a real slice
+- realSlice.m2: functions with documentation interleaved with tests
 
 **searching for a real slice**
 

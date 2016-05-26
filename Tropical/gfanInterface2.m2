@@ -389,7 +389,6 @@ gfanParseBool String := (s) -> s == "true\n"
 gfanParseBoolInteger = method()
 gfanParseBoolInteger String := (s) -> s == "1\n"
 
-
 ------------------------------------------
 -- Gfan Parsing Polymake-style data
 ------------------------------------------
@@ -437,7 +436,7 @@ gfanParsePolyhedralFan String := o -> s -> (
 		P#"GfanFileRawBlocks" = rawBlocks;
 		);
    	if gfanKeepFiles and o#?"GfanFileName" and o#"GfanFileName" =!= null then P#"GfanFileName" = o#"GfanFileName";
-        P
+	P
 )
 
 gfanParseHeader = method(TypicalValue => Type)
