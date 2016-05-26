@@ -275,7 +275,6 @@ profondeur Module := M -> (
     m := presentation M;
     mm := substitute(m, S0); 
     MM := coker(mm | r**target mm);
-    error();
     numgens S0 - pdim MM
     
     )
