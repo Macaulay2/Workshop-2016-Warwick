@@ -1,30 +1,30 @@
 gfanInterface2.m2: brainstorming ideas
 ======================================
--add missing documentation
--prefix bug (x_1, x_10)
--ease of use
--polyhedral interface
--add missing commands
--Polymake commands (how do we best integrate Polymake with gfan?)
--customize gfan install
+- add missing documentation
+- prefix bug (x_1, x_10)
+- ease of use
+- polyhedral interface
+- add missing commands
+- Polymake commands (how do we best integrate Polymake with gfan?)
+- customize gfan install
 
 
 How do we want to separate gfanInterface2 from gfanInterface? Do we want to have a Tropical.m2? YES!
 
 Tropical.m2 ought to have:
 ==========================
--tropical number min/max
--stableIntersection (make ourselves? interface with Singular?)
--aTint interface
+- tropical number min/max
+- stableIntersection (make ourselves? interface with Singular?)
+- aTint interface
 
 
 Missing documentation from gfanInterface2.m2
--polymakeConeToCone
+- polymakeConeToCone
 - polymakeFanToFan
--gfanFunctions
--gfanTropicalHyperSurfaceReconstruction
--gfanTropicalHyperSurfaceReconstruction(Fan), key: (gfanTropicalHyperSurfaceReconstruction,Fan)
--markedPolynomialList(List), key: (markedPolynomialList,List)
+- gfanFunctions
+- gfanTropicalHyperSurfaceReconstruction
+- gfanTropicalHyperSurfaceReconstruction(Fan), key: (gfanTropicalHyperSurfaceReconstruction,Fan)
+- markedPolynomialList(List), key: (markedPolynomialList,List)
 - gfanVersion
 
 
@@ -69,14 +69,17 @@ To do:
 Answered questions:
 ==========================
 tropicalVariety:
--testing if an ideal is homogeneous is not expensive so it could be used in tropicalVariety
--homogenize computes only the homogenization of the generators
+- testing if an ideal is homogeneous is not expensive so it could be used in tropicalVariety
+- homogenize computes only the homogenization of the generators
+
 TESTS:
--include the examples in the tests as easy tests
--include "boundary" examples like empty fan 
+- include the examples in the tests as easy tests
+- include "boundary" examples like empty fan 
+
 stableIntersection:
--use directly polymake without calling the interface with Polymake since it is not stable yet
+- use directly polymake without calling the interface with Polymake since it is not stable yet
+
 PREFIX BUGS
--Jeff and Nathan are working on it
+- Jeff and Nathan are working on it
 
 	  

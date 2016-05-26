@@ -132,7 +132,9 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 	else
 		--If ideal is prime, use following algorithm for speed
 	       (if (opt.computeMultiplicities==true and opt.Prime== true)
-		then (F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
+		then (
+<<describe ring I<<endl;		    
+		    F:= gfanTropicalTraverse( gfanTropicalStartingCone I);
 	            tropicalCycle(F,F#"Multiplicities"))
 		else
 		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
@@ -143,24 +145,48 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 
 
 --Main function to call for tropicalVariety.  Makes no assumption on ideal
+--WARNING:  There is a bug here in the way the new polynomial ring is dealt with.
+-- it seems to work if we've define the new ring globally, but not inside the package.
 tropicalVariety (Ideal) := o -> (I) ->(
     if isHomogeneous(I) then return(tropicalVariety(I,true,o))
     else (
 	--First homogenize
     	R:=ring I;
-	KK:=coefficientRing R;
---Next line needs to be fixed - AA is a "safe" variable	
-    	AA:= local AA;
-	S:=KK(monoid[gens R | {AA}]);
-	I=substitute(I,S);
-	J:=homogenize(I,AA);
-	J=saturate(J,AA);
-	--Then compute tropical variety of homogenized ideal calling the other function
+--	KK:=coefficientRing R;
+    	AA:= symbol AA;
+    	S:= first flattenRing( R[AA, Join=>false]);
+	J:=substitute(I,S);
+	J=homogenize(J,S_0);
+	J=saturate(J,S_0);
+	--Then compute tropical variety of homogenized ideal calling
+        --the other function
 	T:=tropicalVariety(J,true);
     	--Then remove lineality space
-    	return(T);
+	--The following lines will need to be changed once the
+	--Polyhedra package has been updated (hopefully summer 2016)
+    	Trays:=getRays(T);
+	--Add a multiple of the all-ones vector to each ray to make the first
+	-- coordinate zero, drop the first coordinate, and divide by the 
+	-- gcd.
+	newTrays := apply(Trays, v->(
+	    newv := apply(#v-1,i->(v#(i+1)-v#0));
+	    gcdv := gcd(newv);
+	    newv = newv/gcdv;
+	    newv = apply(newv,i->(lift(i,ZZ)))
+       	    ));
+    	--The next line in particular should be replaced by a constructor.
+    	T#"Rays" = newTrays;
+	T#"Dim" = getDim(T)-1;
+	T#"AmbientDim" = T#"AmbientDim"-1;
+	--For the next one, if we want to remember the lineality space
+	--we should instead quotient by the all ones vector
+	remove(T,"LinealitySpace");
+	remove(T,"OrthLinealitySpace");
+	remove(T,"LinealityDim");
+	return(T);
     )
-)    
+)
+
 
 --Check if a list of polynomials is a tropical basis for the ideal they generate
 
