@@ -367,7 +367,7 @@ koszulDepth(ZZ,Ideal) := (k,I) -> (
     C := koszul mingens I;
     depth HH_k(C)
     )
-
+s = scan( 5, d -> if d ==2 then break d)
 
 isStronglyCM = method()
 isStronglyCM(Ideal) := I -> (
@@ -376,9 +376,9 @@ isStronglyCM(Ideal) := I -> (
     d := dim J;
     m := numgens J;
     C := koszul gens J;
-    kd := apply(m-c, i->depth HH_i(C)); 
-    --note that if H_0 is CM then we don't have to check H_(m-c), the canonical module.
-    all(kd, i -> i==d)
+    result := true;
+    scan(m-c, i-> if depth HH_i(C)<d then (result = false; break;)); 
+    return result;
     )
 TEST///
 --isStronglyCM

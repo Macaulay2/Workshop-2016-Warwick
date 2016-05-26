@@ -1030,20 +1030,6 @@ doc ///
 
 doc ///
   Key
-    computingPrecision
-  Headline
-    flag to set the working precision
-  Description
-    Text
-      The default precision is double precision.
-
-      The user can change the working precision of solveSystem
-      to double double or quad double precision by setting the
-      flag to 2 or 4.
-///;
-
-doc ///
-  Key
     [solveSystem,computingPrecision]
   Headline
     option to specify the working precision
@@ -1599,6 +1585,42 @@ doc ///
     intersectSlice
 ///;
 
+------------------
+-- realSlice2D  --
+------------------
+
+doc ///
+  Key 
+    realSlice2D
+    (realSlice2D, WitnessSet)
+  Headline
+    computes a real slice for a two dimensional witness set
+  Usage
+    slc = realSlice2D(w)
+  Inputs
+    w:WitnessSet
+      a witness set for a solution set
+  Outputs
+    slc:List
+      list of linear equations with the largest number of real solutions
+  Description
+    Text
+      
+      A real slice is a set of linear equations with the largest number
+      of real solutions of the equations for a given witness set.
+    
+    Example
+      R = CC[x,y,z];
+      paraboloid = {z - x^2 - y^2};
+      (w, ns) = topWitnessSet(paraboloid, 2);
+      slc = realSlice2D(w, searcNpoints=>5);
+      solsRR = intersectSlice(w,slc)
+      for i to #solsRR-1 do print solsRR_i
+    
+  SeeAlso
+    intersectSlice
+///;
+
 doc ///
   Key
     searchNpoints
@@ -1618,6 +1640,15 @@ doc ///
     option of realSlice1D
   Usage
     realSlice1D(...,searchNpoints=>Number)
+///;
+
+doc ///
+  Key
+    [realSlice2D,searchNpoints]
+  Headline
+    option of realSlice2D
+  Usage
+    realSlice2D(...,searchNpoints=>Number)
 ///;
 
 doc ///
@@ -1644,6 +1675,15 @@ doc ///
 
 doc ///
   Key
+    [realSlice2D,searchDelta]
+  Headline
+    option of realSlice2D
+  Usage
+    realSlice2D(...,searchDelta=>Number)
+///;
+
+doc ///
+  Key
     searchTolerance
   Headline
     option of realSlice1D
@@ -1662,4 +1702,13 @@ doc ///
     option of realSlice1D
   Usage
     realSlice1D(...,searchTolerance=>Number)
+///;
+
+doc ///
+  Key
+    [realSlice2D,searchTolerance]
+  Headline
+    option of realSlice2D
+  Usage
+    realSlice2D(...,searchTolerance=>Number)
 ///;
