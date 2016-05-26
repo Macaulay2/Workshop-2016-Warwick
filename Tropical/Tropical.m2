@@ -93,15 +93,17 @@ isWellDefined TropicalCycle := Boolean =>
 
 --Computing a tropical prevariety
 
---in the future, more strategies not dependent on "gfan" will be available
 tropicalPrevariety = method(TypicalValue => Fan,  Options => {
+--in the future, more strategies not dependent on "gfan" will be available
 	Strategy=> "gfan"
 	})
 
---remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle) 
+ 
 tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+--using strategy gfan
     if (o.Strategy=="gfan") then (
     	F:=gfanTropicalIntersection(L, gfanopt); G:=new Fan;
+--remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle)
     	scan(keys F, a-> if a!="Multiplicities" then G#a=F#a); G)
     else error "options not valid"
 )
@@ -155,14 +157,15 @@ isTropicalBasis = method(TypicalValue => Boolean,  Options => {
 	Strategy=> "gfan"
 	})
 
---Under current version of 'gfan', the information is kept in #GfanFileHeader
 isTropicalBasis (List) := o -> L -> (
 	if (o.Strategy=="gfan") then (
 	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false}; if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneous polynomials yet";
  	    F:=gfanTropicalIntersection(L, gfanopt); 
+--Under current version of 'gfan', the information is only kept in #GfanFileHeader, checking the first 13 characters.
 	    if (toString substring(0,13, toString F#"GfanFileHeader")=="The following") then false
 	    else (
 		if (toString substring(0,13, toString F#"GfanFileHeader")=="_application ") then true
+--In case something has changed in 'gfan' or 'gfanInterface'
 	        else error "Algorithm fail"
 		)
 	)
