@@ -13,7 +13,7 @@ newPackage ( "ResidualIntersections",
 	{Name => "Jay Yang",
 	    Email => "jkelleyy@gmail.com"}
 	},
-    PackageExports => {"RandomIdeal"},
+    PackageExports => {"RandomIdeal", "Depth"},
     Headline => "Package for studying conditions associated to Residual Intersection theory",
     Reload => true,
     DebuggingMode => true
@@ -22,7 +22,7 @@ newPackage ( "ResidualIntersections",
 export {
     	"profondeur",
 	"isLicci",
-	"minimalRegularSequence",
+--	"homogeneousRegularSequence",
 	"linkageBound",
 	"UseNormalModule",
 	"genericResidual",
@@ -125,7 +125,7 @@ if numgens I <= c then return ideal(1_(ring I));
 --n :=numcols sgens;
 --rsgens  := sgens * random(source sgens, source sgens);
 --regseq := ideal rsgens_{n-c..n-1};
-regseq := minimalRegularSequence(c,I);
+regseq := homogeneousRegularSequence(c,I);
 trim(regseq : I)
 )
 randomLink Ideal := I->randomLink(codim I, I)
@@ -140,8 +140,8 @@ if opts.UseNormalModule == false then
 )
 
 {*
-minimalRegularSequence = method()
-minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
+homogeneousRegularSequence = method()
+homogeneousRegularSequence(ZZ,Ideal) := (c,I) ->(
 if numgens I == c then return I;
     --takes care of I = 0 and I principal;
 sgens := sort gens I;
@@ -158,11 +158,11 @@ while c'<c do(
     );
 J
 )
-minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
-*}
+homogeneousRegularSequence Ideal := I -> homogeneousRegularSequence(codim I, I)
 
-minimalRegularSequence = method()
-minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
+
+homogeneousRegularSequence = method()
+homogeneousRegularSequence(ZZ,Ideal) := (c,I) ->(
 if numgens I == c then return I;
     --takes care of I = 0 and I principal;
 sgens := sort gens I;
@@ -185,7 +185,7 @@ for i from 0 to n-1 do(
 	c' = c'';
 	if c' ==c then break));
 J)
-minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
+homogeneousRegularSequence Ideal := I -> homogeneousRegularSequence(codim I, I)
 
 ///
 restart
@@ -193,13 +193,13 @@ loadPackage "ResidualIntersections"
 S = ZZ/101[a,b,c]
 I = ideal"cb,b2,ab,a2"
 codim I 
-minimalRegularSequence(codim I, I)
+homogeneousRegularSequence(codim I, I)
      I = ideal"cb,b2,a2"
-     minimalRegularSequence I     
+     homogeneousRegularSequence I     
      I = ideal"ab,ac,bc"
-     minimalRegularSequence( I)
+     homogeneousRegularSequence( I)
 ///
-
+*}
 isLicci = method(Options => {UseNormalModule =>false, Verbose =>false})
 isLicci(ZZ, ZZ, Ideal) := opts -> (b,c,I) -> (
     --I homogeneous ideal
@@ -288,6 +288,8 @@ restart
 debug loadPackage ("ResidualIntersections", Reload=>true)
 
 S = ZZ/101[x_1..x_6]
+m0=map(S^1,S^1,1)
+pdim coker m0
 I =minors(2, genericSymmetricMatrix(S,x_1,3))
 C = koszul mingens I
 H = HH_4 C
@@ -295,6 +297,31 @@ pH = prune H
 pdim H
 profondeur H
 profondeur pH
+
+pdim Module := M-> length res  minimalPresentation M
+
+S = ZZ/101[x]
+N = coker map(S^1,S^1,1)
+trim N
+
+pdim N
+trim N ==trim M
+res trim M
+res trim N
+M = subquotient(map(S^1,S^1,1),map(S^1,S^1,1))
+M == N
+res M
+trim M
+pdim M
+res trim M
+
+f = map (S^1,S^1,1)
+M = coker f
+N= subquotient(f,f)
+assert(M==N)
+assert (res M == res N)
+assert (res trim M == res trim N)
+
 
 
 
@@ -587,24 +614,6 @@ doc ///
     UseNormalModule
 ///
 
-
-------------------------------------------------------------
--- DOCUMENTATION minimalRegularSequence
-------------------------------------------------------------
-doc ///
-   Key
-    minimalRegularSequence
-    (minimalRegularSequence,ZZ,Ideal)
-    (minimalRegularSequence,Ideal)
-   Headline
-    Finds a maximal regular sequence of minimal degree in an ideal
-   Usage
-    J=minimalRegularSequence(n,I)
-    J=minimalRegularSequence(I)
-   Inputs
-    n:ZZ
-    I:Ideal
-///
 
 ------------------------------------------------------------
 -- DOCUMENTATION maxGs
