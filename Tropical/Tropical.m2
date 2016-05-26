@@ -1,3 +1,7 @@
+--TODO: min/max
+--TODO: implement (unstable) intersection
+--TODO: implement different strategies
+--TODO: implement valuation fields
 newPackage(
     	"Tropical",
 	Version => "0.1",
@@ -32,7 +36,6 @@ export {
   "stableIntersection",
   "tropicalVariety",
   "isTropicalBasis",
-  "convertToPolymake",
   "getRays",
   "getCones",
   "getDim",
@@ -65,6 +68,7 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 --TODO make this a method
 tropicalCycle = (F,mult)->(
+--TODO change to the following: TropicalCycle should not inherit from Fan, but it should have a fan and multiplicities as hash entries
     if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle from F;
     T#"Multiplicities" = mult;
@@ -73,6 +77,7 @@ tropicalCycle = (F,mult)->(
 
 
 isBalanced = F->(
+-- parse object into a polymake script, run polymake and get result back from the same file (which got overwritten by polymake)
 	filename := temporaryFileName();
 	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
 	runstring := "polymake "|filename;
@@ -177,6 +182,9 @@ stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+-- does not work yet! Problems with intersection in atint (polymake)
+
+-- TODO: rewrite complety after Polyhedra is done and gfanInterface2 got adapted to Polyhedra
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
 	openingStr := "\"_type SymmetricFan\\n\\nAMBIENT_DIM\\n\";";
@@ -196,29 +204,31 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
-	gfanParsePolyhedralFan result
+	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
 )    
 
 convertToPolymake = (T) ->(
+-- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
+	if (T#"Dim" < 0) then (return "new Cycle<Min>(PROJECTIVE_VERTICES=>[],MAXIMAL_POLYTOPES=>[],WEIGHTS=>[]);";) else (
 	str := "new Cycle<";
 	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
-	str = str|">(PROJECTIVE_VERTICES=>[[1";
 	rays := T#"Rays";
-	ray := rays#0;
-	rayDimension := #ray;
-	scan (rayDimension,i -> str = str|",0");
-	str = str|"]";
 	numberOfRays := #rays;
+	ambientDim := T#"AmbientDim";
+	str = str|">(PROJECTIVE_VERTICES=>[[1";
+	local ray;
+	scan (ambientDim,i -> str = str|",0");
+	str = str|"]";
 	scan (numberOfRays,i -> (
 		ray = rays#i;
 		str = str|",[0";
-		scan (rayDimension,j -> str = str|","|ray#j);
+		scan (ambientDim,j -> str = str|","|ray#j);
 		str = str|"]";
 	));
 	str = str|"],MAXIMAL_POLYTOPES=>[";
 	maxCones := T#"MaximalCones";
 	numberOfMaxCones := #maxCones;
-	cone := maxCones#0;
+	local cone;
 	scan (numberOfMaxCones,i -> (
 		cone = maxCones#i;
 		str = str|"[0";
@@ -232,7 +242,8 @@ convertToPolymake = (T) ->(
 	scan (numberOfMaxCones,i -> str = str|mult#i|",");
 	str = substring(0,#str-1,str);
 	str = str | "]);";
-	return str
+	return str;
+	)
 )
 
 
@@ -240,8 +251,7 @@ convertToPolymake = (T) ->(
 
 
 --functions to get stuff from fans and tropical cycles
-
-
+--TODO: uncomment getters after TropicalCycle does not inherit from Fan any longer
 
 getRays = method(TypicalValue => List)
 
