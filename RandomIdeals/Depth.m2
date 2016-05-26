@@ -18,6 +18,10 @@ newPackage(
 	  {Name => "David Eisenbud", 
 	      Email => "de@msri.org",
 	      HomePage => "http://www.msri.org/~de"
+	  },
+	  {Name => "Branden Stone", 
+	      Email => "bstone@adelphi.edu",
+	      HomePage => "http://math.adelphi.edu/~bstone/"
 	  }
 	  },
      Headline => "aids in computations related to depth",
@@ -36,7 +40,8 @@ export{
     "isCM","Sparseness",
     "Bound",
     "Attempts",
-    "Maximal"} 
+    "Maximal",
+    "dIM"} 
         
 --=========================================================================--
 
@@ -49,6 +54,96 @@ depth(Ideal,Module) := ZZ => (I,M) -> (
      infinity
      )
 
+dIM = method()
+dIM(Ideal,Module) := ZZ => (J,M) -> (
+     R := ring J;
+     
+     if not isCommutative R then error "'Depth' not implemented yet for noncommutative rings.";
+     if R =!= ring M then error "expected modules over the same ring";    
+     
+     AJ := R^1/J;
+     d := dim M;
+     C := resolution(AJ,LengthLimit=>d+1);
+--     C' = (dual C)**M
+     b := C.dd;
+     complete b;
+
+-- Compute Ext on the resolution. 
+s := scan(0..d, i -> ( 
+	print i;
+	if i === 0 
+	then (
+	    if Hom(AJ,M) != 0 then break i
+	    )
+	else (
+	    MP := minimalPresentation (
+		if b#?i then (
+		    if b#?(i+1) 
+		    then homology(Hom(b_(i+1),M), Hom(b_i,M))
+		    else cokernel Hom(b_i,M))
+		else (
+		    if b#?(i+1) 
+		    then kernel Hom(b_(i+1),M)
+		    else Hom(C_i,M))
+		);
+	    if (MP != 0) then break i;
+	    )
+	)
+    );
+if s =!= null then (
+    return s;
+    )
+else (
+    return "-- Error: If this message appears, something is wrong with the code";
+    )
+)
+
+ 
+///
+uninstallPackage"Depth"
+restart
+loadPackage("Depth", Reload => true)
+
+S = ZZ/101[x_1..x_(9)]
+I = minors(2, genericMatrix(S,x_1,3,3))
+M = S^1/I;
+J = (ideal vars S)^2;
+
+time depth(J,M)
+time dIM(J,M)
+time depth M
+
+restart
+S = ZZ/101[x_1..x_(9)]
+I = minors(2, genericMatrix(S,x_1,3,3))
+M = S^1/I;
+J = (ideal vars S)^2;
+
+time C = resolution((ring J)^1/J,LengthLimit=>6)
+time b = C.dd;
+time complete b;
+
+
+Ext(ZZ, Module, Module) := Module => opts -> (i,M,N) -> (
+     R := ring M;
+     if not isCommutative R then error "'Ext' not implemented yet for noncommutative rings.";
+     if R =!= ring N then error "expected modules over the same ring";
+     if i < 0 then R^0
+     else if i === 0 then Hom(M,N)
+     else (
+	  C := resolution(M,LengthLimit=>i+1);
+	  b := C.dd;
+	  complete b;
+	  minimalPresentation if b#?i then (
+	       if b#?(i+1) 
+	       then homology(Hom(b_(i+1),N), Hom(b_i,N))
+	       else cokernel Hom(b_i,N))
+	  else (
+	       if b#?(i+1) 
+	       then kernel Hom(b_(i+1),N)
+	       else Hom(C_i,N))))
+        
+///
 -----------------------------------------------------------------------------
 
 depth(Module) := ZZ => M -> (
