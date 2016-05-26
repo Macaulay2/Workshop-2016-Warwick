@@ -167,8 +167,25 @@ TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	filename := temporaryFileName();
-	filename << "$c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << close;
-	return filename;
+	--ugly declaration of helping strings
+	openingStr := "\"_type SymmetricFan\\n\\nAMBIENT_DIM\\n\";";
+	dimStr := "\"\\n\\nDIM\\n\";";
+	linDimStr := "\"\\n\\nLINEALITY_DIM\\n\";";
+	raysStr := "\"\\n\\nRAYS\\n\";";
+	nRaysStr := "\"\\nN_RAYS\\n\";";
+	linSpaceStr := "\"\\n\\nLINEALITY_SPACE\\n\";";
+	orthLinStr := "\"\\n\\nORTH_LINEALITY_SPACE\\n\";";
+	fStr := "\"\\n\\nF_VECTOR\\n\";";
+	simpStr := "\"\\n\\nSIMPLICIAL\\n\";";
+	pureStr := "\"\\n\\nPURE\\n\";";
+	coneStr := "\"\\n\\nCONES\\n\";";
+	maxConeStr := "\"MAXIMAL_CONES\\n\";";
+	weightStr := "\"\\nMULTIPLICITIES\\n\";";
+	filename << "use application 'tropical';" << "my $c = "|convertToPolymake(F) << "my $d = "|convertToPolymake(G) << "my $i = intersect($c,$d);" << "use strict;" << "my $filename = '" << filename << "';" << "open(my $fh, '>', $filename);" << "print $fh " << openingStr << "print $fh $i->AMBIENT_DIM;" << "print $fh " << dimStr << "print $fh $i->DIM;" << "print $fh " << linDimStr << "print $fh $i->LINEALITY_DIM;" << "print $fh " << raysStr << "print $fh $i->RAYS;" << "print $fh " << nRaysStr << "print $fh $i->N_RAYS;" << "print $fh " << linSpaceStr << "print $fh $i->LINEALITY_SPACE;" << "print $fh " << orthLinStr << "print $fh $i->ORTH_LINEALITY_SPACE;" << "print $fh " << fStr << "print $fh $i->F_VECTOR;" << "print $fh " << simpStr << "print $fh $i->SIMPLICIAL;" << "print $fh " << pureStr << "print $fh $i->PURE;" << "print $fh " << coneStr << "my $cones = $i->CONES;" << "$cones =~ s/['\\>','\\<']//g;" << "print $fh $cones;" << "print $fh " << maxConeStr << "print $fh $i->MAXIMAL_CONES;" << "print $fh " << weightStr << "print $fh $i->WEIGHTS;" << "close $fh;" << close;
+	runstring := "polymake "|filename;
+	run runstring;
+	result := get filename;
+	gfanParsePolyhedralFan result
 )    
 
 convertToPolymake = (T) ->(
