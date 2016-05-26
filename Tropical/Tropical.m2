@@ -153,13 +153,15 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	--First homogenize
     	R:=ring I;
 --	KK:=coefficientRing R;
-    	AA:= symbol AA;
-    	S:= first flattenRing( R[AA, Join=>false]);
+--    	AA:= symbol AA;
+    	S:= first flattenRing( R[getSymbol "AA", Join=>false]);
 	J:=substitute(I,S);
 	J=homogenize(J,S_0);
 	J=saturate(J,S_0);
 	--Then compute tropical variety of homogenized ideal calling
         --the other function
+--I'm worried about the use S here - this might be broken.
+	use S;
 	T:=tropicalVariety(J,true);
     	--Then remove lineality space
 	--The following lines will need to be changed once the
