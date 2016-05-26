@@ -41,6 +41,16 @@ searchSlice2D=(w) -> (
     return matrix2slice(slcmin,w)
     )
 
+searchSlice2D2=(w) -> (
+    npoints := 5;
+    delta := 0.1;
+    tol := 0.0001;
+    startSlice := realPartMatrix(w.Slice);
+    costfun := (a,b) -> sliceCost(changeOfSlice2D(a,b,startSlice), w);
+    (min1,min2)=alternatingMinimization2(costfun,0,2*pi,0,2*pi,tol, npoints);
+    slcmin:=changeOfSlice2D(min1,min2,startSlice);
+    return matrix2slice(slcmin,w)
+    )
 
 
 matrix2slice = (slcmat, w) -> (
@@ -73,6 +83,22 @@ alternatingMinimization = (F,a1,b1,a2,b2,tol) -> (
 	Fd:=(x)->F(x,d);
 	cOld=c;
 	c=goldenSearch(Fd,a1,b1,tol);
+	);
+    return (c,d);
+    )
+
+alternatingMinimization2 = (F,a1,b1,a2,b2,tol,npoints) -> (
+    cOld:=a1;
+    dOld:=a2;
+    c:=a1+random(RR)*(b1-a1);
+    d:=a2+random(RR)*(b2-a2);
+    while abs(c - cOld) > tol and abs(d - dOld) > tol do (
+	Fc:=(y)->F(c,y);
+	dOld=d;
+	d=lineSearch(Fc,a2,b2,tol,npoints);
+	Fd:=(x)->F(x,d);
+	cOld=c;
+	c=lineSearch(Fd,a1,b1,tol,npoints);
 	);
     return (c,d);
     )
@@ -164,6 +190,44 @@ discretization=(F,n,startSlice,w) -> (
 )
 
 realPartMatrix = (m) -> matrix applyTable (entries m, x->1_CC*realPart x)
+
+sphericalCoordinates = (angles) -> (
+    for i to #angles list (
+        xi := product for j to i-1 list sin(angles_j);
+        if i<#angles then xi = xi*cos(angles_i);
+        xi
+    )
+)
+
+orthUnitVect1D = (angles1) -> (
+    x1 := sphericalCoordinates(angles1);
+    x2 := matrix {{1},{0}};
+    angles1 = angles1 / (x-> -(pi/2-x));
+    R1 := rotationMatrix2D(2,0,1,angles1_0);
+    x1 = transpose matrix {x1};
+    Rx2 := R1*x2;
+    X := x1|Rx2;
+    return X;
+)
+
+orthUnitVect = (angles1,angles2) -> (
+    x1 := {cos(angles1_0)*sin(angles1_1), sin(angles1_0)*sin(angles1_1), cos(angles1_1)};
+    --x1 := sphericalCoordinates(angles1);
+    x2 := sphericalCoordinates(angles2);
+    angles1 = angles1 / (x-> -(pi/2-x));
+    angles2 = angles1 / (x-> -(pi/2-x));
+    R1 := rotationMatrix2D(3,0,1,angles1_0);
+    R2 := rotationMatrix2D(3,1,2,angles1_1);
+    x1 = transpose matrix {x1};
+    x2 = transpose matrix {append(x2, 0)};
+    Rx2 := R1*R2*x2;
+    X := x1|Rx2;
+    return X;
+)
+
+R = orthUnitVect( {1.23,2.37}, {-.42} );
+r = (transpose R) * R;
+print r;
 
 end -----------------------------------------------------------------
 
