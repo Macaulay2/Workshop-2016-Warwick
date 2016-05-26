@@ -55,6 +55,10 @@ depth(Ideal,Module) := ZZ => (I,M) -> (
 
 dIM = method()
 dIM(Ideal,Module) := ZZ => (J,M) -> (
+    
+     if dim M === 0 then  return 0;
+     if (ideal vars ring M) === J then return depth M;
+      
      R := ring J;
      
      if not isCommutative R then error "'Depth' not implemented yet for noncommutative rings.";
@@ -99,7 +103,37 @@ else (
 
  
 ///
-uninstallPackage"Depth"
+--------------------------------------------------------
+-- New Methods
+-- * depth M
+-- * dIM(J,M), soon to be new depth(J,M)
+-- * homogeneousRegularSequence
+--
+-- todo: ?give timed check for random NZD for dim 1?
+--       make work for modules over quotients (tonight)
+--
+restart
+loadPackage("Depth", Reload => true)
+S = ZZ/101[x_1..x_(9)];
+J = ideal vars S;
+M = S^1/J^5;
+
+time depth(J,M) -- used 87.7697 seconds
+time depth M 
+time dIM(J,M)
+
+restart
+loadPackage("Depth", Reload => true)
+    	    
+S = ZZ/101[x_1..x_(9)]
+I = minors(2, genericMatrix(S,x_1,3,3))
+M = S^1/I;
+J = (ideal vars S)^1;
+
+time depth(J,M) -- used 3.24255 seconds with J = (ideal vars S)^1;
+time dIM(J,M) 
+time depth M 
+
 restart
 loadPackage("Depth", Reload => true)
 
@@ -108,46 +142,67 @@ I = minors(2, genericMatrix(S,x_1,3,3))
 M = S^1/I;
 J = (ideal vars S)^2;
 
-time depth(J,M) -- used 308.183 seconds
-time dIM(J,M) -- used 254.367 seconds
-time depth M
+time depth(J,M) -- used 308.183 seconds with J = (ideal vars S)^2;
+time dIM(J,M) -- used 254.367 seconds with J = (ideal vars S)^2;
 
 restart
-S = ZZ/101[x_1..x_(9)]
-I = minors(2, genericMatrix(S,x_1,3,3))
-M = S^1/I;
-J = (ideal vars S)^2;
+loadPackage("Depth", Reload => true)
 
-time C = resolution((ring J)^1/J,LengthLimit=>6)
-time b = C.dd;
-time complete b;
+S = ZZ/101[x_1..x_(15)]
+I = minors(3, genericMatrix(S,x_1,3,5))
+M = (S/I)^1;
+J = (ideal vars (S/I))^1;
+ring J === ring M
+(ideal vars ring M) === J
+
+time depth M
+time depth(J,M) -- bad
+time dIM(J,M)
+
+------------------------------
+-- homogeneousRegularSequence
+--
+restart
+loadPackage("Depth", Reload => true)
+
+S = ZZ/101[a,b,c]
+I = ideal"cb,b2,ab,a2"
+codim I 
+
+regularSequence(I,S) -- original method (still works)
+homogeneousRegularSequence(codim I, I)
+homogeneousRegularSequence(codim I, I, Density => 1, Attempts =>2)
+
+I = ideal"cb,b2,a2"
+homogeneousRegularSequence(1,I)
+
+I = ideal"ab,ac,bc"
+homogeneousRegularSequence(codim I, I)
+homogeneousRegularSequence(I, Attempts => 1, Density => .01)
+time homogeneousRegularSequence(I, Attempts => 10000, Density => .01)     
+
+n=5;m=2;     
+S = ZZ/101[vars(0..n-1)]
+I = ideal apply ( numgens S, j-> (
+	product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k))
+	)
+    )
+homogeneousRegularSequence(I, Density => .2,  Attempts => 1000)
+
+L = toList(0..n-1)
+subs = subsets(L,m)
+I = ideal(apply(subs, p -> product(p, i-> S_i)))
+     homogeneousRegularSequence(I, Density => .2,  Attempts => 1000, Verbose => true)
+     homogeneousRegularSequence(I, Verbose =>true)
 
 
-Ext(ZZ, Module, Module) := Module => opts -> (i,M,N) -> (
-     R := ring M;
-     if not isCommutative R then error "'Ext' not implemented yet for noncommutative rings.";
-     if R =!= ring N then error "expected modules over the same ring";
-     if i < 0 then R^0
-     else if i === 0 then Hom(M,N)
-     else (
-	  C := resolution(M,LengthLimit=>i+1);
-	  b := C.dd;
-	  complete b;
-	  minimalPresentation if b#?i then (
-	       if b#?(i+1) 
-	       then homology(Hom(b_(i+1),N), Hom(b_i,N))
-	       else cokernel Hom(b_i,N))
-	  else (
-	       if b#?(i+1) 
-	       then kernel Hom(b_(i+1),N)
-	       else Hom(C_i,N))))
-        
 ///
 -----------------------------------------------------------------------------
 
 depth(Module) := ZZ => M -> (
     --depth of a module with respect to the max ideal, via finite proj dim
     --gives error if the ultimate coeficient ring of R = ring M is not a field.
+    if dim M === 0 then  return 0; -- quick test for detph 0
     R := ring M;
     S := (flattenRing R)_0;
     if not isCommutative R then error"depth undefined for noncommutative rings";
@@ -393,7 +448,7 @@ I = ideal"cb,b2,ab,a2"
 codim I 
 homogeneousRegularSequence(codim I, I)
 homogeneousRegularSequence(codim I, I, Density => 1, Attempts =>2)
-
+viewHelp Depth
      I = ideal"cb,b2,a2"
      homogeneousRegularSequence(1,I)
      I = ideal"ab,ac,bc"
