@@ -1,5 +1,5 @@
 newPackage(
-	"RandomIdeal",
+	"RandomIdeals",
     	Version => "2.0", 
     	Date => "May 9, 2016",
         Authors => {
@@ -357,12 +357,12 @@ listsToMonomials = (P,R) -> apply(P, D->product apply(D,d->R_d))
 monomialsToLists = (L,R) -> 
 
 ------------------------------------------------------------
--- DOCUMENTATION RandomIdeal -- documentation
+-- DOCUMENTATION RandomIdeals -- documentation
 ------------------------------------------------------------
 
 doc ///
 Key 
-     RandomIdeal
+     RandomIdeals
 Headline 
      A package to construct various sorts of random ideals
 Description
@@ -1307,17 +1307,17 @@ assert( (randomSquareFreeStep J) === {monomialIdeal map((S)^1,(S)^{{-2},{-2}},{{
 
 end--  
 restart
---loadPackage "RandomIdeal"
-uninstallPackage "RandomIdeal"
-installPackage "RandomIdeal"
-check "RandomIdeal"
-viewHelp RandomIdeal
+--loadPackage "RandomIdeals"
+uninstallPackage "RandomIdeals"
+installPackage "RandomIdeals"
+check "RandomIdeals"
+viewHelp RandomIdeals
 
 
 --temporary:
 
 restart
-loadPackage "RandomIdeal"
+loadPackage "RandomIdeals"
 setRandomSeed(1)
 S=ZZ/2[vars(0..3)]
 rsfs = randomSquareFreeStep
@@ -1330,7 +1330,7 @@ tally ((unique L)/(J->numgens trim J))
 
 
 restart
-loadPackage "RandomIdeal"
+loadPackage "RandomIdeals"
 S=ZZ/2[a..d]
 setRandomSeed(1)
 rsfs = randomSquareFreeStep
