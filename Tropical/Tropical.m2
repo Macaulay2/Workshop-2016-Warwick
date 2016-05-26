@@ -549,5 +549,7 @@ TEST ///
     assert(
 	try(runstring:= "polymake  use application 'tropical';"; R:=QQ[x,y,z,t]; isBalanced tropicalVariety 		   (ideal {6*x^2+3*x*y+8*y^2+x*z+6*y*z+3*z^2+2*x*t+5*z*t+3*t^2,5*x^2+x*y+8*y^2+x*z+4*y*z+9*z^2+5*x*t+8*y*t+z*t}, true)) 
 	else print "POLYMAKE NOT FOUND: COULD NOT TEST"; true)
+    --assert(R:=QQ[x,y,z,t]; I=ideal(x+y+z+t); J=ideal(4*x+y-2*z+5*t); 
+	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
 ///    	    	
        
