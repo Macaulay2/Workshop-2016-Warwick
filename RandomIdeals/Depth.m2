@@ -59,7 +59,7 @@ depth(Ideal,Module) := ZZ => (J,M) -> (
      
      if not isCommutative R then error "'Depth' not implemented yet for noncommutative rings.";
      if R =!= ring M then error "expected modules over the same ring";    
-
+    
      -- Checks dimension of M
      if dim M === 0 then  return 0;
      -- Checks if M is a rank one free module over polynomial ring
@@ -398,6 +398,7 @@ inhomogeneousSystemOfParameters(Ideal,Ring) := Matrix => opts -> (I,A) -> (
      if PHI == 0 then << "--warning: no maximal regular sequence found" <<endl;
      compress(f*PHI)
      )
+
 
 TEST /// 
 A = ZZ/5051[x, y, z];
