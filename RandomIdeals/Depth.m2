@@ -59,7 +59,8 @@ depth(Ideal,Module) := ZZ => (J,M) -> (
      
      if not isCommutative R then error "'Depth' not implemented yet for noncommutative rings.";
      if R =!= ring M then error "expected modules over the same ring";    
-    
+     if J == ring J then return infinity;
+
      -- Checks dimension of M
      if dim M === 0 then  return 0;
      -- Checks if M is a rank one free module over polynomial ring
@@ -93,91 +94,57 @@ depth(Ideal,Module) := ZZ => (J,M) -> (
     
      if s =!= null then return s else return d
      )
-///
-restart
-loadPackage("Depth", Reload => true)
+ 
+TEST///
 S = ZZ/101[x_1..x_(9)];
-coefficientRing S
 J = ideal vars S;
-M = S/J^5;
-coefficientRing M
-time depth(J,S)
+T = S/J^5;
+I = ideal vars T;
+assert( depth(I,T) === 0 )
+assert( depth(I,T^1) === 0 )
+assert( depth T === 0 )
 ///     
 
-
-
-///
---------------------------------------------------------
--- New Methods in Depth.m2
--- * depth M
--- * dIM(J,M), soon to be new depth(J,M)
--- * systemOfParameters
---
--- todo: ?give timed check for random NZD for dim 1?
---       make work for modules over quotients (tonight)
---
-restart
---uninstallPackage "Depth"
-loadPackage("Depth", Reload => true)
-S = ZZ/101[x_1..x_(9)];
-J = ideal vars S;
-M = S^1/J^5;
-
-time depth(J,M) -- used 87.7697 seconds
-time depth M 
-time dIM(J,M)
-time dim M
-
-restart
-loadPackage("Depth", Reload => true)
-    	    
+TEST///
 S = ZZ/101[x_1..x_(9)]
 I = minors(2, genericMatrix(S,x_1,3,3))
 M = S^1/I;
 J = (ideal vars S)^1;
+assert( depth(J,M) === 5 )
+assert( depth M === 5 )
+///
 
-time depth(J,M) -- used 3.24255 seconds with J = (ideal vars S)^1;
-time depth M 
-
-restart
-loadPackage("Depth", Reload => true)
-
+TEST///
 S = ZZ/101[x_1..x_(9)]
 I = minors(2, genericMatrix(S,x_1,3,3))
 M = S^1/I;
 J = (ideal vars S)^2;
+assert( depth(J,M) === 5)
+///
 
-time depth(J,M) -- used 308.183 seconds with J = (ideal vars S)^2;
-
-restart
-loadPackage("Depth", Reload => true)
-
+TEST///
 S = ZZ/101[x_1..x_(15)]
 I = minors(3, genericMatrix(S,x_1,3,5))
 M = (S/I)^1;
 J = (ideal vars (S/I))^2;
-ring J === ring M
-(ideal vars ring M) === J
+assert( depth M === 12 )
+assert( depth(J,M) === 12 )
+///
 
-time depth M
-time depth(J,M) -- bad
-
-restart
-loadPackage("Depth", Reload => true)
-
+TEST///
 S = ZZ/101[x,y,z,w]
 I = minors(2, matrix{{x,y,z},{y,z,w}} )
 SS = S/I
-M = (SS)^1;
-J = apply( 4, i -> (depth( ideal(vars SS)_(toList(0..i)), M )))
-J = apply( 4, i -> (dIM( ideal(vars SS)_(toList(0..i)), M )))
+assert( apply( 4, i -> (depth( ideal(vars SS)_(toList(0..i)), SS))) === {1,1,1,2} )
+assert( apply( 4, i -> (depth( ideal(vars SS)_(toList(0..i)), SS^1))) === {1,1,1,2} )
+///
 
-restart
-loadPackage("Depth", Reload => true)
 
+-- Not a TEST
+///
 S = ZZ/101[x_1..x_(16)]
 I = minors(4, genericMatrix(S,x_1,4,4))
-R = S/I;
+R = S/I
 J = minors(2, genericMatrix(R,x_1,4,4))
 M = R^1/minors(3, genericMatrix(R,x_1,4,4));
 
@@ -188,45 +155,8 @@ time depth M
 time depth(J,M) -- bad
 
 time depth(ideal vars S, S^1)
-
-------------------------------
--- systemOfParameters
---
-restart
-loadPackage("Depth", Reload => true)
-
-S = ZZ/101[a,b,c]
-I = ideal"cb,b2,ab,a2"
-codim I 
-
-inhomogeneousSystemOfParameters(I,S) -- original method (still works)
-systemOfParameters(codim I, I)
-systemOfParameters(codim I, I, Density => 1, Attempts =>2)
-
-I = ideal"cb,b2,a2"
-systemOfParameters(1,I)
-
-I = ideal"ab,ac,bc"
-systemOfParameters(codim I, I)
-systemOfParameters(I, Attempts => 1, Density => .01)
-time systemOfParameters(I, Attempts => 10000, Density => .01)     
-
-n=5;m=2;     
-S = ZZ/101[vars(0..n-1)]
-I = ideal apply ( numgens S, j-> (
-	product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k))
-	)
-    )
-systemOfParameters(I, Density => .2,  Attempts => 1000)
-
-L = toList(0..n-1)
-subs = subsets(L,m)
-I = ideal(apply(subs, p -> product(p, i-> S_i)))
-     systemOfParameters(I, Density => .2,  Attempts => 1000, Verbose => true)
-     systemOfParameters(I, Verbose =>true)
-
-
 ///
+
 -----------------------------------------------------------------------------
 
 depth(Module) := ZZ => M -> (
@@ -248,16 +178,6 @@ depth(Module) := ZZ => M -> (
     numgens S0 - length res coker mm
      )    
 
-///
-restart
-loadPackage("Depth", Reload =>true)
-
-T = ZZ/101[a,b,c]
-keys T
-J = ideal "a2,b4"
-M = (T/ideal vars T)^1
-depth M
-///
 -----------------------------------------------------------------------------
 
 depth(Ideal,Ring) := ZZ => (I,A) -> (
@@ -266,13 +186,13 @@ depth(Ideal,Ring) := ZZ => (I,A) -> (
 
 -----------------------------------------------------------------------------
 
-depth(Ideal,QuotientRing) := ZZ => (I,A) -> (
-     R := ambient A;
-     if isField coefficientRing A and isPolynomialRing R and I == ideal gens A and isHomogeneous ideal A then (
-	  d := dim R;
-	  d - length res(ideal A, LengthLimit => d)) else 
-     depth(I,module A)
-     )
+--depth(Ideal,QuotientRing) := ZZ => (I,A) -> (
+--     R := ambient A;
+--     if isField coefficientRing A and isPolynomialRing R and I == ideal gens A and isHomogeneous ideal A then (
+--	  d := dim R;
+--	  d - length res(ideal A, LengthLimit => d)) else 
+--     depth(I,module A)
+--     )
 
 -----------------------------------------------------------------------------
 
@@ -432,37 +352,38 @@ isCM(Module) := Boolean => (M) -> (
 
 systemOfParameters = method(Options => {Density => 0, Attempts => 100, Verbose => false})
 systemOfParameters(ZZ,Ideal) := opts -> (c,I) ->(
-den := opts.Density;
-att := opts.Attempts;
-if numgens I == c then return I;
-    --takes care of I = 0 and I principal;
-sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
-if den == 0 then den = ((1+c)/(numcols sgens));
-if opts.Verbose == true then <<"Attempts: "<<att<<" Density: "<< den<<endl;
-n :=numcols sgens;
-J := ideal sgens_{0};
-if c == 1 then return J;
-K := J;
-c' := 1;
-c'' := c;
-for i from 1 to n-1 do(
-    c'' = codim(K = J + ideal(sgens_{i}));
-    if c''>c' then (
-        J = K;
-	c' = c''));
-if c' == c then return J;
-scan(att, j->(
-rgens := sgens * random(source sgens, source sgens, Density => 1.0*den);
-for i from 0 to n-1 do(
-    c'' = codim(K = J + ideal(rgens_{i}));
-    if c''>c' then(
-        J = K;
-	c' = c'';
-	if c' == c then break c'));
-if c'==c then break
-if opts.Verbose == true then print j));
-if numgens J !=c then error "no regular sequence found; try increasing Density or Attempts options";
-J)
+	den := opts.Density;
+	att := opts.Attempts;
+	if numgens I == c then return I;
+	    --takes care of I = 0 and I principal;
+	sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
+	if den == 0 then den = ((1+c)/(numcols sgens));
+	if opts.Verbose == true then <<"Attempts: "<<att<<" Density: "<< den<<endl;
+	n :=numcols sgens;
+	J := ideal sgens_{0};
+	if c == 1 then return J;
+	K := J;
+	c' := 1;
+	c'' := c;
+    
+	for i from 1 to n-1 do(
+	    c'' = codim(K = J + ideal(sgens_{i}));
+	    if c''>c' then (
+	        J = K;
+		c' = c''));
+	if c' == c then return J;
+	scan(att, j->(
+	rgens := sgens * random(source sgens, source sgens, Density => 1.0*den);
+	for i from 0 to n-1 do(
+	    c'' = codim(K = J + ideal(rgens_{i}));
+	    if c''>c' then(
+	        J = K;
+		c' = c'';
+		if c' == c then break c'));
+	if c'==c then break
+	if opts.Verbose == true then print j));
+	if numgens J !=c then error "no regular sequence found; try increasing Density or Attempts options";
+	J)
 
 
 systemOfParameters Ideal := opts -> I -> 
@@ -591,7 +512,7 @@ doc ///
      First sorts the generators of trim I by ascending degree, ascending monomial
      order. Looks first for as much of a regular sequence among the generators as possible,
      then tries up to Attempts sparse random combinations of given Density.
-     The defaut valuse of Density is (1+codim I)/(numgens trim I).
+     The default value of Density is (1+codim I)/(numgens trim I).
     Example
      S = ZZ/101[a,b,c,d]
      I = ideal"ab,bc,cd,da"
@@ -612,46 +533,44 @@ doc ///
 
 -----------------------------------------------------------------------------
 
-document {
-     Key => {
-	  (depth, Ideal, Ring),
-	  (depth, Ring),
-	  (depth, Ideal, Module),
-	  (depth, Module),
-	  (depth, Ideal, Ideal),
-	  (depth, Ideal, PolynomialRing),
-	  (depth, Ideal, QuotientRing)
-	  },
-     Headline => "computes the depth of a ring",
-     Usage => "depth(I,A)",
-     Inputs => {
-	  "I" => {},
-	  "A" => {}
-	  },
-     Outputs => {
-	  ZZ => {"the ", TT "I", "-depth of a ring"}
-	  },
-          "The function ", TT "depth(I,A)", ", computes the ", TT "I",
-"-depth of a ring. In the most general setting, it does this by computing ", 
-TT "Ext^i(A^1/I,A)", " and noting where it does not vanish. 
- If the ring in 
-question is a polynomial ring over a field, then it merely computes the codimension of ", TT "I", 
-". If the ring in question is a quotient of a polynomial ring over a field and we are computing 
-the depth over the ideal generated by  ", TO (gens, Ring), ", then it computes the 
-difference between the dimension of this polynomial ring and the projective dimension of the 
-quotient ring. If the ideal is omitted, then the depth is taken over the ideal generated by ", TO (gens, Ring), ".", 
-     EXAMPLE lines ///
-     A = QQ[x_1..x_3]/ideal(x_1^2, x_1*x_2);
-     depth A
-     ///,
-     "If ", TT "I", " contains a unit, then ", TT "depth(I,A)", " outputs ", TO "infinity", ".",
-     EXAMPLE lines ///
-     depth(ideal(1),ZZ)
-     ///,
-     PARA {
-     	  "This symbol is provided by the package ", TO Depth, "."
-     	  }
-     }	   
+doc///
+     Key 
+     	  (depth, Ideal, Ring)
+	  (depth, Ring)
+	  (depth, Ideal, Module)
+	  (depth, Module)
+	  (depth, Ideal, Ideal)
+     Headline 
+          computes the depth of a ring
+     Usage
+          depth(I,A)
+	  depth(A)
+	  depth(I,M)
+	  depth(M)
+	  depth(I,I)
+     Inputs 
+          I:Ideal
+	  A:Ring
+     Outputs
+	  :ZZ
+	    the I-depth of a ring
+     Description
+        Text
+          The function depth(I,A) computes the I-depth of a ring. In the most general 
+	  setting, it does this by computing Ext^i(A^1/I,A) and noting where it does not vanish. 
+	  If the ring in question is a polynomial ring over a field, then it merely computes the 
+	  codimension of I. --If the ring in question is a quotient of a polynomial ring over a field and we are computing the depth over the ideal generated by  ", TO (gens, Ring), ", then it computes the difference between the dimension of this polynomial ring and the projective dimension of the quotient ring. If the ideal is omitted, then the depth is taken over the ideal generated by ", TO (gens, Ring), ".", 
+        Example
+	  A = QQ[x_1..x_3]/ideal(x_1^2, x_1*x_2)
+	  depth A
+    	Text
+	  If I contains a unit, then depth(I,A) outputs infinity.
+	Example
+	  depth(ideal(1_A),A)
+
+      	Text
+     	  This symbol is provided by the package Depth.m2
+///
 
 -----------------------------------------------------------------------------
 
@@ -869,9 +788,54 @@ assert(depth( (S/m)^1) ==0)
 
 end--
 
+restart
 uninstallPackage "Depth"
 restart
 installPackage "Depth"
 check Depth
 
 viewHelp Depth
+restart
+loadPackage"Depth"
+     A = QQ[x_1..x_3]/ideal(x_1^2, x_1*x_2)
+     depth A
+     depth(ideal(1_A),A)
+///
+------------------------------
+-- systemOfParameters
+--
+restart
+loadPackage("Depth", Reload => true)
+
+S = ZZ/101[a,b,c]
+I = ideal"cb,b2,ab,a2"
+codim I 
+
+inhomogeneousSystemOfParameters(I,S) -- original method (still works)
+systemOfParameters(codim I, I)
+systemOfParameters(codim I, I, Density => 1, Attempts =>2)
+
+I = ideal"cb,b2,a2"
+systemOfParameters(1,I)
+
+I = ideal"ab,ac,bc"
+systemOfParameters(codim I, I)
+systemOfParameters(I, Attempts => 1, Density => .01)
+time systemOfParameters(I, Attempts => 10000, Density => .01)     
+
+n=5;m=2;     
+S = ZZ/101[vars(0..n-1)]
+I = ideal apply ( numgens S, j-> (
+	product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k))
+	)
+    )
+systemOfParameters(I, Density => .2,  Attempts => 1000)
+
+L = toList(0..n-1)
+subs = subsets(L,m)
+I = ideal(apply(subs, p -> product(p, i-> S_i)))
+     systemOfParameters(I, Density => .2,  Attempts => 1000, Verbose => true)
+     systemOfParameters(I, Verbose =>true)
+
+
+///
