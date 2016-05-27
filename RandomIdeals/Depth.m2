@@ -34,7 +34,7 @@ export{
     "systemOfParameters",
     "regularSequenceCheck",
     "isRegularSequence",
-    "regularSequence",
+    "inhomogeneousSystemOfParameters",
     "isCM",
     "Sparseness",
     "Bound",
@@ -199,7 +199,7 @@ S = ZZ/101[a,b,c]
 I = ideal"cb,b2,ab,a2"
 codim I 
 
-regularSequence(I,S) -- original method (still works)
+inhomogeneousSystemOfParameters(I,S) -- original method (still works)
 systemOfParameters(codim I, I)
 systemOfParameters(codim I, I, Density => 1, Attempts =>2)
 
@@ -377,8 +377,8 @@ isRegularSequence(Matrix) := Boolean => X -> isRegularSequence(X,ring X)
 
 --=========================================================================--
 
-regularSequence = method(Options => {Sparseness => .5, Bound => 1, Attempts => 100, Maximal => true})
-regularSequence(Ideal,Ring) := Matrix => opts -> (I,A) -> (
+inhomogeneousSystemOfParameters = method(Options => {Sparseness => .5, Bound => 1, Attempts => 100, Maximal => true})
+inhomogeneousSystemOfParameters(Ideal,Ring) := Matrix => opts -> (I,A) -> (
      k := coefficientRing A;
      f := gens I;
      r := numColumns f;
@@ -404,13 +404,13 @@ A = ZZ/5051[x, y, z];
 I = ideal (x, x*y, y*z);
 -- the success of this test depends on the random number generator:
 setRandomSeed()
-assert(regularSequence(I,A,Bound=>100,Sparseness=>.9) - matrix {{90*y*z-2*x, -71*y*z+38*x}}==0)
+assert(inhomogeneousSystemOfParameters(I,A,Bound=>100,Sparseness=>.9) - matrix {{90*y*z-2*x, -71*y*z+38*x}}==0)
 ///
 
 -----------------------------------------------------------------------------
 
-regularSequence(Ring) := Matrix => opts -> A -> regularSequence(ideal gens A,A)
-regularSequence(Ideal) := Matrix => opts -> I -> regularSequence(I,ring I)
+inhomogeneousSystemOfParameters(Ring) := Matrix => opts -> A -> inhomogeneousSystemOfParameters(ideal gens A,A)
+inhomogeneousSystemOfParameters(Ideal) := Matrix => opts -> I -> inhomogeneousSystemOfParameters(I,ring I)
 
 	       
 --=========================================================================--
@@ -528,7 +528,7 @@ doc ///
      I. The other routines in this package try probabilistically to find regular 
      sequences in an ideal; in a regular or Cohen-Macaulay ring, the length of
      such a sequence is equal to the codimension of the ideal, so
-     (regularSequence,Ideal) and (systemOfParameters, Ideal), without
+     (inhomogeneousSystemOfParameters,Ideal) and (systemOfParameters, Ideal), without
      further arguments, look for regular sequences of length codim I.  
      
      To find such sequences, one can simply take an appropriate number of
@@ -546,7 +546,7 @@ doc ///
      I = ideal"ab,bc,cd,da"
      codim I
      setRandomSeed 0
-     regularSequence I
+     inhomogeneousSystemOfParameters I
      systemOfParameters 
      systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
    Caveat
@@ -555,7 +555,7 @@ doc ///
     for each d.
    SeeAlso
     depth
-    regularSequence
+    inhomogeneousSystemOfParameters
     systemOfParameters
 ///
 
@@ -596,7 +596,7 @@ doc ///
      I = ideal"ab,bc,cd,da"
      codim I
      setRandomSeed 0
-     regularSequence I
+     inhomogeneousSystemOfParameters I
      systemOfParameters I
      systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
    Caveat
@@ -605,7 +605,7 @@ doc ///
    SeeAlso
     regularSequenceCheck
     Depth
-    regularSequence
+    inhomogeneousSystemOfParameters
 ///
 
 
@@ -722,20 +722,20 @@ document {
 -----------------------------------------------------------------------------
 
 document {
-     Key => {regularSequence,
-	  (regularSequence,Ideal,Ring),
-	  (regularSequence,Ring),
-	  (regularSequence,Ideal),	  
+     Key => {inhomogeneousSystemOfParameters,
+	  (inhomogeneousSystemOfParameters,Ideal,Ring),
+	  (inhomogeneousSystemOfParameters,Ring),
+	  (inhomogeneousSystemOfParameters,Ideal),	  
 	  Attempts,
 	  Bound,
 	  Sparseness,
 	  Maximal,
-	  [regularSequence,Attempts],
-	  [regularSequence,Bound],
-	  [regularSequence,Maximal],
-	  [regularSequence,Sparseness]},
+	  [inhomogeneousSystemOfParameters,Attempts],
+	  [inhomogeneousSystemOfParameters,Bound],
+	  [inhomogeneousSystemOfParameters,Maximal],
+	  [inhomogeneousSystemOfParameters,Sparseness]},
      Headline => "generates a regular sequence",
-     Usage => "regularSequence(I,A)",
+     Usage => "inhomogeneousSystemOfParameters(I,A)",
      Inputs => {
 	  "I" => Ideal,
 	  "A" => Ring,
@@ -745,7 +745,7 @@ document {
 	  Maximal => Boolean => "whether to insist on searching for a maximal regular sequence"
 	  },
      Outputs => {Matrix},
-     "Given a ring and an ideal, ", TT "regularSequence", " attempts
+     "Given a ring and an ideal, ", TT "inhomogeneousSystemOfParameters", " attempts
      to generate a regular sequence contained in ", TT "I", ". The
      algorithm is based on one found in Chapter 5.5 of W. Vasconcelos'
      book: ", EM "Computational Methods in Commutative Algebra and
@@ -753,14 +753,14 @@ document {
      EXAMPLE lines ///
      A = ZZ/5051[x, y, z];
      I = ideal (x, x*y, y*z);
-     X = regularSequence(I,A)
+     X = inhomogeneousSystemOfParameters(I,A)
      isRegularSequence(X,A)
      ///,
      "Here are examples with optional inputs:",
      EXAMPLE lines ///
      A = ZZ/5051[x, y, z];
      I = ideal (x, x*y, y*z);
-     regularSequence(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)
+     inhomogeneousSystemOfParameters(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)
      ///,
      "Here are examples with the optional input ", TT "Maximal => false", ":",
      EXAMPLE lines ///
@@ -771,7 +771,7 @@ document {
      Y = transpose genericMatrix(A,y_(1,1),n,n);
      b = ideal(X*Y - Y*X);
      B = A/b;
-     regularSequence(B,Attempts=>1,Maximal=>false)
+     inhomogeneousSystemOfParameters(B,Attempts=>1,Maximal=>false)
      ///,
      PARA {
      	  "This symbol is provided by the package ", TO Depth, "."
@@ -838,11 +838,11 @@ TEST///
      b = ideal(X*Y - Y*X);
      B = A/b;
      setRandomSeed 0
-     assert(numcols regularSequence(B,Attempts=>1,Maximal=>false) == 6)
+     assert(numcols inhomogeneousSystemOfParameters(B,Attempts=>1,Maximal=>false) == 6)
      assert(depth B == dim B)
      A = ZZ/5051[x, y, z];
      I = ideal (x, x*y, y*z);
-     assert (0==regularSequence(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)- matrix {{88*y*z, -34*x}})
+     assert (0==inhomogeneousSystemOfParameters(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)- matrix {{88*y*z, -34*x}})
 ///
 TEST///
      S = ZZ/101[a,b,c,d]
@@ -852,7 +852,7 @@ TEST///
      I = ideal"ab,bc,cd,da"
      codim I
      setRandomSeed 0
-     regularSequence I
+     inhomogeneousSystemOfParameters I
      systemOfParameters 
      systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
 ///
