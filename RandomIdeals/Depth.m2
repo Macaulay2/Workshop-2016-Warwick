@@ -39,29 +39,26 @@ export{
     "Sparseness",
     "Bound",
     "Attempts",
-    "Maximal",
-    "dIM"} 
+    "Maximal"
+    } 
         
 --=========================================================================--
 
 -- All this does is check where the ext modules don't vanish.
+--depth(Ideal,Module) := ZZ => (I,M) -> (
+--     AI := (ring I)^1/I;
+--     for i from 0 to dim ring M do(
+--	  if Ext^i(AI,M) != 0 then return i); 
+--     infinity
+--     )
 
-depth(Ideal,Module) := ZZ => (I,M) -> (
-     AI := (ring I)^1/I;
-     for i from 0 to dim ring M do(
-	  if Ext^i(AI,M) != 0 then return i); 
-     infinity
-     )
-
-dIM = method()
-dIM(Ideal,Module) := ZZ => (J,M) -> (
+depth(Ideal,Module) := ZZ => (J,M) -> (
       
      R := ring J;
      
      if not isCommutative R then error "'Depth' not implemented yet for noncommutative rings.";
      if R =!= ring M then error "expected modules over the same ring";    
-    
-    
+
      if dim M === 0 then  return 0;
      if (ideal vars ring M) === J then return depth M;
      if dim J === 0 then return depth M; 
@@ -70,9 +67,12 @@ dIM(Ideal,Module) := ZZ => (J,M) -> (
      S := (flattenRing R)_0;
      pS := presentation S;
      S0 := ring pS;
+     
      m := presentation M;    
      MM := coker( (presentation S ** sub(target m, S0)) |sub(m,S0));
-   
+
+     if isField coefficientRing MM then return "PolyRing";
+        
      JJ := ideal(sub(gens J,S0)|pS);
     
      AJ := S0^1/JJ;
@@ -88,6 +88,16 @@ dIM(Ideal,Module) := ZZ => (J,M) -> (
     
      if s =!= null then return s else return d
      )
+///
+restart
+loadPackage("Depth", Reload => true)
+S = ZZ/101[x_1..x_(9)];
+J = ideal vars S;
+M = S^1--/J^5;
+
+time depth(J,M) -- used 87.7697 seconds
+///     
+
 
 
 ///
@@ -101,6 +111,7 @@ dIM(Ideal,Module) := ZZ => (J,M) -> (
 --       make work for modules over quotients (tonight)
 --
 restart
+--uninstallPackage "Depth"
 loadPackage("Depth", Reload => true)
 S = ZZ/101[x_1..x_(9)];
 J = ideal vars S;
