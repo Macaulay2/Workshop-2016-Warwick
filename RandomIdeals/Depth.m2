@@ -360,6 +360,8 @@ systemOfParameters = method(Options => {Density => 0, Attempts => 100, Verbose =
 systemOfParameters(ZZ,Ideal) := opts -> (c,I) ->(
 	den := opts.Density;
 	att := opts.Attempts;
+--	gbI := ideal gens gb I;
+--	if numgens gbI == c then return gbI;
 	if numgens I == c then return I;
 	    --takes care of I = 0 and I principal;
 	sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
@@ -403,10 +405,11 @@ systemOfParameters Ideal := opts -> I ->
 ///
 uninstallPackage "Depth"
 restart
-notify = true
-installPackage "Depth"
 loadPackage ("Depth", Reload=>true)
-S = ZZ/101[a,b,c]
+S = ZZ/101[a]
+J = ideal"a-a2,a+a2"
+systemOfParameters(2,J)
+
 I = ideal"cb,b2,ab,a2"
 codim I 
 systemOfParameters(codim I, I)
