@@ -96,6 +96,12 @@ depth(Ideal,Module) := ZZ => (J,M) -> (
      )
  
 TEST///
+A = QQ[x_1..x_3]/ideal(x_1^2, x_1*x_2)
+assert( depth A === 1 )
+assert( depth(ideal(1_A),A) === infinity )
+///
+
+TEST///
 S = ZZ/101[x_1..x_(9)];
 J = ideal vars S;
 T = S/J^5;
@@ -365,7 +371,6 @@ systemOfParameters(ZZ,Ideal) := opts -> (c,I) ->(
 	K := J;
 	c' := 1;
 	c'' := c;
-    
 	for i from 1 to n-1 do(
 	    c'' = codim(K = J + ideal(sgens_{i}));
 	    if c''>c' then (
@@ -795,47 +800,7 @@ installPackage "Depth"
 check Depth
 
 viewHelp Depth
-restart
-loadPackage"Depth"
-     A = QQ[x_1..x_3]/ideal(x_1^2, x_1*x_2)
-     depth A
-     depth(ideal(1_A),A)
-///
-------------------------------
--- systemOfParameters
---
-restart
-loadPackage("Depth", Reload => true)
-
-S = ZZ/101[a,b,c]
-I = ideal"cb,b2,ab,a2"
-codim I 
-
-inhomogeneousSystemOfParameters(I,S) -- original method (still works)
-systemOfParameters(codim I, I)
-systemOfParameters(codim I, I, Density => 1, Attempts =>2)
-
-I = ideal"cb,b2,a2"
-systemOfParameters(1,I)
-
-I = ideal"ab,ac,bc"
-systemOfParameters(codim I, I)
-systemOfParameters(I, Attempts => 1, Density => .01)
-time systemOfParameters(I, Attempts => 10000, Density => .01)     
-
-n=5;m=2;     
-S = ZZ/101[vars(0..n-1)]
-I = ideal apply ( numgens S, j-> (
-	product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k))
-	)
-    )
-systemOfParameters(I, Density => .2,  Attempts => 1000)
-
-L = toList(0..n-1)
-subs = subsets(L,m)
-I = ideal(apply(subs, p -> product(p, i-> S_i)))
-     systemOfParameters(I, Density => .2,  Attempts => 1000, Verbose => true)
-     systemOfParameters(I, Verbose =>true)
 
 
-///
+
+
