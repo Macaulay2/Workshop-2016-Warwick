@@ -358,10 +358,25 @@ isCM(Module) := Boolean => (M) -> (
 
 systemOfParameters = method(Options => {Density => 0, Attempts => 100, Verbose => false})
 systemOfParameters(ZZ,Ideal) := opts -> (c,I) ->(
+    	
+	if c > codim I then error "integer is larger than the codimension of the ideal";
+	
+{*
+One possibility is that the sop code compute:
+
+K = trim ideal gens gb I 
+
+If it has only codim I generators return K.
+If NO, then check 
+isHomogeneous K
+and if false we should simply use the inhomogeneous code.
+*}	
+		
 	den := opts.Density;
 	att := opts.Attempts;
 --	gbI := ideal gens gb I;
 --	if numgens gbI == c then return gbI;
+--	if numgens I == codim I then return I;
 	if numgens I == c then return I;
 	    --takes care of I = 0 and I principal;
 	sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
@@ -402,36 +417,72 @@ systemOfParameters Ideal := opts -> I ->
 
 
 
-///
-uninstallPackage "Depth"
+
+TEST///
 restart
 loadPackage ("Depth", Reload=>true)
 S = ZZ/101[a]
 J = ideal"a-a2,a+a2"
-systemOfParameters(2,J)
+assert( systemOfParameters(1,J) === ideal "a" )
+///
+
+TEST///
+restart
+loadPackage ("Depth", Reload=>true)
+S = ZZ/101[a,b,c]
+I = ideal"ab+c2, a2"
+J = ideal gens gb I;
+assert(systemOfParameters J == ideal"a2,ab+c2")
+assert(systemOfParameters I == ideal"a2,ab+c2")
+assert (numgens J == 4)
+assert (numgens trim J == 2)
+///
+
+TEST///
+restart
+loadPackage ("Depth", Reload=>true)
+S = ZZ/101[a,b,c]
 
 I = ideal"cb,b2,ab,a2"
-codim I 
-systemOfParameters(codim I, I)
-systemOfParameters(codim I, I, Density => 1, Attempts =>2)
-viewHelp Depth
-     I = ideal"cb,b2,a2"
-     systemOfParameters(1,I)
-     I = ideal"ab,ac,bc"
-     systemOfParameters(codim I, I)
-     systemOfParameters(I, Attempts => 1, Density => .01)
-     systemOfParameters(I, Attempts => 10000, Density => .01)     
+assert( systemOfParameters I == ideal"a2,b2" )
+assert( systemOfParameters(codim I, I) == ideal"a2,b2" )
+assert( systemOfParameters(codim I, I, Density => 1, Attempts =>2) == ideal"a2,b2" )
+
+I = ideal"cb,b2,a2"
+assert( systemOfParameters(1,I) == ideal"a2" )
+
+I = ideal"ab,ac,bc"
+sopI = systemOfParameters(codim I, I)
+assert( numgens sopI  ==  codim I )
+assert( radical sopI == I )
+
+--systemOfParameters(I, Attempts => 1, Density => .01)
+--systemOfParameters(I, Attempts => 10000, Density => .01)     
+///
+
+TEST///
+restart
+loadPackage ("Depth", Reload=>true)
 n=5;m=2;     
 S = ZZ/101[vars(0..n-1)]
-     I = ideal apply(numgens S, 
-	 j-> product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k)))
-     systemOfParameters(I, Density => .2,  Attempts => 1000)
+
+I = ideal apply(numgens S, 
+    j-> product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k)))
+sopI = systemOfParameters(I, Density => .2,  Attempts => 1000)
+assert( numgens sopI  ==  codim I )
+assert( radical sopI == I )
+
 L = toList(0..n-1)
 subs = subsets(L,m)
 I = ideal(apply(subs, p -> product(p, i-> S_i)))
-     systemOfParameters(I, Density => .2,  Attempts => 1000, Verbose => true)
-     systemOfParameters(I, Verbose =>true)
+sopI = systemOfParameters(I, Density => .2,  Attempts => 1000)
+assert( numgens sopI  ==  codim I )
+assert( radical sopI == I )
+
+--     systemOfParameters(I, Density => .2,  Attempts => 1000, Verbose => true)
+--     systemOfParameters(I, Verbose =>true)
 ///
+
 --=========================================================================--
 --=========================================================================--
 
