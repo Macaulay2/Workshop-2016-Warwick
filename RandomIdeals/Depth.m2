@@ -372,7 +372,7 @@ systemOfParameters(ZZ,Ideal) := opts -> (c,H) ->(
 		
 	den := opts.Density;
 	att := opts.Attempts;
-	sgens := sort (gens I, DegreeOrder => Ascending, MonomialOrder => Descending);
+	sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
 	if den == 0 then den = ((1+c)/(numcols sgens));
 	if opts.Verbose == true then <<"Attempts: "<<att<<" Density: "<< den<<endl;
 	n :=numcols sgens;
@@ -418,6 +418,7 @@ TEST///
 S = ZZ/101[a]
 J = ideal"a-a2,a+a2"
 assert( systemOfParameters(1,J) === ideal "a" )
+assert( isRegularSequence gens systemOfParameters J === true)
 ///
 
 TEST///
@@ -427,14 +428,18 @@ I = ideal"cb,b2,ab,a2"
 assert( systemOfParameters I == ideal"a2,b2" )
 assert( systemOfParameters(codim I, I) == ideal"a2,b2" )
 assert( systemOfParameters(codim I, I, Density => 1, Attempts =>2) == ideal"a2,b2" )
+assert( isRegularSequence gens systemOfParameters I === true)
 
+     
 I = ideal"cb,b2,a2"
 assert( systemOfParameters(1,I) == ideal"a2" )
+assert( isRegularSequence gens systemOfParameters I === true)
 
 I = ideal"ab,ac,bc"
 sopI = systemOfParameters(codim I, I)
 assert( numgens sopI  ==  codim I )
 assert( radical sopI == I )
+assert( isRegularSequence gens systemOfParameters I === true)
 
 --systemOfParameters(I, Attempts => 1, Density => .01)
 --systemOfParameters(I, Attempts => 10000, Density => .01)     
@@ -449,6 +454,12 @@ I = ideal apply(numgens S,
 sopI = systemOfParameters(I, Density => .2,  Attempts => 1000)
 assert( numgens sopI  ==  codim I )
 assert( radical sopI == I )
+assert( isRegularSequence gens systemOfParameters I === true)
+///
+
+TEST///
+n=5;m=2;     
+S = ZZ/101[vars(0..n-1)]
 
 L = toList(0..n-1)
 subs = subsets(L,m)
@@ -456,6 +467,7 @@ I = ideal(apply(subs, p -> product(p, i-> S_i)))
 sopI = systemOfParameters(I, Density => .2,  Attempts => 1000)
 assert( numgens sopI  ==  codim I )
 assert( radical sopI == I )
+assert( isRegularSequence gens systemOfParameters I === true)
 
 --     systemOfParameters(I, Density => .2,  Attempts => 1000, Verbose => true)
 --     systemOfParameters(I, Verbose =>true)
@@ -690,19 +702,19 @@ document {
 	  [inhomogeneousSystemOfParameters,Bound],
 	  [inhomogeneousSystemOfParameters,Maximal],
 	  [inhomogeneousSystemOfParameters,Sparseness]},
-     Headline => "generates a regular sequence",
+     Headline => "generates an inhomogeneous system of parameters",
      Usage => "inhomogeneousSystemOfParameters(I,A)",
      Inputs => {
 	  "I" => Ideal,
 	  "A" => Ring,
-	  Attempts => ZZ => "number of attempts made to generate a regular sequence",
+	  Attempts => ZZ => "number of attempts made to generate an inhomogeneous system of parameters",
 	  Bound => ZZ => "bound on the value of the random coefficients",
 	  Sparseness => RR => "between 0 and 1 giving the frequency of the coefficients being equal to zero",
-	  Maximal => Boolean => "whether to insist on searching for a maximal regular sequence"
+	  Maximal => Boolean => "whether to insist on searching for a maximal inhomogeneous system of parameters"
 	  },
      Outputs => {Matrix},
      "Given a ring and an ideal, ", TT "inhomogeneousSystemOfParameters", " attempts
-     to generate a regular sequence contained in ", TT "I", ". The
+     to generate an inhomogeneous system of parameters contained in ", TT "I", ". The
      algorithm is based on one found in Chapter 5.5 of W. Vasconcelos'
      book: ", EM "Computational Methods in Commutative Algebra and
      Algebraic Geometry", ".",
