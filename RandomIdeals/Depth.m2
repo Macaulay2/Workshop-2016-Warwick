@@ -368,7 +368,8 @@ systemOfParameters(ZZ,Ideal) := opts -> (c,H) ->(
 	I := trim ideal gens gb H;
 	if (n := numgens I)<c then error"Ideal has too small codimension.";
 	if numgens I == c then return I;
-	if not isHomogeneous I then error"ideal must have homogeneous generating system";
+	if not isHomogeneous I then error("ideal not homogeneous; 
+	      use "inhomogeneousSystemOfParameters" instead");
 		
 	den := opts.Density;
 	att := opts.Attempts;
@@ -395,7 +396,7 @@ systemOfParameters(ZZ,Ideal) := opts -> (c,H) ->(
 		scan(n,i->(
 	    		c'' = codim(K = J + ideal(rgens_{i}));
 	    		if c''>c' then(
-	        	    J = K;
+	        	    J = ideal compress gens K;
 			    c' = c'';
 			    if c' == c then break)));
 		    if opts.Verbose == true then print j;
@@ -842,6 +843,12 @@ assert (depth (S/m) == 0)
 assert(depth(S^1/m) == 0)
 assert(depth( (S/m)^1) ==0)
 ///
+TEST///
+setRandomSeed 0
+R = ZZ/101[a,b]/ideal(a*b)
+I = ideal(a,b)
+assert(systemOfParameters I == ideal"24a - 36b")
+///
 
 end--
 
@@ -851,14 +858,6 @@ restart
 installPackage "Depth"
 viewHelp Depth
 check Depth
-
-S = ZZ/101[a,b,c,d]
-I = ideal"ab,bc,cd,da"
-codim I
-setRandomSeed 0
-inhomogeneousSystemOfParameters I
-systemOfParameters I
-systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
 
 
 
