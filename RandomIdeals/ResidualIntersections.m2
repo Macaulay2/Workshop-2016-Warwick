@@ -1,5 +1,5 @@
 newPackage ( "ResidualIntersections",
-    Version => "1.0",
+    Version => "1.1",
     Date => "07 May 2016",
     Authors => {
 	{Name => "Katie Ansaldi",
@@ -15,7 +15,6 @@ newPackage ( "ResidualIntersections",
 	},
     PackageExports => {"RandomIdeal", "Depth"},
     Headline => "Package for studying conditions associated to Residual Intersection theory",
-    Reload => true,
     DebuggingMode => true
     )
 
@@ -123,7 +122,7 @@ if numgens I <= c then return ideal(1_(ring I));
 --n :=numcols sgens;
 --rsgens  := sgens * random(source sgens, source sgens);
 --regseq := ideal rsgens_{n-c..n-1};
-regseq := homogeneousRegularSequence(c,I);
+regseq := systemOfParameters(c,I);
 trim(regseq : I)
 )
 randomLink Ideal := I->randomLink(codim I, I)
@@ -137,67 +136,6 @@ if opts.UseNormalModule == false then
 	max(0, 2*(numgens N - codim I)-6))
 )
 
-{*
-homogeneousRegularSequence = method()
-homogeneousRegularSequence(ZZ,Ideal) := (c,I) ->(
-if numgens I == c then return I;
-    --takes care of I = 0 and I principal;
-sgens := sort gens I;
-rsgens := sgens * random(source sgens, source sgens);
-n :=numcols sgens;
-J := ideal sgens_{0};
-K := J;
-count := 1; -- next element to add
-c' := 1; -- current codim J
-while c'<c do(
-    if codim (K = J + ideal sgens_{count}) > c' then (J = K; c' = c'+1)
-    else if codim (K = J + ideal rsgens_{count}) > c' then (J = K; c' = c'+1);
-    count = count+1;
-    );
-J
-)
-homogeneousRegularSequence Ideal := I -> homogeneousRegularSequence(codim I, I)
-
-
-homogeneousRegularSequence = method()
-homogeneousRegularSequence(ZZ,Ideal) := (c,I) ->(
-if numgens I == c then return I;
-    --takes care of I = 0 and I principal;
-sgens := sort gens I;
-n :=numcols sgens;
-J := ideal sgens_{0};
-K := J;
-c' := 1;
-c'' := c;
-for i from 1 to n-1 do(
-    c'' = codim(K = J + ideal(sgens_{i}));
-    if c''>c' then (
-        J = K;
-	c' = c''));
-if c' == c then return J;
-rgens := sgens * random(source sgens, source sgens);
-for i from 0 to n-1 do(
-    c'' = codim(K = J + ideal(rgens_{i}));
-    if c''>c' then(
-        J = K;
-	c' = c'';
-	if c' ==c then break));
-J)
-homogeneousRegularSequence Ideal := I -> homogeneousRegularSequence(codim I, I)
-
-///
-restart
-loadPackage "ResidualIntersections"
-S = ZZ/101[a,b,c]
-I = ideal"cb,b2,ab,a2"
-codim I 
-homogeneousRegularSequence(codim I, I)
-     I = ideal"cb,b2,a2"
-     homogeneousRegularSequence I     
-     I = ideal"ab,ac,bc"
-     homogeneousRegularSequence( I)
-///
-*}
 isLicci = method(Options => {UseNormalModule =>false, Verbose =>false})
 isLicci(ZZ, ZZ, Ideal) := opts -> (b,c,I) -> (
     --I homogeneous ideal
@@ -219,7 +157,7 @@ isLicci(ZZ, ZZ, Ideal) := opts -> (b,c,I) -> (
 
 isLicci(ZZ,Ideal) := opts -> (b,I) -> isLicci(b,codim I, I)
 isLicci Ideal := opts -> I -> (
-isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
+isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I, Verbose => opts.Verbose
     ))
 ///
 restart
@@ -507,6 +445,7 @@ doc ///
     (isLicci,ZZ,ZZ,Ideal)
     (isLicci,ZZ,Ideal)
     (isLicci,Ideal)
+    [isLicci,Verbose]
    Headline
     Tests whether an ideal is licci
    Usage
@@ -961,9 +900,9 @@ TEST ///
 --koszulDepth, hasSlidingDepth
 R = QQ[x_1..x_6];
 I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
-assert(koszulDepth I == {3,0,2,3})
+assert(koszulDepth I == {3,0,2})
 assert(koszulDepth(2,I) == 2)
-assert(not hasSlidingDepth I)
+assert(not hasSlidingDepth(2,I))
 assert(hasSlidingDepth(1,I))
 assert(not hasSlidingDepth(2,I))
 assert(not isStronglyCM I)
@@ -987,17 +926,8 @@ TEST///
 ///
 
 end--
-restart
-loadPackage("ResidualIntersections", 
-    FileName =>"/Users/david/research/Workshop-2016-Warwick/RandomIdeals/ResidualIntersections.m2")
-loadPackage "RandomIdeal"
-installPackage ("RandomIdeal")
-
 uninstallPackage "ResidualIntersections"
 restart
 installPackage ("ResidualIntersections", UserMode=>true)
 check "ResidualIntersections"
 viewHelp ResidualIntersections
-J = idealChainFromSC randomChain(10,5,20);
-J/maxGs
-J/residualCodims

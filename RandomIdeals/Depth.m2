@@ -25,7 +25,7 @@ newPackage(
 	  }
 	  },
      Headline => "aids in computations related to depth",
-     DebuggingMode => false
+     DebuggingMode => true
      )
 
 --=========================================================================--
@@ -366,40 +366,43 @@ systemOfParameters(ZZ,Ideal) := opts -> (c,H) ->(
 	    --takes care of H = 0 and H principal;    
 	
 	I := trim ideal gens gb H;
+	if (n := numgens I)<c then error"Ideal has too small codimension.";
 	if numgens I == c then return I;
---	if not isHomogeneous I then return ideal inhomogeneousSystemOfParameters H;
-	    -- gives complete sop, not just first c
+	if not isHomogeneous I then error"ideal must have homogeneous generating system";
 		
 	den := opts.Density;
 	att := opts.Attempts;
 	sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
 	if den == 0 then den = ((1+c)/(numcols sgens));
 	if opts.Verbose == true then <<"Attempts: "<<att<<" Density: "<< den<<endl;
-	n :=numcols sgens;
-	J := ideal sgens_{0};
-	if c == 1 then return J;
-	
+
+	J := ideal 0_(ring I);
 	K := J;
-	c' := 1;
-	c'' := c;
-	for i from 1 to n-1 do(
+	c' := 0;
+	c'' := 0;
+
+	scan(n, i->(
 	    c'' = codim(K = J + ideal(sgens_{i}));
 	    if c''>c' then (
-	        J = K;
-		c' = c''));
-	if c' == c then return J;
+	        J = ideal compress gens K;
+		c' = c'');
+	    if c' == c then break;
+	    ));
+    	if c' == c then return J;
+			
 	scan(att, j->(
-	rgens := sgens * random(source sgens, source sgens, Density => 1.0*den);
-	for i from 0 to n-1 do(
-	    c'' = codim(K = J + ideal(rgens_{i}));
-	    if c''>c' then(
-	        J = K;
-		c' = c'';
-		if c' == c then break c'));
-	if c'==c then break
-	if opts.Verbose == true then print j));
-	if numgens J !=c then error "no regular sequence found; try increasing Density or Attempts options";
-	J)
+		rgens := sgens * random(source sgens, source sgens, Density => 1.0*den);
+		scan(n,i->(
+	    		c'' = codim(K = J + ideal(rgens_{i}));
+	    		if c''>c' then(
+	        	    J = K;
+			    c' = c'';
+			    if c' == c then break)));
+		    if opts.Verbose == true then print j;
+    		    if c'==c then break));
+    	if c' == c then return J else
+	     error "no system of parameters found; try increasing Density or Attempts options"
+	)
 
 
 systemOfParameters Ideal := opts -> I -> 
@@ -572,8 +575,14 @@ doc ///
      systemOfParameters I
      systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
    Caveat
-    could be rewritten to take into account the codimensions of the sub ideals generated
-    by the elements of degree up to d for each d.
+    Could be rewritten to take into account the codimensions of the sub ideals generated
+    by the elements of degree up to d for each d. 
+    
+    The routine tries to find generators among linear combinations, with field coefficients,
+    of generators of I; but over very small fields there may not be any! For example
+    there is no linear form that is a parameter in the 1-dimensional
+    ring 
+    R = ZZ/2[x,y]/intersect(ideal"x", ideal"x+y", ideal"y")
    SeeAlso
     regularSequenceCheck
     Depth
@@ -843,6 +852,13 @@ installPackage "Depth"
 viewHelp Depth
 check Depth
 
+S = ZZ/101[a,b,c,d]
+I = ideal"ab,bc,cd,da"
+codim I
+setRandomSeed 0
+inhomogeneousSystemOfParameters I
+systemOfParameters I
+systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
 
 
 
