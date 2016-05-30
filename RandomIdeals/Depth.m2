@@ -357,8 +357,7 @@ isCM(Module) := Boolean => (M) -> (
 --=========================================================================--
 --=========================================================================--
 
-systemOfParameters = method(Options => {Density => 0, Attempts => 100, Verbose => false,
-	Seed => null})
+systemOfParameters = method(Options => {Density => 0, Seed => null, Attempts => 100, Verbose => false})
 systemOfParameters(ZZ,Ideal) := opts -> (c,H) ->(
     	
 	cd := codim H;
@@ -369,18 +368,18 @@ systemOfParameters(ZZ,Ideal) := opts -> (c,H) ->(
 	
 	I := trim ideal gens gb H;
 	if (n := numgens I)<c then error"Ideal has too small codimension.";
-	if numgens I == c then return I;
 	if not isHomogeneous I then error("ideal not homogeneous; 
 	      use "inhomogeneousSystemOfParameters" instead");
 		
 	den := opts.Density;
 	att := opts.Attempts;
 	sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
-	if den == 0 then den = ((1+c)/(numcols sgens));
-	if opts.Verbose == true then <<"Attempts: "<<att<<" Density: "<< den<<endl;
-
     	J := opts.Seed;
-	if J == null then J = ideal 0_(ring I) ;
+	if den == 0 then den = ((1+c)/(numcols sgens));
+	if opts.Verbose == true then (
+	    <<"Attempts: "<<att<<" Density: "<< den<<" Seed: "<<J<<endl);
+	if J === null then J = ideal 0_(ring I) ;
+	if J != 0 and (codim J < numgens J or (gens J)%I != 0) then error"bad Seed ideal";
 	
 	K := J;
 	c' := 0;
@@ -417,7 +416,8 @@ systemOfParameters Ideal := opts -> I ->
                              systemOfParameters(codim I, I,
 			     Density => opts.Density, 
 			     Attempts => opts.Attempts,
-			     Verbose => opts.Verbose)
+			     Verbose => opts.Verbose,
+			     Seed => opts.Seed)
 
 systemOfParameters Ring := opts -> R ->
                              systemOfParameters(dim R, ideal vars R,
