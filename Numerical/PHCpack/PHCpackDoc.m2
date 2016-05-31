@@ -1304,6 +1304,8 @@ doc ///
     gamma
     interactive
     intermediateSolutions
+    loadSettingsPath
+    saveSettingsPath
     numThreads
     seeProgress
     tDegree
@@ -1484,6 +1486,53 @@ doc ///
     option to get all intermediate solutions on a path
   Usage
     trackPaths(...,intermediateSolutions=>Boolean)
+///;
+
+doc ///
+  Key
+    saveSettingsPath
+  Headline
+    option of trackPaths to save the settings for a reproducible rerun
+  Description
+    Text
+      By default, this option is set to the empty string.
+
+      If the user provides a string that is not the empty string,
+      then the settings of the path tracker are saved for a rerun.
+      Calling trackPaths, giving the same string to loadSettingsPath,
+      enables a reproducible run.
+///;
+
+doc ///
+  Key
+    [trackPaths,saveSettingsPath]
+  Headline
+    option to save the settings of the path trackers for a reproducible rerun
+  Usage
+    trackPaths(...,saveSettingsPath=>String)
+///;
+
+doc ///
+  Key
+    loadSettingsPath
+  Headline
+    option of trackPaths to load the settings for a reproducible rerun
+  Description
+    Text
+      By default, this option is set to the empty string.
+
+      To apply the option, the user should give as string the argument
+      used for the option saveSettingsPath.
+      With this option, one gets a reproducible run.
+///;
+
+doc ///
+  Key
+    [trackPaths,loadSettingsPath]
+  Headline
+    option to load the settings of the path trackers for a reproducible rerun
+  Usage
+    trackPaths(...,loadSettingsPath=>String)
 ///;
 
 ----------------
