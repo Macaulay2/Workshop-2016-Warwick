@@ -196,6 +196,22 @@ doc ///
     numericalIrreducibleDecompositon(...,StartDimension=>ZZ)
 ///;
 
+doc ///
+  Key
+    [numericalIrreducibleDecomposition,Verbose]
+  Headline
+    option to specify whether additional output is wanted 
+  Usage
+    numericalIrreducibleDecomposition(...,Verbose=>Boolean)
+  Description
+    Text
+      The value of the Verbose option (by default set to false)
+      is passed to the methods cascade and factorWitnessSet.
+
+      The output file of {\tt phc} contains timings for all stages
+      in the numerical irreducible decomposition.
+///;
+
 -------------------------
 -- CONSTRUCT EMBEDDING --
 -------------------------
@@ -1285,11 +1301,12 @@ doc ///
       (m,q,qsols) = mixedVolume(f,StartSystem=>true);
       fsols = trackPaths(f,q,qsols)
   SeeAlso
-    tDegree
     gamma
     interactive
+    intermediateSolutions
     numThreads
     seeProgress
+    tDegree
 ///;
 
 -- options for trackPaths
@@ -1443,6 +1460,30 @@ doc ///
 
       The output file of {\tt phc} contains timings for the path tracker
       and additional diagnostics for each path.
+///;
+
+doc ///
+  Key
+    intermediateSolutions
+  Headline
+    option of trackPaths to get all intermediate solutions on a path
+  Description
+    Text
+      By default, when this option is false, on return are only the
+      end points of each solution path.
+
+      With this option set to true, on return are all intermediate
+      solutions along a path.  For large systems and/or complicated
+      solution paths, the list on return can be rather large.
+///;
+
+doc ///
+  Key
+    [trackPaths,intermediateSolutions]
+  Headline
+    option to get all intermediate solutions on a path
+  Usage
+    trackPaths(...,intermediateSolutions=>Boolean)
 ///;
 
 ----------------
