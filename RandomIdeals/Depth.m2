@@ -3,7 +3,7 @@
 --=========================================================================--
 --=========================================================================--
 {*
-Author: Bart Snapp. Revisde in May 2016 by David Eisenbud and Branden Stone
+Author: Bart Snapp. Revised in May 2016 by David Eisenbud and Branden Stone
 This file is in the public domain.
 *} 
 newPackage(
@@ -25,54 +25,61 @@ newPackage(
 	  }
 	  },
      Headline => "aids in computations related to depth",
-     DebuggingMode => false
+     DebuggingMode => true
      )
 
 --=========================================================================--
      
 export{
-    "homogeneousRegularSequence",
+    "systemOfParameters",
     "regularSequenceCheck",
     "isRegularSequence",
-    "regularSequence",
+    "inhomogeneousSystemOfParameters",
     "isCM",
     "Sparseness",
     "Bound",
     "Attempts",
-    "Maximal",
-    "dIM"} 
+    "Seed",
+    "Maximal"
+    } 
         
 --=========================================================================--
 
+-- Depreciated Code (Branden Stone)
 -- All this does is check where the ext modules don't vanish.
+--depth(Ideal,Module) := ZZ => (I,M) -> (
+--     AI := (ring I)^1/I;
+--     for i from 0 to dim ring M do(
+--	  if Ext^i(AI,M) != 0 then return i); 
+--     infinity
+--     )
 
-depth(Ideal,Module) := ZZ => (I,M) -> (
-     AI := (ring I)^1/I;
-     for i from 0 to dim ring M do(
-	  if Ext^i(AI,M) != 0 then return i); 
-     infinity
-     )
-
-dIM = method()
-dIM(Ideal,Module) := ZZ => (J,M) -> (
+depth(Ideal,Module) := ZZ => (J,M) -> (
       
      R := ring J;
      
      if not isCommutative R then error "'Depth' not implemented yet for noncommutative rings.";
      if R =!= ring M then error "expected modules over the same ring";    
-    
-    
+     if J == ring J then return infinity;
+
+     -- Checks dimension of M
      if dim M === 0 then  return 0;
-     if (ideal vars ring M) === J then return depth M;
+     -- Checks if M is a rank one free module over polynomial ring
+     if (R^1 === M and isPolynomialRing R and isField coefficientRing R) then return codim J;
+     -- Checks if J is maximal ideal
+--     if (ideal vars R) === J then return depth M;
+     -- Checks if J is primary to maximal ideal
      if dim J === 0 then return depth M; 
 --     if dim(J + ann M) === 0 then return 0; 
+
 
      S := (flattenRing R)_0;
      pS := presentation S;
      S0 := ring pS;
+     
      m := presentation M;    
      MM := coker( (presentation S ** sub(target m, S0)) |sub(m,S0));
-   
+
      JJ := ideal(sub(gens J,S0)|pS);
     
      AJ := S0^1/JJ;
@@ -81,97 +88,70 @@ dIM(Ideal,Module) := ZZ => (J,M) -> (
      complete resolution(AJ,LengthLimit=>d);
 
      s := scan(0..(d-1), i -> ( 
-	    print i;
+--	    print i;
 	    if Ext^i(AJ,MM) != 0 then break i;    
 	    )
 	);
     
      if s =!= null then return s else return d
      )
-
-
+ 
+TEST///
+A = QQ[x_1..x_3]/ideal(x_1^2, x_1*x_2)
+assert( depth A === 1 )
+assert( depth(ideal(1_A),A) === infinity )
 ///
---------------------------------------------------------
--- New Methods in Depth.m2
--- * depth M
--- * dIM(J,M), soon to be new depth(J,M)
--- * homogeneousRegularSequence
---
--- todo: ?give timed check for random NZD for dim 1?
---       make work for modules over quotients (tonight)
---
-restart
-loadPackage("Depth", Reload => true)
+
+TEST///
 S = ZZ/101[x_1..x_(9)];
 J = ideal vars S;
-M = S^1/J^5;
+T = S/J^5;
+I = ideal vars T;
+assert( depth(I,T) === 0 )
+assert( depth(I,T^1) === 0 )
+assert( depth T === 0 )
+///     
 
-time depth(J,M) -- used 87.7697 seconds
-time depth M 
-time dIM(J,M)
-time dim M
-
-restart
-loadPackage("Depth", Reload => true)
-    	    
+TEST///
 S = ZZ/101[x_1..x_(9)]
 I = minors(2, genericMatrix(S,x_1,3,3))
 M = S^1/I;
 J = (ideal vars S)^1;
+assert( depth(J,M) === 5 )
+assert( depth M === 5 )
+///
 
-time depth(J,M) -- used 3.24255 seconds with J = (ideal vars S)^1;
-time dIM(J,M) 
-time depth M 
-
-restart
-loadPackage("Depth", Reload => true)
-
+TEST///
 S = ZZ/101[x_1..x_(9)]
 I = minors(2, genericMatrix(S,x_1,3,3))
 M = S^1/I;
 J = (ideal vars S)^2;
+assert( depth(J,M) === 5)
+///
 
-C = res(M, DegreeLimit => 3);
-C.dd;
-keys C
-complete C
-
-
-viewHelp complete
-time depth(J,M) -- used 308.183 seconds with J = (ideal vars S)^2;
-time dIM(J,M) -- used 0.006662 seconds
-
-restart
-loadPackage("Depth", Reload => true)
-
+TEST///
 S = ZZ/101[x_1..x_(15)]
 I = minors(3, genericMatrix(S,x_1,3,5))
 M = (S/I)^1;
 J = (ideal vars (S/I))^2;
-ring J === ring M
-(ideal vars ring M) === J
+assert( depth M === 12 )
+assert( depth(J,M) === 12 )
+///
 
-time depth M
-time depth(J,M) -- bad
-time dIM(J,M)
-
-
-restart
-loadPackage("Depth", Reload => true)
-
+TEST///
 S = ZZ/101[x,y,z,w]
 I = minors(2, matrix{{x,y,z},{y,z,w}} )
 SS = S/I
-M = (SS)^1;
-J = apply( 4, i -> (depth( ideal(vars SS)_(toList(0..i)), M )))
-J = apply( 4, i -> (dIM( ideal(vars SS)_(toList(0..i)), M )))
+assert( apply( 4, i -> (depth( ideal(vars SS)_(toList(0..i)), SS))) === {1,1,1,2} )
+assert( apply( 4, i -> (depth( ideal(vars SS)_(toList(0..i)), SS^1))) === {1,1,1,2} )
+///
 
-restart
-loadPackage("Depth", Reload => true)
 
+-- Not a TEST
+///
 S = ZZ/101[x_1..x_(16)]
 I = minors(4, genericMatrix(S,x_1,4,4))
-R = S/I;
+R = S/I
 J = minors(2, genericMatrix(R,x_1,4,4))
 M = R^1/minors(3, genericMatrix(R,x_1,4,4));
 
@@ -180,73 +160,31 @@ ring J === ring M
 
 time depth M
 time depth(J,M) -- bad
-time dIM(J,M)
 
-
-------------------------------
--- homogeneousRegularSequence
---
-restart
-loadPackage("Depth", Reload => true)
-
-S = ZZ/101[a,b,c]
-I = ideal"cb,b2,ab,a2"
-codim I 
-
-regularSequence(I,S) -- original method (still works)
-homogeneousRegularSequence(codim I, I)
-homogeneousRegularSequence(codim I, I, Density => 1, Attempts =>2)
-
-I = ideal"cb,b2,a2"
-homogeneousRegularSequence(1,I)
-
-I = ideal"ab,ac,bc"
-homogeneousRegularSequence(codim I, I)
-homogeneousRegularSequence(I, Attempts => 1, Density => .01)
-time homogeneousRegularSequence(I, Attempts => 10000, Density => .01)     
-
-n=5;m=2;     
-S = ZZ/101[vars(0..n-1)]
-I = ideal apply ( numgens S, j-> (
-	product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k))
-	)
-    )
-homogeneousRegularSequence(I, Density => .2,  Attempts => 1000)
-
-L = toList(0..n-1)
-subs = subsets(L,m)
-I = ideal(apply(subs, p -> product(p, i-> S_i)))
-     homogeneousRegularSequence(I, Density => .2,  Attempts => 1000, Verbose => true)
-     homogeneousRegularSequence(I, Verbose =>true)
-
-
+time depth(ideal vars S, S^1)
 ///
+
 -----------------------------------------------------------------------------
 
 depth(Module) := ZZ => M -> (
     --depth of a module with respect to the max ideal, via finite proj dim
     --gives error if the ultimate coeficient ring of R = ring M is not a field.
-    if dim M === 0 then  return 0; -- quick test for detph 0
+    
+    if dim M === 0 then  return 0; -- quick test for depth 0
+    
     R := ring M;
     S := (flattenRing R)_0;
+    
     if not isCommutative R then error"depth undefined for noncommutative rings";
     if not isField coefficientRing S then error"input must be a module over an affine ring";
+    
     S0 := ring presentation S;
         
     m := presentation M;    
     mm := (presentation S ** sub(target m, S0)) |sub(m,S0);
     numgens S0 - length res coker mm
---    depth(ideal gens ring M,M)
      )    
 
-///
-restart
-loadPackage("Depth", Reload =>true)
-
-T = ZZ/101[a,b,c]
-M = (T/ideal vars T)^1
-depth M
-///
 -----------------------------------------------------------------------------
 
 depth(Ideal,Ring) := ZZ => (I,A) -> (
@@ -255,13 +193,13 @@ depth(Ideal,Ring) := ZZ => (I,A) -> (
 
 -----------------------------------------------------------------------------
 
-depth(Ideal,QuotientRing) := ZZ => (I,A) -> (
-     R := ambient A;
-     if isField coefficientRing A and isPolynomialRing R and I == ideal gens A and isHomogeneous ideal A then (
-	  d := dim R;
-	  d - length res(ideal A, LengthLimit => d)) else 
-     depth(I,module A)
-     )
+--depth(Ideal,QuotientRing) := ZZ => (I,A) -> (
+--     R := ambient A;
+--     if isField coefficientRing A and isPolynomialRing R and I == ideal gens A and isHomogeneous ideal A then (
+--	  d := dim R;
+--	  d - length res(ideal A, LengthLimit => d)) else 
+--     depth(I,module A)
+--     )
 
 -----------------------------------------------------------------------------
 
@@ -275,9 +213,10 @@ depth(Ideal,Ideal) := ZZ => (I,A) -> (
 
 -----------------------------------------------------------------------------
 
-depth(Ideal,PolynomialRing) := ZZ => (I,A) -> (
-     if isField coefficientRing A then codim I else depth(I,module A)
-     ) -- if we can compute dimensions over ZZ, then we can remove this if-then statement
+-- Depreciated Code (Branden Stone)
+--depth(Ideal,PolynomialRing) := ZZ => (I,A) -> (
+--     if isField coefficientRing A then codim I else depth(I,module A)
+--     ) -- if we can compute dimensions over ZZ, then we can remove this if-then statement
 
 -----------------------------------------------------------------------------
 
@@ -365,8 +304,8 @@ isRegularSequence(Matrix) := Boolean => X -> isRegularSequence(X,ring X)
 
 --=========================================================================--
 
-regularSequence = method(Options => {Sparseness => .5, Bound => 1, Attempts => 100, Maximal => true})
-regularSequence(Ideal,Ring) := Matrix => opts -> (I,A) -> (
+inhomogeneousSystemOfParameters = method(Options => {Sparseness => .5, Bound => 1, Attempts => 100, Maximal => true})
+inhomogeneousSystemOfParameters(Ideal,Ring) := Matrix => opts -> (I,A) -> (
      k := coefficientRing A;
      f := gens I;
      r := numColumns f;
@@ -387,18 +326,19 @@ regularSequence(Ideal,Ring) := Matrix => opts -> (I,A) -> (
      compress(f*PHI)
      )
 
+
 TEST /// 
 A = ZZ/5051[x, y, z];
 I = ideal (x, x*y, y*z);
 -- the success of this test depends on the random number generator:
 setRandomSeed()
-assert(regularSequence(I,A,Bound=>100,Sparseness=>.9) - matrix {{90*y*z-2*x, -71*y*z+38*x}}==0)
+assert(inhomogeneousSystemOfParameters(I,A,Bound=>100,Sparseness=>.9) - matrix {{90*y*z-2*x, -71*y*z+38*x}}==0)
 ///
 
 -----------------------------------------------------------------------------
 
-regularSequence(Ring) := Matrix => opts -> A -> regularSequence(ideal gens A,A)
-regularSequence(Ideal) := Matrix => opts -> I -> regularSequence(I,ring I)
+inhomogeneousSystemOfParameters(Ring) := Matrix => opts -> A -> inhomogeneousSystemOfParameters(ideal gens A,A)
+inhomogeneousSystemOfParameters(Ideal) := Matrix => opts -> I -> inhomogeneousSystemOfParameters(I,ring I)
 
 	       
 --=========================================================================--
@@ -417,79 +357,147 @@ isCM(Module) := Boolean => (M) -> (
 --=========================================================================--
 --=========================================================================--
 
-homogeneousRegularSequence = method(Options => {Density => 0, Attempts => 100, Verbose => false})
-homogeneousRegularSequence(ZZ,Ideal) := opts -> (c,I) ->(
-den := opts.Density;
-att := opts.Attempts;
-if numgens I == c then return I;
-    --takes care of I = 0 and I principal;
-sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
-if den == 0 then den = ((1+c)/(numcols sgens));
-if opts.Verbose == true then <<"Attempts: "<<att<<" Density: "<< den<<endl;
-n :=numcols sgens;
-J := ideal sgens_{0};
-if c == 1 then return J;
-K := J;
-c' := 1;
-c'' := c;
-for i from 1 to n-1 do(
-    c'' = codim(K = J + ideal(sgens_{i}));
-    if c''>c' then (
-        J = K;
-	c' = c''));
-if c' == c then return J;
-scan(att, j->(
-rgens := sgens * random(source sgens, source sgens, Density => 1.0*den);
-for i from 0 to n-1 do(
-    c'' = codim(K = J + ideal(rgens_{i}));
-    if c''>c' then(
-        J = K;
-	c' = c'';
-	if c' == c then break c'));
-if c'==c then break
-if opts.Verbose == true then print j));
-if numgens J !=c then error "no regular sequence found; try increasing Density or Attempts options";
-J)
+systemOfParameters = method(Options => {Density => 0, Seed => null, Attempts => 100, Verbose => false})
+systemOfParameters(ZZ,Ideal) := opts -> (c,H) ->(
+    	
+	cd := codim H;
+	if c > cd  then error "integer is larger than the codimension of the ideal";
+	
+	if numgens H == c then return H;
+	    --takes care of H = 0 and H principal;    
+	
+	I := trim ideal gens gb H;
+	if (n := numgens I)<c then error"Ideal has too small codimension.";
+	if not isHomogeneous I then error("ideal not homogeneous; 
+	      use "inhomogeneousSystemOfParameters" instead");
+		
+	den := opts.Density;
+	att := opts.Attempts;
+	sgens := sort (gens trim I, DegreeOrder => Ascending, MonomialOrder => Descending);
+    	J := opts.Seed;
+	if den == 0 then den = ((1+c)/(numcols sgens));
+	if opts.Verbose == true then (
+	    <<"Attempts: "<<att<<" Density: "<< den<<" Seed: "<<J<<endl);
+	if J === null then J = ideal 0_(ring I) ;
+	if J != 0 and (codim J < numgens J or (gens J)%I != 0) then error"bad Seed ideal";
+	
+	K := J;
+	c' := 0;
+	c'' := 0;
+
+	scan(n, i->(
+	    c'' = codim(K = J + ideal(sgens_{i}));
+	    if c''>c' then (
+	        J = ideal compress gens K;
+		c' = c'');
+	    if c' == c then break;
+	    ));
+    	if c' == c then return J;
+			
+	scan(att, j->(
+		rgens := sgens * random(source sgens, source sgens, Density => 1.0*den);
+		scan(n,i->(
+	    		c'' = codim(K = J + ideal(rgens_{i}));
+	    		if c''>c' then(
+	        	    J = ideal compress gens K;
+			    c' = c'';
+			    if c' == c then break)));
+		    if opts.Verbose == true then print j;
+    		    if c'==c then break));
+    	if c' == c then 
+	return J else if den == 1 then
+	    error "no system of parameters found; try increasing Density or Attempts options" else
+	    systemOfParameters(I, 
+		Density => min(1.0,den+.1), Attempts =>20, Seed =>J, Verbose => opts.Verbose)
+	)
 
 
-homogeneousRegularSequence Ideal := opts -> I -> 
-                             homogeneousRegularSequence(codim I, I,
+systemOfParameters Ideal := opts -> I -> 
+                             systemOfParameters(codim I, I,
 			     Density => opts.Density, 
 			     Attempts => opts.Attempts,
-			     Verbose => opts.Verbose)
+			     Verbose => opts.Verbose,
+			     Seed => opts.Seed)
+
+systemOfParameters Ring := opts -> R ->
+                             systemOfParameters(dim R, ideal vars R,
+			     Density => opts.Density, 
+			     Attempts => opts.Attempts,
+			     Verbose => opts.Verbose,
+			     Seed => opts.Seed)
 
 
-
-
+TEST///
+n = 5
+m=2
+S = ZZ/101[x_0..x_(n-1)]
+I = ideal apply (subsets(n,m), s -> product apply(s, i-> x_i))
+R = S/I
+setRandomSeed 0
+assert(systemOfParameters(ideal vars R, Density =>.1)== ideal(37*x_0  - 10*x_1  + 16*x_2  - 10*x_3  - 47*x_4))
+setRandomSeed 0
+assert(systemOfParameters(R, Density =>.1)== ideal(37*x_0  - 10*x_1  + 16*x_2  - 10*x_3  - 47*x_4))
 ///
-uninstallPackage "Depth"
-restart
-notify = true
-installPackage "Depth"
-loadPackage ("Depth", Reload=>true)
+
+TEST///
+S = ZZ/101[a]
+J = ideal"a-a2,a+a2"
+assert( systemOfParameters(1,J) === ideal "a" )
+assert( isRegularSequence gens systemOfParameters J === true)
+///
+
+TEST///
 S = ZZ/101[a,b,c]
+
 I = ideal"cb,b2,ab,a2"
-codim I 
-homogeneousRegularSequence(codim I, I)
-homogeneousRegularSequence(codim I, I, Density => 1, Attempts =>2)
-viewHelp Depth
-     I = ideal"cb,b2,a2"
-     homogeneousRegularSequence(1,I)
-     I = ideal"ab,ac,bc"
-     homogeneousRegularSequence(codim I, I)
-     homogeneousRegularSequence(I, Attempts => 1, Density => .01)
-     homogeneousRegularSequence(I, Attempts => 10000, Density => .01)     
+assert( systemOfParameters I == ideal"a2,b2" )
+assert( systemOfParameters(codim I, I) == ideal"a2,b2" )
+assert( systemOfParameters(codim I, I, Density => 1, Attempts =>2) == ideal"a2,b2" )
+assert( isRegularSequence gens systemOfParameters I === true)
+
+     
+I = ideal"cb,b2,a2"
+assert( systemOfParameters(1,I) == ideal"a2" )
+assert( isRegularSequence gens systemOfParameters I === true)
+
+I = ideal"ab,ac,bc"
+sopI = systemOfParameters(codim I, I)
+assert( numgens sopI  ==  codim I )
+assert( radical sopI == I )
+assert( isRegularSequence gens systemOfParameters I === true)
+
+--systemOfParameters(I, Attempts => 1, Density => .01)
+--systemOfParameters(I, Attempts => 10000, Density => .01)     
+///
+
+TEST///
 n=5;m=2;     
 S = ZZ/101[vars(0..n-1)]
-     I = ideal apply(numgens S, 
-	 j-> product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k)))
-     homogeneousRegularSequence(I, Density => .2,  Attempts => 1000)
+
+I = ideal apply(numgens S, 
+    j-> product flatten( (for k to j-1 list S_k)| (for k from j+1 to numgens S-1 list S_k)))
+sopI = systemOfParameters(I, Density => .2,  Attempts => 1000)
+assert( numgens sopI  ==  codim I )
+assert( radical sopI == I )
+assert( isRegularSequence gens systemOfParameters I === true)
+///
+
+TEST///
+n=5;m=2;     
+S = ZZ/101[vars(0..n-1)]
+
 L = toList(0..n-1)
 subs = subsets(L,m)
 I = ideal(apply(subs, p -> product(p, i-> S_i)))
-     homogeneousRegularSequence(I, Density => .2,  Attempts => 1000, Verbose => true)
-     homogeneousRegularSequence(I, Verbose =>true)
+sopI = systemOfParameters(I, Density => .2,  Attempts => 1000)
+assert( numgens sopI  ==  codim I )
+assert( radical sopI == I )
+assert( isRegularSequence gens systemOfParameters I === true)
+
+--     systemOfParameters(I, Density => .2,  Attempts => 1000, Verbose => true)
+--     systemOfParameters(I, Verbose =>true)
 ///
+
 --=========================================================================--
 --=========================================================================--
 
@@ -501,9 +509,14 @@ doc ///
    Key
     Depth
    Headline
-    Finds depth of a module and regular sequences in an ideal
+    Finds the depth of a module or ideal, and systems of parameters in an ideal
    Description
     Text
+     There are two major groups of routines: one for finding the depth of an
+     ideal or module or ring,or the depth of an ideal on a module; and the other
+     for finding relatively sparse systems of homogeneous parameters in an ideal
+     (there is an inhomogeneous version too.)
+     
      The depth of an ideal on a module is a fundamental invariant, a kind
      of arithmetic version of codimension. In many local or graded cases one is interested
      in the depth of the maximal ideal on the module, and then we speak just of the 
@@ -512,133 +525,156 @@ doc ///
      formula depth M = dim R - pdim M, where pdim is the projective dimension. In general,
      depth(I,M) = min {i | Ext^i(R/I,M) != 0}. Both these methods are incorporated.
      
-     The depth of I on M is also the length of a maximal regular sequence on M contained in
-     I. The other routines in this package try probabilistically to find regular 
-     sequences in an ideal; in a regular or Cohen-Macaulay ring, the length of
-     such a sequence is equal to the codimension of the ideal, so
-     (regularSequence,Ideal) and (homogeneousRegularSequence, Ideal), without
+     Depth can be computed from regular sequences, which are systems of parameters.
+     The other routines in this package try probabilistically to find relatively
+     sparse systems of parameters; the maximum length of
+     such a system is equal to the codimension of the ideal, so
+     (inhomogeneousSystemOfParameters,Ideal) and (systemOfParameters, Ideal), without
      further arguments, look for regular sequences of length codim I.  
      
      To find such sequences, one can simply take an appropriate number of
-     random linear combinations of the generators of the ideal. Since being a regular
-     sequence is a matter of certain elements not being in certain prime ideals, this
+     random linear combinations of the generators of the ideal, and
+     this is what's done by inhomogeneousSystemOfParameters. Since being a 
+     system of parameters is a matter of certain elements not being in certain prime ideals, this
      succeeds with very high probability over any field of reasonable size. But it 
-     produces inhomogeneous generators. For many applications, when the ideal is
-     homogeneous, a homogeneous regular sequence is needed; this is provided, again
-     probabilistically, by the routine homogeneousRegularSequence.
+     produces inhomogeneous elements. When the ideal is
+     homogeneous, one generally wants a homogeneous system of parameters;
+     this is provided, again probabilistically, by the routine systemOfParameters.
+     
+     Here is an example computing depths of modules (that is, the depths of the
+     maximal ideal on the module:
     Example
      S = ZZ/101[a,b,c,d]
      K = koszul vars S
      apply(numgens S, i-> depth coker K.dd_(i+1))
-
-     I = ideal"ab,bc,cd,da"
+    Text
+     and here is one computing systems of paramters. The "Density" (a number between
+     0 and 1) is a measure of the sparseness sought, and "Attempts" bounds
+     the number of probabilistic attempts.
+    Example
+     I = ideal"ab,bc,cd2,da"
      codim I
      setRandomSeed 0
-     regularSequence I
-     homogeneousRegularSequence 
-     homogeneousRegularSequence(I, Density => .1, Attempts => 1000, Verbose => true)
+     systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
+     inhomogeneousSystemOfParameters I     
    Caveat
-    The homogeneousRegularSequence code could be improved by working one degree at a time,
+    The systemOfParameters code could be improved by working one degree at a time,
     using a knowledge of the codim of the ideal generated by elements of degrees <=d 
     for each d.
    SeeAlso
     depth
-    regularSequence
-    homogeneousRegularSequence
+    inhomogeneousSystemOfParameters
+    systemOfParameters
 ///
 
 ------------------------------------------------------------
--- DOCUMENTATION homogeneousRegularSequence
+-- DOCUMENTATION systemOfParameters
 ------------------------------------------------------------
 doc ///
    Key
-    homogeneousRegularSequence
-    (homogeneousRegularSequence, Ideal)
-    (homogeneousRegularSequence, ZZ, Ideal)
-    [homogeneousRegularSequence,Attempts]
-    [homogeneousRegularSequence,Density]
-    [homogeneousRegularSequence,Verbose]        
+    systemOfParameters
+    Seed
+    (systemOfParameters, Ideal)
+    (systemOfParameters, Ring)    
+    (systemOfParameters, ZZ, Ideal)
+    [systemOfParameters,Attempts]
+    [systemOfParameters,Density]
+    [systemOfParameters,Verbose]        
+    [systemOfParameters,Seed]            
    Headline
-    finds a relatively sparse homogeneous regular sequence of minimal degree in an ideal
+    finds a relatively sparse homogeneous system of parameters of minimal degree in an ideal
    Usage
-    J = homogeneousRegularSequence I
-    J = homogeneousRegularSequence (i,I)
+    J = systemOfParameters I
+    J = systemOfParameters (i,I)
    Inputs
     I:Ideal
+     generated by homogeneous elements
     i:ZZ
     Verbose => Boolean
     Attempts => ZZ
     Density => RR
      or QQ or ZZ; will be converted to RR
+    Seed => null
+    Seed => Ideal
    Outputs
     J:Ideal
-     generated by a regular sequence of length i
+     generated by a homogeneous system of parameters of length i contained in I
    Description
     Text
-     First sorts the generators of trim I by ascending degree, ascending monomial
-     order. Looks first for as much of a regular sequence among the generators as possible,
+     First sorts the generators of trim ideal gens gb I by ascending degree, ascending monomial
+     order. Looks first for as much of a system of parameters among the generators as possible,
      then tries up to Attempts sparse random combinations of given Density.
-     The defaut valuse of Density is (1+codim I)/(numgens trim I).
+     The default value of Density is (1+codim I)/(numgens trim I).
+     
+     If the option Seed is not
+     null then it should be an ideal of ring I generated by a part of a sop in
+     I, and it is used as the beginning of the system of parameters constructed.
+     
+     If no sop is found after Attempts tries, and the Density is < 1 then the Density
+     is increased by .1, and 20 more attempts are made. If the Density is already == 1,
+     then the program stops with an error.
     Example
      S = ZZ/101[a,b,c,d]
      I = ideal"ab,bc,cd,da"
      codim I
      setRandomSeed 0
-     regularSequence I
-     homogeneousRegularSequence I
-     homogeneousRegularSequence(I, Density => .1, Attempts => 1000, Verbose => true)
+     inhomogeneousSystemOfParameters I
+     systemOfParameters I
+     systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
    Caveat
-    could be rewritten to take into account the codimensions of the sub ideals generated
-    by the elements of degree up to d for each d.
+    Could be rewritten to take into account the codimensions of the sub ideals generated
+    by the elements of degree up to d for each d. 
+    
+    The routine tries to find generators among linear combinations, with field coefficients,
+    of generators of I; but over very small fields there may not be any! For example
+    there is no linear form that is a parameter in the 1-dimensional
+    ring 
+    R = ZZ/2[x,y]/intersect(ideal"x", ideal"x+y", ideal"y")
    SeeAlso
     regularSequenceCheck
     Depth
-    regularSequence
+    inhomogeneousSystemOfParameters
 ///
 
 
 -----------------------------------------------------------------------------
 
-document {
-     Key => {
-	  (depth, Ideal, Ring),
-	  (depth, Ring),
-	  (depth, Ideal, Module),
-	  (depth, Module),
-	  (depth, Ideal, Ideal),
-	  (depth, Ideal, PolynomialRing),
-	  (depth, Ideal, QuotientRing)
-	  },
-     Headline => "computes the depth of a ring",
-     Usage => "depth(I,A)",
-     Inputs => {
-	  "I" => {},
-	  "A" => {}
-	  },
-     Outputs => {
-	  ZZ => {"the ", TT "I", "-depth of a ring"}
-	  },
-          "The function ", TT "depth(I,A)", ", computes the ", TT "I",
-"-depth of a ring. In the most general setting, it does this by computing ", 
-TT "Ext^i(A^1/I,A)", " and noting where it does not vanish. 
- If the ring in 
-question is a polynomial ring over a field, then it merely computes the codimension of ", TT "I", 
-". If the ring in question is a quotient of a polynomial ring over a field and we are computing 
-the depth over the ideal generated by  ", TO (gens, Ring), ", then it computes the 
-difference between the dimension of this polynomial ring and the projective dimension of the 
-quotient ring. If the ideal is omitted, then the depth is taken over the ideal generated by ", TO (gens, Ring), ".", 
-     EXAMPLE lines ///
-     A = QQ[x_1..x_3]/ideal(x_1^2, x_1*x_2);
-     depth A
-     ///,
-     "If ", TT "I", " contains a unit, then ", TT "depth(I,A)", " outputs ", TO "infinity", ".",
-     EXAMPLE lines ///
-     depth(ideal(1),ZZ)
-     ///,
-     PARA {
-     	  "This symbol is provided by the package ", TO Depth, "."
-     	  }
-     }	   
+doc///
+     Key 
+     	  (depth, Ideal, Ring)
+	  (depth, Ring)
+	  (depth, Ideal, Module)
+	  (depth, Module)
+          (depth, Ideal, Ideal)
+     Headline 
+          computes the depth of a ring
+     Usage
+          d = depth(I,M)
+	  d = depth(M)
+	  d = depth(I,I)
+     Inputs 
+          I:Ideal
+	  M:Ring 
+	     or Module or Ideal
+     Outputs
+	  d:ZZ
+	    the I-depth of a ring, module, or ideal
+     Description
+        Text
+          The function depth(I,M) computes the I-depth of a ring, module, or ideal. In the most general 
+	  setting, it does this by computing Ext^i(A^1/I,M) for an A-Module M, and noting where it does not vanish. 
+	  If the ring in question is a polynomial ring over a field, then it merely computes the 
+	  codimension of I. 	
+        Example
+	  A = QQ[x_1..x_3]/ideal(x_1^2, x_1*x_2)
+	  depth A
+    	Text
+	  If I contains a unit, then depth(I,A) outputs infinity.
+	Example
+	  depth(ideal(1_A),A)
+      	Text
+     	  This symbol is provided by the package Depth.m2
+///
 
 -----------------------------------------------------------------------------
 
@@ -710,45 +746,45 @@ document {
 -----------------------------------------------------------------------------
 
 document {
-     Key => {regularSequence,
-	  (regularSequence,Ideal,Ring),
-	  (regularSequence,Ring),
-	  (regularSequence,Ideal),	  
+     Key => {inhomogeneousSystemOfParameters,
+	  (inhomogeneousSystemOfParameters,Ideal,Ring),
+	  (inhomogeneousSystemOfParameters,Ring),
+	  (inhomogeneousSystemOfParameters,Ideal),	  
 	  Attempts,
 	  Bound,
 	  Sparseness,
 	  Maximal,
-	  [regularSequence,Attempts],
-	  [regularSequence,Bound],
-	  [regularSequence,Maximal],
-	  [regularSequence,Sparseness]},
-     Headline => "generates a regular sequence",
-     Usage => "regularSequence(I,A)",
+	  [inhomogeneousSystemOfParameters,Attempts],
+	  [inhomogeneousSystemOfParameters,Bound],
+	  [inhomogeneousSystemOfParameters,Maximal],
+	  [inhomogeneousSystemOfParameters,Sparseness]},
+     Headline => "generates an inhomogeneous system of parameters",
+     Usage => "inhomogeneousSystemOfParameters(I,A)",
      Inputs => {
 	  "I" => Ideal,
 	  "A" => Ring,
-	  Attempts => ZZ => "number of attempts made to generate a regular sequence",
+	  Attempts => ZZ => "number of attempts made to generate an inhomogeneous system of parameters",
 	  Bound => ZZ => "bound on the value of the random coefficients",
 	  Sparseness => RR => "between 0 and 1 giving the frequency of the coefficients being equal to zero",
-	  Maximal => Boolean => "whether to insist on searching for a maximal regular sequence"
+	  Maximal => Boolean => "whether to insist on searching for a maximal inhomogeneous system of parameters"
 	  },
      Outputs => {Matrix},
-     "Given a ring and an ideal, ", TT "regularSequence", " attempts
-     to generate a regular sequence contained in ", TT "I", ". The
+     "Given a ring and an ideal, ", TT "inhomogeneousSystemOfParameters", " attempts
+     to generate an inhomogeneous system of parameters contained in ", TT "I", ". The
      algorithm is based on one found in Chapter 5.5 of W. Vasconcelos'
      book: ", EM "Computational Methods in Commutative Algebra and
      Algebraic Geometry", ".",
      EXAMPLE lines ///
      A = ZZ/5051[x, y, z];
      I = ideal (x, x*y, y*z);
-     X = regularSequence(I,A)
+     X = inhomogeneousSystemOfParameters(I,A)
      isRegularSequence(X,A)
      ///,
      "Here are examples with optional inputs:",
      EXAMPLE lines ///
      A = ZZ/5051[x, y, z];
      I = ideal (x, x*y, y*z);
-     regularSequence(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)
+     inhomogeneousSystemOfParameters(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)
      ///,
      "Here are examples with the optional input ", TT "Maximal => false", ":",
      EXAMPLE lines ///
@@ -759,7 +795,7 @@ document {
      Y = transpose genericMatrix(A,y_(1,1),n,n);
      b = ideal(X*Y - Y*X);
      B = A/b;
-     regularSequence(B,Attempts=>1,Maximal=>false)
+     inhomogeneousSystemOfParameters(B,Attempts=>1,Maximal=>false)
      ///,
      PARA {
      	  "This symbol is provided by the package ", TO Depth, "."
@@ -826,11 +862,11 @@ TEST///
      b = ideal(X*Y - Y*X);
      B = A/b;
      setRandomSeed 0
-     assert(numcols regularSequence(B,Attempts=>1,Maximal=>false) == 6)
+     assert(numcols inhomogeneousSystemOfParameters(B,Attempts=>1,Maximal=>false) == 6)
      assert(depth B == dim B)
      A = ZZ/5051[x, y, z];
      I = ideal (x, x*y, y*z);
-     assert (0==regularSequence(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)- matrix {{88*y*z, -34*x}})
+     assert (0==inhomogeneousSystemOfParameters(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)- matrix {{88*y*z, -34*x}})
 ///
 TEST///
      S = ZZ/101[a,b,c,d]
@@ -840,9 +876,9 @@ TEST///
      I = ideal"ab,bc,cd,da"
      codim I
      setRandomSeed 0
-     regularSequence I
-     homogeneousRegularSequence 
-     homogeneousRegularSequence(I, Density => .1, Attempts => 1000, Verbose => true)
+     inhomogeneousSystemOfParameters I
+     systemOfParameters 
+     systemOfParameters(I, Density => .1, Attempts => 1000, Verbose => true)
 ///
 TEST///
 S = QQ[a..e]
@@ -853,12 +889,21 @@ assert (depth (S/m) == 0)
 assert(depth(S^1/m) == 0)
 assert(depth( (S/m)^1) ==0)
 ///
+TEST///
+setRandomSeed 0
+R = ZZ/101[a,b]/ideal(a*b)
+I = ideal(a,b)
+assert(systemOfParameters I == ideal"24a - 36b")
+///
 
 end--
 
+restart
 uninstallPackage "Depth"
 restart
 installPackage "Depth"
+viewHelp Depth
 check Depth
 
-viewHelp Depth
+
+

@@ -77,15 +77,15 @@ alternatingMinimization = (F,a1,b1,a2,b2,tol) -> (
     c:=a1+random(RR)*(b1-a1);
     d:=a2+random(RR)*(b2-a2);
     while abs(c - cOld) > tol and abs(d - dOld) > tol do (
-	Fc:=(y)->F(c,y);
-	dOld=d;
-	d=goldenSearch(Fc,a2,b2,tol);
-	Fd:=(x)->F(x,d);
-	cOld=c;
-	c=goldenSearch(Fd,a1,b1,tol);
+        Fc:=(y)->F(c,y);
+        dOld=d;
+        d=goldenSearch(Fc,a2,b2,tol);
+        Fd:=(x)->F(x,d);
+        cOld=c;
+        c=goldenSearch(Fd,a1,b1,tol);
 	);
     return (c,d);
-    )
+)
 
 alternatingMinimization2 = (F,a1,b1,a2,b2,tol,npoints) -> (
     cOld:=a1;
@@ -93,15 +93,15 @@ alternatingMinimization2 = (F,a1,b1,a2,b2,tol,npoints) -> (
     c:=a1+random(RR)*(b1-a1);
     d:=a2+random(RR)*(b2-a2);
     while abs(c - cOld) > tol and abs(d - dOld) > tol do (
-	Fc:=(y)->F(c,y);
-	dOld=d;
-	d=lineSearch(Fc,a2,b2,tol,npoints);
-	Fd:=(x)->F(x,d);
-	cOld=c;
-	c=lineSearch(Fd,a1,b1,tol,npoints);
+        Fc:=(y)->F(c,y);
+        dOld=d;
+        d=lineSearch(Fc,a2,b2,tol,npoints);
+        Fd:=(x)->F(x,d);
+        cOld=c;
+        c=lineSearch(Fd,a1,b1,tol,npoints);
 	);
     return (c,d);
-    )
+)
 
 lineSearch = (F,a,b,tol,npoints) -> (
     delta := (b-a)/(2*npoints);
@@ -191,6 +191,23 @@ discretization=(F,n,startSlice,w) -> (
 
 realPartMatrix = (m) -> matrix applyTable (entries m, x->1_CC*realPart x)
 
+angles2orthMatrix = (Angles) -> (
+    --IN: Nested list of angles
+    --      First list has n coordinates
+    --      Second list has n-1 coordinates
+    --      Last list has n-(d-1) coordinates
+    --OUT: d x n matrix with orthonormal rows
+    x0 := sphericalCoordinates(Angles_0);
+    X := matrix {x0};
+    for i in 1..#Angles-1 do (
+        xi := sphericalCoordinates(Angles_i);
+        Vi := nullSpace(X);
+        xi = matrix({xi})*Vi;
+        X = X || xi;
+    );
+    return X;
+)
+
 sphericalCoordinates = (angles) -> (
     for i to #angles list (
         xi := product for j to i-1 list sin(angles_j);
@@ -199,33 +216,17 @@ sphericalCoordinates = (angles) -> (
     )
 )
 
-orthUnitVect1D = (angles1) -> (
-    x1 := sphericalCoordinates(angles1);
-    x2 := matrix {{1},{0}};
-    angles1 = angles1 / (x-> -(pi/2-x));
-    R1 := rotationMatrix2D(2,0,1,angles1_0);
-    x1 = transpose matrix {x1};
-    Rx2 := R1*x2;
-    X := x1|Rx2;
-    return X;
+nullSpace(Matrix) := A -> (
+    A = promote(A,RR);
+    (S,U,Vt) := SVD(A);
+    m := numRows(A);
+    n := numColumns(A);
+    eps := max(S)*max(m,n)*1.11e-16;
+    rk := #select(S,s -> s > eps );
+    return Vt^{rk..n-1};
 )
 
-orthUnitVect = (angles1,angles2) -> (
-    x1 := {cos(angles1_0)*sin(angles1_1), sin(angles1_0)*sin(angles1_1), cos(angles1_1)};
-    --x1 := sphericalCoordinates(angles1);
-    x2 := sphericalCoordinates(angles2);
-    angles1 = angles1 / (x-> -(pi/2-x));
-    angles2 = angles1 / (x-> -(pi/2-x));
-    R1 := rotationMatrix2D(3,0,1,angles1_0);
-    R2 := rotationMatrix2D(3,1,2,angles1_1);
-    x1 = transpose matrix {x1};
-    x2 = transpose matrix {append(x2, 0)};
-    Rx2 := R1*R2*x2;
-    X := x1|Rx2;
-    return X;
-)
-
-R = orthUnitVect( {1.23,2.37}, {-.42} );
+R = angles2orthMatrix( { {2.32,3.54,1.23}, {1.23,2.37} } );
 r = (transpose R) * R;
 print r;
 
