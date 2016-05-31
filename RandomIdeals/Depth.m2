@@ -25,7 +25,7 @@ newPackage(
 	  }
 	  },
      Headline => "aids in computations related to depth",
-     DebuggingMode => true
+     DebuggingMode => false
      )
 
 --=========================================================================--
@@ -505,8 +505,10 @@ assert( isRegularSequence gens systemOfParameters I === true)
 regularSequence = method(Options => {Sparseness => .5, Bound => 1, Attempts => 100, Maximal => true})
 regularSequence(Ideal,Ring) := Matrix => opts -> (I,A) -> (
     
-      if isCM A === false then error "The ring is not Cohen-Macaulay, use inhomogeneousSystemOfParameters or systemOfParameters instead";
-      
+      if isCM A === false then (
+	  error "The ring is not Cohen-Macaulay, use inhomogeneousSystemOfParameters or systemOfParameters instead";
+	  );
+
       return inhomogeneousSystemOfParameters(I,A,opts);
     )
 
@@ -986,10 +988,9 @@ end--
 restart
 uninstallPackage "Depth"
 restart
-path = {"~/GitHub/Workshop-2016-Warwick/RandomIdeals/"}|path
 installPackage "Depth"
 viewHelp Depth
 check Depth
 
 
-
+   
