@@ -495,10 +495,17 @@ dimEmbedding (List) := (system) -> (
   -- OUT: returns the number of slack variables = the dimension.
   eR := ring first system;
   v := gens eR;
-  slack := v_(#v-1); 
-  zz := toString(slack);
-  ds := substring(2,#zz-1,zz);
-  dimension := if (value(ds)===null) then 0 else value(ds);
+  slack := v_(#v-1);                 -- slack is the last variable
+  zz := toString(slack);             -- zz is the name of the last variable
+  if substring(0,2,zz) != "zz" then  -- check if slack starts with zz
+  (
+    return 0;
+  )
+  else
+  (
+    ds := substring(2,#zz-1,zz);
+    dimension := if (value(ds)===null) then 0 else value(ds);
+  );
   return dimension;
 )
 
@@ -656,14 +663,17 @@ cascade (List) := o -> (system) -> (
   --get solutions
   
   result := new MutableList from {};
-  dims:=select(toList (0..startdim),j->(fileExists (PHCoutputFile | "_sw" | j) and 
-	    match("THE SOLUTIONS",get (PHCoutputFile | "_sw" | j))));
+  dims:=select(toList (0..startdim),j->(fileExists (PHCoutputFile | "_sw" | j)
+        and match("THE SOLUTIONS",get (PHCoutputFile | "_sw" | j))));
   topdimension := max dims; 
+  if o.Verbose then
+    stdio << "the top dimension is " << topdimension << endl;
   i := topdimension;
   while i>=0 do
   (   if member(i,dims) then (	
       fil := (PHCoutputFile | "_sw" | i);
-      
+      if o.Verbose then
+        stdio << "processing super witness set file " << fil << endl;     
       if i > 0 then
       (
         slackvars = apply(i, k->getSymbol("zz"|toString(k+1)));
@@ -683,6 +693,8 @@ cascade (List) := o -> (system) -> (
         run(PHCexe | " -z " | fil | " " | PHCsolsFile);
         use R;
 	supwit = witnessSetFromFile(fil);
+        if o.Verbose then
+          stdio << "the super witness set from file :\n" << supwit << endl;
 	psols := parseSolutions(PHCsolsFile,R);
         isols := witnessSuperSetsFilter(result,psols);
         ws = witnessSet(ideal(equations(supwit)),ideal(slice(supwit)),isols);
@@ -987,15 +999,17 @@ nonZeroFilter (List,ZZ,RR) := (sols,k,tol) -> (
 -----------------------------------------
 
 numericalIrreducibleDecomposition=method(TypicalValue=>NumericalVariety,
-  Options=>{StartDimension=>-1})
+  Options=>{StartDimension=>-1, Verbose=>false})
 numericalIrreducibleDecomposition (List) := o -> (L) -> (
   --IN: an ideal, top dimension
   --OUT: a NumericalVariety
   setRandomSeed(random ZZ);
-  startdim:=o.StartDimension;  
-  W:=cascade(L,StartDimension=>startdim);
+  if o.Verbose then
+    stdio << "starting cascade of homotopies ..." << endl;
+  W := cascade(L, StartDimension=>o.StartDimension, Verbose=>o.Verbose);
   witsets := apply(keys W, 
-    i->if i!=0 then (factorWitnessSet((W#i)_0))#i else W#i);
+    i->if i!=0 then (factorWitnessSet((W#i)_0, Verbose=>o.Verbose))#i
+               else W#i);
   numericalVariety(flatten witsets)  
 )
 
@@ -1061,8 +1075,9 @@ refineSolutions (List,List,ZZ) := o-> (f,sols,dp) -> (
 ------------------
 
 solveSystem = method(TypicalValue => List, 
-  Options => {Verbose => false, numThreads=>0, randomSeed => -1, computingPrecision => 1})
-solveSystem  List := List =>  o->system -> (
+  Options => {Verbose => false, numThreads=>0, randomSeed => -1, 
+              computingPrecision => 1})
+solveSystem List := List =>  o->system -> (
   -- IN:  system = list of polynomials with complex coeffiecients, 
   -- i.e. the system to solved 
   -- OUT: solutions to the system, a list of Points
