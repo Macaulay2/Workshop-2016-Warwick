@@ -40,7 +40,8 @@ export{
     "Bound",
     "Attempts",
     "Seed",
-    "Maximal"
+    "Maximal",
+    "regularSequence"
     } 
         
 --=========================================================================--
@@ -501,6 +502,30 @@ assert( isRegularSequence gens systemOfParameters I === true)
 --=========================================================================--
 --=========================================================================--
 
+regularSequence = method(Options => {Sparseness => .5, Bound => 1, Attempts => 100, Maximal => true})
+regularSequence(Ideal,Ring) := Matrix => opts -> (I,A) -> (
+    
+      if isCM A === false then error "The ring is not Cohen-Macaulay, use inhomogeneousSystemOfParameters or systemOfParameters instead";
+      
+      return inhomogeneousSystemOfParameters(I,A,opts);
+    )
+
+
+TEST /// 
+A = ZZ/5051[x, y, z];
+I = ideal (x, x*y, y*z);
+-- the success of this test depends on the random number generator:
+setRandomSeed()
+assert(regularSequence(I,A,Bound=>100,Sparseness=>.9) - matrix {{90*y*z-2*x, -71*y*z+38*x}}==0)
+///
+
+-----------------------------------------------------------------------------
+
+regularSequence(Ring) := Matrix => opts -> A -> regularSequence(ideal gens A,A)
+
+--=========================================================================--
+--=========================================================================--
+
 beginDocumentation() -- the start of the documentation
 
 -----------------------------------------------------------------------------
@@ -801,6 +826,66 @@ document {
      	  "This symbol is provided by the package ", TO Depth, "."
      	  }
      }
+
+-----------------------------------------------------------------------------
+
+document {
+     Key => {regularSequence,
+	  (regularSequence,Ideal,Ring),
+	  (regularSequence,Ring),
+	  [regularSequence,Attempts],
+	  [regularSequence,Bound],
+	  [regularSequence,Maximal],
+	  [regularSequence,Sparseness]},
+     Headline => "generates a regular sequence given a Cohen-Macaulay ring",
+     Usage => "regularSequence(I,A)",
+     Inputs => {
+	  "I" => Ideal,
+	  "A" => Ring,
+	  Attempts => ZZ => "number of attempts made to generate an inhomogeneous system of parameters",
+	  Bound => ZZ => "bound on the value of the random coefficients",
+	  Sparseness => RR => "between 0 and 1 giving the frequency of the coefficients being equal to zero",
+	  Maximal => Boolean => "whether to insist on searching for a maximal inhomogeneous system of parameters"
+	  },
+     Outputs => {Matrix},
+     "This method has been replaced by ", TO "inhomogeneousSystemOfParameters", " and ", TO "systemOfParameters",". 
+     Given a Cohen-Macaulay ring and an ideal, ", TT "regularSequence", " attempts
+     to generate an inhomogeneous system of parameters contained in ", TT "I", ". The
+     algorithm first checks if the ring is Cohen-Macaulay, if not, an error is thrown. If the ring is Cohen-Macaulay,
+     ", TO "inhomogeneousSystemOfParameters", " is called. Because of the this check, 
+     the method can take some time to compute. It is recommended to use ", TO "inhomogeneousSystemOfParameters", 
+     " or ", TO "systemOfParameters"," instead if the ring is known to be Cohen-Macaulay.   This method
+     is based on the algorithm found in Chapter 5.5 of W. Vasconcelos'
+     book: ", EM "Computational Methods in Commutative Algebra and
+     Algebraic Geometry", ".",
+     EXAMPLE lines ///
+     A = ZZ/5051[x, y, z];
+     I = ideal (x, x*y, y*z);
+     X = regularSequence(I,A)
+     isRegularSequence(X,A)
+     ///,
+     "Here are examples with optional inputs:",
+     EXAMPLE lines ///
+     A = ZZ/5051[x, y, z];
+     I = ideal (x, x*y, y*z);
+     regularSequence(I,A,Attempts=>1,Bound=>100,Sparseness=>.9)
+     ///,
+     "Here are examples with the optional input ", TT "Maximal => false", ":",
+     EXAMPLE lines ///
+     x = symbol x; y = symbol y;
+     n = 2;
+     A = ZZ/101[x_(1,1)..x_(n,n),y_(1,1)..y_(n,n)];
+     X = transpose genericMatrix(A,n,n);
+     Y = transpose genericMatrix(A,y_(1,1),n,n);
+     b = ideal(X*Y - Y*X);
+     B = A/b;
+     regularSequence(B,Attempts=>1,Maximal=>false)
+     ///,
+     PARA {
+     	  "This symbol is provided by the package ", TO Depth, "."
+     	  }
+     }
+
 -----------------------------------------------------------------------------
 
 document {
@@ -901,6 +986,7 @@ end--
 restart
 uninstallPackage "Depth"
 restart
+path = {"~/GitHub/Workshop-2016-Warwick/RandomIdeals/"}|path
 installPackage "Depth"
 viewHelp Depth
 check Depth
