@@ -77,6 +77,53 @@ doc ///
     1.9 of Macaulay2 and with version 2.4.17 of phc.
 ///;
 
+-------------------
+-- versionNumber --
+-------------------
+
+doc ///
+  Key
+    versionNumber
+    (versionNumber,Nothing)
+  Headline
+    returns the version number and release date of phc
+  Usage
+    versionNumber(null)
+    versionNumber(,Verbose=>true)
+  Inputs
+    null:Nothing
+  Outputs
+    :Sequence
+      The sequence on return contains two strings.
+      The first string on return is the version number.
+      The second string on return is the release date.
+  Description
+    Text
+      The version number and release date of the executable phc
+      are important for consistency between the methods in this
+      package and preparing the input batch files for the executable phc.
+
+      A successful run of this method verifies whether the location
+      of the executable phc is in the execution path.
+
+    Example
+      v = versionNumber(null)
+      print v_0
+      print v_1
+///;
+
+doc ///
+  Key
+    [versionNumber,Verbose]
+  Headline
+    option to print the output of phc --version to screen
+  Usage
+    cascade(...,Verbose=>Boolean)
+  Description
+    Text
+      Use {\tt Verbose=>true} to see the output of {\tt phc --version}.
+///;
+
 -------------
 -- CASCADE --
 -------------

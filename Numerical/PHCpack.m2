@@ -93,7 +93,8 @@ export {
   "searchNpoints",
   "searchTolerance",
   "realSlice1D",
-  "realSlice2D"
+  "realSlice2D",
+  "versionNumber"
 }
 
 protect ErrorTolerance, protect Iterations,
@@ -1775,6 +1776,36 @@ realSlice2D(WitnessSet) := o -> (w) -> (
     (min1,min2) = alternatingMinimization(costfun,a1,b1,a2,b2,tol);
     slcmin := changeOfSlice2D(min1,min2,startSlice);
     return matrix2slice(slcmin,w)
+)
+
+-------------------
+-- versionNumber --
+-------------------
+
+versionNumber = method(TypicalValue => Nothing, Options => {Verbose => false})
+versionNumber(Nothing) :=  o -> (Nothing) -> (
+-- Calling versionNumber(null) returns a tuple of two strings,
+-- with the version number and release date.
+-- IN: if the option Verbose is true, versionNumber(Verbose=>true),
+--     then the output of phc --version is printed to screen.
+-- OUT: information about the current version of phc.
+  filename := temporaryFileName() | "PHCversion";
+  run(PHCexe|" --version > "|filename);
+  data := get filename;
+  if o.Verbose then
+    stdio << data << endl;
+  if #data < 31 then
+  (
+    stdio << "Which version of phc is in your execution path?" << endl;
+    stdio << data << endl;
+    return ("", "");
+  )
+  else
+  (
+    vnbr := substring(4,6,data);
+    date := substring(#data-11,10,data);
+    return (vnbr, date);
+  );
 )
 
 --##########################################################################--
