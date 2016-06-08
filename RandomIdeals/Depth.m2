@@ -25,7 +25,7 @@ newPackage(
 	  }
 	  },
      Headline => "aids in computations related to depth",
-     DebuggingMode => true
+     DebuggingMode => false
      )
 
 --=========================================================================--
@@ -801,7 +801,9 @@ document {
      	  "This symbol is provided by the package ", TO Depth, "."
      	  }
      }
+
 -----------------------------------------------------------------------------
+
 
 document {
      Key => {isCM,
@@ -906,4 +908,4 @@ viewHelp Depth
 check Depth
 
 
-
+   
