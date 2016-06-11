@@ -48,14 +48,21 @@ mm1 = matrix"
 0,0,0,d,0,-c;
 0,0,0,0,-a,0;
 0,0,0,0,0,d;
-0,0,0,0,0,0";
+0,0,0,0,0,0"
 mm = mm1-transpose mm1
 pfaffians(6, mm)
 
-phi = map(S^6,,mm)
-betti res coker (R**phi)
-psi = R**phi
-betti res coker psi^{0,1,2}
+S = ZZ/101[a..z]
+mm2 = matrix"
+0,a,d,-x,e,c;
+0,0,b,e,-y,0;
+0,0,0,c,0,-z;
+0,0,0,0,a,d;
+0,0,0,0,0,b;
+0,0,0,0,0,0"
+mm = mm2-transpose mm2
+pfaffians(6, mm)
+ 
 
 ---
 restart
@@ -128,3 +135,66 @@ m = matrix{{x_0,0,y_0},{y_1,x_1,0},{0,y_2,x_2}}
 R = S/det m
 syz sub(m,R)
 m^2
+
+S = ZZ/101[vars(0..14)]
+
+M = genericSkewMatrix(S,a,6)
+pfaffians(6, M)
+spec = map(S,S,{a,0,c,0,e,f,f,h,0,j,k,l,m,0,o})
+sM = spec M
+pfaffians(6, sM)
+
+f = a*b*c+d*e*f+g*h*i
+R = S/f
+I = intersect{ideal(a,d,g),ideal(a,d,h),ideal(a,d,i),
+    ideal(a,e,h),ideal(b,e,h), ideal(c,e,h),
+    ideal(c,d,g)}
+betti res I
+codim(ideal(f)+q)
+betti res q
+
+restart
+S = ZZ/101[a,b,c,x,y,z,u,v,w,p_0..p_5]
+f = ideal"abc+xyz+uvw"
+R = S/f
+I = product toList(
+    ideal"a,b", 
+    ideal"a,c",
+    ideal"b,c",
+    ideal"x,y", 
+    ideal"x,z",
+    ideal"y,z",
+    ideal"u,v", 
+    ideal"u,w",
+    ideal"v,w"
+    )
+
+betti res I
+use S
+m = matrix{
+{0,a,0,u,0,x},
+{0,0,0,z,v,0},
+{0,0,0,0,y,w},
+{0,0,0,0,b,0},
+{0,0,0,0,0,c},
+{0,0,0,0,0,0}}
+
+mm = m-transpose m
+pfaffians(6,matrix mm)
+
+restart
+S = ZZ/101[x_0..x_14]
+subs = subsets(15,6);
+M = genericSkewMatrix(S,x_0,6)
+L = subs_0
+varlist = toList(x_0..x_14)
+
+zeroOut = L ->
+pfaffians(6,(map(S,S,apply(15, i->if member(i,L) then 0 else x_i))) M)
+
+polys = apply(subs, L -> if numgens zeroOut L == 0 then 0_S else (zeroOut L)_0);
+polys3 = select(polys, p-> size p == 3);
+
+select(polys3, p->all(0..14, i->size sub(p,{x_i =>0})>1))
+
+
