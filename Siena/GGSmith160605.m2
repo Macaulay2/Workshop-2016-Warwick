@@ -44,52 +44,21 @@ product X
 ///
 
 testMatrix(ZZ,ZZ) := (d,m)->(
-    --block matrices with m x m blocks; cyclic commuting within AA, BB and 
-    --AA_i commutes with BB_j for i !=j.
+    --block matrices with m x m blocks; cyclic commuting within AA and 
+    --BB_i commutes with everything.
+--do it in char p for readability
 (p,r) =  getPrimeWithRootOfUnity(d,5, Range => (50,1000));
 z =(i,n)-> (n+i)%d;
 
+--building blocks
 x := symbol a; y:=symbol b;
 S = ZZ/p[a_(0,0,0)..a_(d-1,m-1,m-1),b_(0,0,0)..b_(d-1, m-1,m-1)];
+one = map(S^m,S^m, 1);
+zer = map(S^m,S^m, 0);
 AA = apply(d, i-> genericMatrix(S,a_(i,0,0),m,m));
 BB = apply(d, i-> genericMatrix(S,b_(i,0,0),m,m));
 
---VARIOUS partial commutativity, but not enough!
-PA = product apply(d, i-> AA_i);
---PB = product apply(d, i-> BB_i);
---eqns that say As and the Bs each cyclically commute:
-eqA = sum apply(d-1, j -> ideal(
-	product apply(d, i -> AA_(z(j+1,i))) -  PA));
---eqB = sum apply(d-1, j -> ideal(
---	product apply(d, i -> BB_(z(j+1,i))) - PB));
---eqns that say A_i commutes with B_j for i !=j
---uneq = select (subsets(d,2), s -> s_0 !=s_1);
---eq2 = sum apply(uneq, s -> ideal (AA_(s_0)*BB_(s_1)-BB_(s_1)*AA_(s_0)));
---eq3 = sum apply(uneq, s -> ideal (AA_(s_1)*BB_(s_0)-BB_(s_0)*AA_(s_1)));
---eq2 = sum flatten apply(d,i->ideal(AA_i*BB_i-BB_i*AA_i));
---eq = eqA+eqB+eq2; -- +eq3;
---eq = eqA+eqB+eq2;
-
---Now total Commutativity: All the AA_i commute, all the BB_i commute, and the all commute
---with each other.
-
---eqAall = sum flatten apply(d, s-> apply(d, t-> ideal(AA_s*AA_t-AA_t*AA_s)));
-eqBall = sum flatten apply(d, s-> apply(d, t-> ideal(BB_s*BB_t-BB_t*BB_s)));
-eq2 = sum flatten apply(d, s-> apply(d, t-> ideal(AA_s*BB_t-BB_t*AA_s)));
---eq = eq2+eqAall+eqBall;
-eq = eq2+eqA+eqBall;
-
-assert isHomogeneous eq;
-R = S/eq;
-assert all(flatten apply(d, i->apply(d,j-> (sub(AA_i*BB_j -BB_j*AA_i, R) ==0))), i->i);
---assert all(flatten apply(d, i->apply(d,j-> (sub(AA_i*AA_j -AA_j*AA_i, R) ==0))), i->i);
-assert all(flatten apply(d, i->apply(d,j-> (sub(BB_i*BB_j -BB_j*BB_i, R) ==0))), i->i);
-
-
 --Now make the block matrices
-one = map(S^m,S^m, 1);
-zer = map(S^m,S^m, 0);
-
 --the cyclic permutation
 C = map((S^m)^d, (S^m)^d, 
     matrix apply(d, i-> apply(d, j-> if (j-i-1) % d == 0 then one else zer)));
@@ -100,17 +69,55 @@ A = map((S^m)^d,(S^{m:-1})^d,
 B = map((S^m)^d,(S^{m:-1})^d, 
     matrix apply(d, i-> apply(d,j-> if i == j then  BB_i else zer))
     );
-
 X = apply(d, i-> C^(i)*A*C^(-i)+r^i*B*C^(-1));
 
---Now construct what *should* be the answer
+--Now construct what *should* be the answer (ie X == Y mod the commutativity conditions).
+--Note the sign in the Y_i
 Ylist = apply(d,j-> product(d,i->AA_i)+(-1)^(d+1)*product(d, i->BB_i));
 Y = map(S^(m*d), S^{m*d:-d}, matrix apply(d, i-> apply(d,j-> if i==j then Ylist_i else 0)));
 
---and test whether they agree mod the commutativity relations
+--VARIOUS partial commutativity that I tried.
+
+--PB = product apply(d, i-> BB_i);
+--eqns that say As and the Bs each cyclically commute:
+--eqB = sum apply(d-1, j -> ideal(
+--	product apply(d, i -> BB_(z(j+1,i))) - PB));
+--eqns that say A_i commutes with B_j for i !=j
+--uneq = select (subsets(d,2), s -> s_0 !=s_1);
+--eq2 = sum apply(uneq, s -> ideal (AA_(s_0)*BB_(s_1)-BB_(s_1)*AA_(s_0)));
+--eq3 = sum apply(uneq, s -> ideal (AA_(s_1)*BB_(s_0)-BB_(s_0)*AA_(s_1)));
+--eq2 = sum flatten apply(d,i->ideal(AA_i*BB_i-BB_i*AA_i));
+--eq = eqA+eqB+eq2; -- +eq3;
+--eq = eqA+eqB+eq2;
+--eqAall = sum flatten apply(d, s-> apply(d, t-> ideal(AA_s*AA_t-AA_t*AA_s)));
+--eq = eq2+eqAall+eqBall;
+
+--What finally worked best:
+PA = product apply(d, i-> AA_i);
+eqA = sum apply(d-1, j -> ideal(
+	product apply(d, i -> AA_(z(j+1,i))) -  PA));
+eqBall = sum flatten apply(d, s-> apply(d, t-> ideal(BB_s*BB_t-BB_t*BB_s)));
+eq2 = sum flatten apply(d, s-> apply(d, t-> ideal(AA_s*BB_t-BB_t*AA_s)));
+eq = eq2+eqA+eqBall;
+--avoid a problem that plagued an earlier version:
+assert isHomogeneous eq;
+
+--check the commutativity relations, and that the answer comes out right
+R = S/eq;
+assert all(flatten apply(d, i->apply(d,j-> (sub(AA_i*BB_j -BB_j*AA_i, R) ==0))), i->i);
+assert all(flatten apply(d, i->apply(d,j-> (sub(BB_i*BB_j -BB_j*BB_i, R) ==0))), i->i);
+
 XR = sub(product X,R);
 YR = sub(Y, R);
 assert(XR - YR == 0);
+
+--finally, check that the X's satisfy cyclic commutativity mod the
+--commutativity relations that have already been imposed.
+PX = product apply(d, i-> X_i);
+eqX = sum apply(d-1, j -> ideal(
+	product apply(d, i -> X_(z(j+1,i))) -  PX));
+assert (sub(eqX, R) == 0);
+
 (XR, YR, AA,BB,C,R)
 )
 end--
@@ -118,28 +125,20 @@ end--
 restart
 load"GGSmith160605.m2"
 
---Result: with commuting blocks AA_i, BB_j, the matrices in the list XR do
---have the right product, but do NOT commute pairwise even when the block size is 1
---except for the d=2 case. However, when the AA_i commute cyclically and
+--when the AA_i commute cyclically and
 --the BB_i commute with each other and with the AA_j, the product is still
---correct AND the resulting X_i do commute cyclically, as shown below.
+--correct AND the resulting X_i do commute cyclically, as tested by
+--assert statements in the script.
 
 -- note: testMatrix(d,m) is relatively fast for m=1,2, but testMatrix(3,3) is slow.
 -- could limit the degree of the gb to make it faster if we needed to.
-
-(XR,YR, AA,BB,C,R) = testMatrix(3,2);
+testMatrix 3
+(XR,YR, AA,BB,C,R) = testMatrix(4,2);
 X
 << sub(X_0*X_1*X_2-X_1*X_2*X_0, R)
-PX = product apply(d, i-> X_i);
---PB = product apply(d, i-> BB_i);
---eqns that say As and the Bs each cyclically commute:
-eqX = sum apply(d-1, j -> ideal(
-	product apply(d, i -> X_(z(j+1,i))) -  PX));
-sub(eqX, R)
 
 XR-YR
 netList X
-testMatrix 3
 A
 B
 C
