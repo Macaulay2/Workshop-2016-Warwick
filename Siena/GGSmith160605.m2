@@ -15,7 +15,8 @@ x := symbol a; y:=symbol b;
 S := ZZ/p[a_1..a_d,b_1..b_d];
 C := map(S^d, S^d, (i,j) -> if (j-i-1) % d == 0 then 1 else 0);
 A := diagonalMatrix toList(a_1..a_d);
-B := diagonalMatrix toList(b_1..b_d);
+--B := diagonalMatrix toList(b_1..b_d);
+B := diagonalMatrix join({b_d},toList(b_1..b_(d-1)));
 --(cycle^(1)*A*cycle^(-1),B*cycle)
 X := apply(d, i-> C^(i)*A*C^(-i)+r^i*B*C^(-1));
 (X,A,B, C)
@@ -24,7 +25,8 @@ X := apply(d, i-> C^(i)*A*C^(-i)+r^i*B*C^(-1));
 ///
 restart
 load"GGSmith160605.m2"
-(X,A,B,C) = testMatrix 3
+(X,A,B,C) = testMatrix 1
+
 product X
 sub (AA_0*BB_1-BB_1*AA_0, R)
 sub (AA_1*BB_0-BB_0*AA_1, R)
@@ -44,7 +46,7 @@ product X
 ///
 
 testMatrix(ZZ,ZZ) := (d,m)->(
-    --block matrices with m x m blocks; cyclic commuting within AA and 
+    --block matrices with m x m blocks; cyclic commuting within AA and, and
     --BB_i commutes with everything.
 --do it in char p for readability
 (p,r) =  getPrimeWithRootOfUnity(d,5, Range => (50,1000));
@@ -55,9 +57,9 @@ x := symbol a; y:=symbol b;
 S = ZZ/p[a_(0,0,0)..a_(d-1,m-1,m-1),b_(0,0,0)..b_(d-1, m-1,m-1)];
 one = map(S^m,S^m, 1);
 zer = map(S^m,S^m, 0);
-AA = apply(d, i-> genericMatrix(S,a_(i,0,0),m,m));
-BB = apply(d, i-> genericMatrix(S,b_(i,0,0),m,m));
-
+AA = apply(d, i-> transpose genericMatrix(S,a_(i,0,0),m,m));
+BB = apply(d, i-> transpose genericMatrix(S,b_(i,0,0),m,m));
+--BB = join({genericMatrix(S,b_(d-1,0,0),m,m)}, apply(d-1, i-> genericMatrix(S,b_(i,0,0),m,m)));
 --Now make the block matrices
 --the cyclic permutation
 C = map((S^m)^d, (S^m)^d, 
@@ -66,22 +68,21 @@ C = map((S^m)^d, (S^m)^d,
 A = map((S^m)^d,(S^{m:-1})^d, 
     matrix apply(d, i-> apply(d,j-> if i == j then AA_i else zer))
     );
+--B = map((S^m)^d,(S^{m:-1})^d, 
+--    matrix apply(d, i-> apply(d,j-> if i == j then  BB_i else zer))
+--    );
 B = map((S^m)^d,(S^{m:-1})^d, 
-    matrix apply(d, i-> apply(d,j-> if i == j then  BB_i else zer))
+    matrix apply(d, i-> apply(d,j-> if i-(1+j) %d ==0 then  BB_j else zer))
     );
-X = apply(d, i-> C^(i)*A*C^(-i)+r^i*B*C^(-1));
+--X = apply(d, i-> C^(i)*A*C^(-i)+r^i*B*C^(-1));
 
+X = apply(d, i-> C^(i)*A*C^(-i)+r^i*B);
 --Now construct what *should* be the answer (ie X == Y mod the commutativity conditions).
 --Note the sign in the Y_i
-Ylist = apply(d,j-> product(d,i->AA_i)+(-1)^(d+1)*product(d, i->BB_i));
-Y = map(S^(m*d), S^{m*d:-d}, matrix apply(d, i-> apply(d,j-> if i==j then Ylist_i else 0)));
+Yblock = product(d,i->AA_i)-(-1)^(d)*product(d, i->BB_(d-1-i));
+Y = map(S^(m*d), S^{m*d:-d}, matrix apply(d, i-> apply(d,j-> if i==j then Yblock else 0)));
 
 --VARIOUS partial commutativity that I tried.
-
---PB = product apply(d, i-> BB_i);
---eqns that say As and the Bs each cyclically commute:
---eqB = sum apply(d-1, j -> ideal(
---	product apply(d, i -> BB_(z(j+1,i))) - PB));
 --eqns that say A_i commutes with B_j for i !=j
 --uneq = select (subsets(d,2), s -> s_0 !=s_1);
 --eq2 = sum apply(uneq, s -> ideal (AA_(s_0)*BB_(s_1)-BB_(s_1)*AA_(s_0)));
@@ -92,57 +93,87 @@ Y = map(S^(m*d), S^{m*d:-d}, matrix apply(d, i-> apply(d,j-> if i==j then Ylist_
 --eqAall = sum flatten apply(d, s-> apply(d, t-> ideal(AA_s*AA_t-AA_t*AA_s)));
 --eq = eq2+eqAall+eqBall;
 
---What finally worked best:
+--eqns that say As and the Bs each cyclically commute:
 PA = product apply(d, i-> AA_i);
 eqA = sum apply(d-1, j -> ideal(
 	product apply(d, i -> AA_(z(j+1,i))) -  PA));
-eqBall = sum flatten apply(d, s-> apply(d, t-> ideal(BB_s*BB_t-BB_t*BB_s)));
-eq2 = sum flatten apply(d, s-> apply(d, t-> ideal(AA_s*BB_t-BB_t*AA_s)));
-eq = eq2+eqA+eqBall;
+PB = product apply(d, i-> BB_(d-1-i));
+eqB = sum apply(d-1, j -> ideal(
+	product apply(d, i -> BB_(d-1-z(j+1,i))) - PB));
+--eqns that say A_i commutes with B_j for i !=j
+uneq1 = select (subsets(d,2), s -> s_0 !=s_1);
+uneq = join(uneq1, uneq1/reverse);
+eq3 = sum apply(uneq, s -> ideal (AA_(s_1)*BB_(s_0)-BB_(s_0)*AA_(s_1)));
+
+eq = eqA+eqB+eq3;
+
+--What previously worked best:
+--PA = product apply(d, i-> AA_i);
+--eqA = sum apply(d-1, j -> ideal(
+--	product apply(d, i -> AA_(z(j+1,i))) -  PA));
+--eqBall = sum flatten apply(d, s-> apply(d, t-> ideal(BB_s*BB_t-BB_t*BB_s)));
+--eq2 = sum flatten apply(d, s-> apply(d, t-> ideal(AA_s*BB_t-BB_t*AA_s)));
+--eq = eq2+eqA+eqBall;
 --avoid a problem that plagued an earlier version:
 assert isHomogeneous eq;
 
 --check the commutativity relations, and that the answer comes out right
+
+--for m>=3 the program is SLOW. It would be nice to compute the GB of eq only up to 
+--degree d or d+1, but I can't figure out how to keep R = S/seq from computing the rest.
+--The following does not work.
+--eq = ideal forceGB gens (gb(gens eq, DegreeLimit => d));
+--error();
+
 R = S/eq;
-assert all(flatten apply(d, i->apply(d,j-> (sub(AA_i*BB_j -BB_j*AA_i, R) ==0))), i->i);
-assert all(flatten apply(d, i->apply(d,j-> (sub(BB_i*BB_j -BB_j*BB_i, R) ==0))), i->i);
+--assert all(flatten apply(d, i->apply(d,j-> (sub(AA_i*BB_j -BB_j*AA_i, R) ==0))), i->i);
+--assert all(flatten apply(d, i->apply(d,j-> (sub(BB_i*BB_j -BB_j*BB_i, R) ==0))), i->i);
 
 XR = sub(product X,R);
 YR = sub(Y, R);
 assert(XR - YR == 0);
 
---finally, check that the X's satisfy cyclic commutativity mod the
---commutativity relations that have already been imposed.
-PX = product apply(d, i-> X_i);
-eqX = sum apply(d-1, j -> ideal(
-	product apply(d, i -> X_(z(j+1,i))) -  PX));
-assert (sub(eqX, R) == 0);
+--with this minimal commutativity assumption, the X's do NOT satisfy cyclic
+--commutativity mod the equations, eg for d=3, m=2! This is shown by the following 
+--asserts, which are commented out Of course if they are really a matrix factorization,
+--then they do automatically.
+--PX = product apply(d, i-> X_i);
+--eqX = sum apply(d-1, j -> ideal(
+--	product apply(d, i -> X_(z(j+1,i))) -  PX));
+--the X_i do not commute cyclically in this order.
+--assert (sub(eqX, R) == 0);
+
+--And also not in the reversed order:
+--PX = product apply(d, i-> X_(d-1-i));
+--eqX = sum apply(d-1, j -> ideal(
+--	product apply(d, i -> X_(d-1-z(j+1,i))) -  PX));
+--assert (sub(eqX, R) == 0);
 
 (XR, YR, AA,BB,C,R)
 )
 end--
-
-restart
-load"GGSmith160605.m2"
-
---when the AA_i commute cyclically and
---the BB_i commute with each other and with the AA_j, the product is still
---correct AND the resulting X_i do commute cyclically, as tested by
+--when the AA_i commute cyclically in the order AA_0..AA_(d-1),
+--and the BB_i commute cyclically in the opposite order BB_(d-1)..BB_0,
+--and BB_i commutes with AA_j for all i !=j,
+--then the product is correct
+--BUT the resulting X_i do NOT commute cyclically, as tested by an assert
 --assert statements in the script.
 
 -- note: testMatrix(d,m) is relatively fast for m=1,2, but testMatrix(3,3) is slow.
 -- could limit the degree of the gb to make it faster if we needed to.
-testMatrix 3
-(XR,YR, AA,BB,C,R) = testMatrix(4,2);
-X
-<< sub(X_0*X_1*X_2-X_1*X_2*X_0, R)
 
-XR-YR
-netList X
+restart
+--gbTrace = 3
+load"GGSmith160605.m2"
+testMatrix 3
+
+(XR,YR, AA,BB,C,R) = testMatrix(5,2);
+
 A
 B
 C
 
+eq
 
 
 
@@ -259,3 +290,9 @@ m = matrix{{x_0,0,y_0},{y_1,x_1,0},{0,y_2,x_2}}
 R = S/det m
 syz sub(m,R)
 m^2
+
+restart
+S = ZZ/101[a..i]
+f = a*b*c+d*e*f+g*h*i
+betti res trim ideal presentation singularLocus (S/f)
+
