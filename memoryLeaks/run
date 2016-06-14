@@ -1,0 +1,20 @@
+needsPackage "RandomIdeals"
+
+restart
+load "~/src/M2/Workshop-2016-Warwick/memoryLeaks/memoryLeak.m2"
+leak11() -- rock steady at 87.3 MB usage, 99/100 collected.
+  seeAllocs()
+restart
+load "~/src/M2/Workshop-2016-Warwick/memoryLeaks/memoryLeak.m2"
+leak4() -- up to approx 350 MB. 76/100 collected, another run:(650 MB, 55/100 collected)
+  seeAllocs()
+
+
+
+  collectGarbage()
+  (1000000:0;)
+  collectGarbage()
+  (1000000:0;)
+  collectGarbage()
+  seeAllocs()
+  
