@@ -1,38 +1,47 @@
 -- modeled after randomCanonicalModelOfPlaneCurve
 
-needsPackage "RandomPlaneCurves"
-needsPackage "RandomCanonicalCurves"
 g = 9
 p = 12347
-d = g+2-g//3
+d = 8
 R = ZZ/p[t_0..t_(g-1)];
 setRandomSeed "37862873"
-
-foo' = x' -> (
-     x := x';
-     y := local x;
-     -- x = y;
-     foo := 1:null;
-     registerFinalizer(foo,"foo");
-     S := (coefficientRing R)[x_0..x_2];
-     delta:=binomial(d-1,2)-g;
-     J:=(random nodalPlaneCurve)(d,delta,S);
-     KC:=(gens intersect(saturate(ideal jacobian J +J),(ideal vars S)^(d-3)))_{0..(g-1)};
-     SJ:=S/J;
-     phi:=map(SJ,R,substitute(KC,SJ));
-     I:=ideal mingens ker phi;
-     minimalBetti I;
-     );
+delta = 12
 
 foo = () -> (
      x := local x;
-     foo' x)
+     foo := 1:null;
+     registerFinalizer(foo,"foo");
+     S = ZZ/p[x_0..x_2];
+     J = ideal(798*x_0^8+5952*x_0^7*x_1-2911*x_0^6*x_1^2-1405*x_0^5*x_1^3+242*x_0^4*x_1^4+5880*x_0^3
+	  *x_1^5-2768*x_0^2*x_1^6+3008*x_0*x_1^7-4206*x_1^8+2676*x_0^7*x_2-2948*x_0^6*x_1*x_2+1126*x_
+	  0^5*x_1^2*x_2-2060*x_0^4*x_1^3*x_2+4071*x_0^3*x_1^4*x_2+4219*x_0^2*x_1^5*x_2+1382*x_0*x_1^6
+	  *x_2-3639*x_1^7*x_2-6080*x_0^6*x_2^2-2818*x_0^5*x_1*x_2^2-1896*x_0^4*x_1^2*x_2^2+993*x_0^3*
+	  x_1^3*x_2^2-3246*x_0^2*x_1^4*x_2^2-477*x_0*x_1^5*x_2^2+5277*x_1^6*x_2^2+1179*x_0^5*x_2^3-
+	  3913*x_0^4*x_1*x_2^3+3307*x_0^3*x_1^2*x_2^3-4470*x_0^2*x_1^3*x_2^3-4336*x_0*x_1^4*x_2^3+
+	  4226*x_1^5*x_2^3-1502*x_0^4*x_2^4+4466*x_0^3*x_1*x_2^4-5963*x_0^2*x_1^2*x_2^4-5778*x_0*x_1^
+	  3*x_2^4+587*x_1^4*x_2^4+439*x_0^3*x_2^5-251*x_0^2*x_1*x_2^5-1427*x_0*x_1^2*x_2^5-3178*x_1^3
+	  *x_2^5-88*x_0^2*x_2^6-183*x_0*x_1*x_2^6-2892*x_1^2*x_2^6+2985*x_0*x_2^7+836*x_1*x_2^7-5370*
+	  x_2^8);
+     K = saturate(ideal jacobian J + J);
+     I := ideal {
+      t_0*t_2-1991*t_0*t_6+543*t_1*t_6-5654*t_2*t_6+1680*t_4*t_6+2076*t_5*t_6-1538*
+      t_6^2-2463*t_0*t_7-1496*t_1*t_7-115*t_2*t_7-1680*t_3*t_7+2172*t_4*t_7-5450*t_5*t_7+6085*t_
+      6*t_7+214*t_7^2+3963*t_0*t_8+5943*t_1*t_8-5509*t_2*t_8-4248*t_3*t_8-5359*t_4*t_8-6085*t_5*
+      t_8-214*t_6*t_8, t_1^2+4476*t_0*t_6-3256*t_1*t_6+3451*t_2*t_6+270*t_4*t_6-2046*t_5*t_6-
+      1357*t_6^2+3274*t_0*t_7+4572*t_1*t_7+4492*t_2*t_7-270*t_3*t_7-3946*t_4*t_7-913*t_5*t_7+
+      5835*t_6*t_7+3540*t_7^2+4125*t_0*t_8+4030*t_1*t_8-4576*t_2*t_8+5992*t_3*t_8+2270*t_4*t_8-
+      5835*t_5*t_8-3540*t_6*t_8, t_0*t_1-4601*t_0*t_6+556*t_1*t_6-4271*t_2*t_6+410*t_4*t_6-1587*
+      t_5*t_6+1303*t_6^2-798*t_0*t_7+6172*t_1*t_7+2268*t_2*t_7-410*t_3*t_7+665*t_4*t_7+5057*t_5*
+      t_7+1594*t_6*t_7+3686*t_7^2+4525*t_0*t_8+2987*t_1*t_8-5641*t_2*t_8+922*t_3*t_8+5987*t_4*t_
+      8-1594*t_5*t_8-3686*t_6*t_8};
+     minimalBetti I;
+     )
 
-for i from 1 to 32 do (
+for i from 1 to 24 do (
      foo();
      << "." << flush;
      )
-<< "..." << flush
+<< "***" << flush
 collectGarbage()
 collectGarbage()
 collectGarbage()
