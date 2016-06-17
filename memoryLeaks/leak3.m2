@@ -1,11 +1,5 @@
--- modeled after randomCanonicalModelOfPlaneCurve
-
-g = 9
 p = 12347
-d = 8
-R = ZZ/p[t_0..t_(g-1)];
-setRandomSeed "37862873"
-delta = 12
+R = ZZ/p[t_0..t_8];
 
 foo = () -> (
      x := local x;
