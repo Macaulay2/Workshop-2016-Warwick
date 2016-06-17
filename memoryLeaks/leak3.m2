@@ -32,7 +32,7 @@ foo = () -> (
       t_5*t_6+1303*t_6^2-798*t_0*t_7+6172*t_1*t_7+2268*t_2*t_7-410*t_3*t_7+665*t_4*t_7+5057*t_5*
       t_7+1594*t_6*t_7+3686*t_7^2+4525*t_0*t_8+2987*t_1*t_8-5641*t_2*t_8+922*t_3*t_8+5987*t_4*t_
       8-1594*t_5*t_8-3686*t_6*t_8};
-     minimalBetti I;
+     resolution(I, StopBeforeComputation=>true, FastNonminimal=>true);
      )
 
 for i from 1 to 32 do (
