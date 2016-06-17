@@ -21,7 +21,7 @@ foo = () -> (
 	  x_2^8);
      K = saturate(ideal jacobian J + J);
 
-     I := ideal {
+     M := coker matrix {{
       t_0*t_2-1991*t_0*t_6+543*t_1*t_6-5654*t_2*t_6+1680*t_4*t_6+2076*t_5*t_6-1538*
       t_6^2-2463*t_0*t_7-1496*t_1*t_7-115*t_2*t_7-1680*t_3*t_7+2172*t_4*t_7-5450*t_5*t_7+6085*t_
       6*t_7+214*t_7^2+3963*t_0*t_8+5943*t_1*t_8-5509*t_2*t_8-4248*t_3*t_8-5359*t_4*t_8-6085*t_5*
@@ -31,8 +31,10 @@ foo = () -> (
       5835*t_5*t_8-3540*t_6*t_8, t_0*t_1-4601*t_0*t_6+556*t_1*t_6-4271*t_2*t_6+410*t_4*t_6-1587*
       t_5*t_6+1303*t_6^2-798*t_0*t_7+6172*t_1*t_7+2268*t_2*t_7-410*t_3*t_7+665*t_4*t_7+5057*t_5*
       t_7+1594*t_6*t_7+3686*t_7^2+4525*t_0*t_8+2987*t_1*t_8-5641*t_2*t_8+922*t_3*t_8+5987*t_4*t_
-      8-1594*t_5*t_8-3686*t_6*t_8};
-     resolution(I, StopBeforeComputation=>true, FastNonminimal=>true);
+      8-1594*t_5*t_8-3686*t_6*t_8}};
+
+     resolution(M, StopBeforeComputation=>true, FastNonminimal=>true);
+
      )
 
 for i from 1 to 32 do (
