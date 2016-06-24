@@ -644,10 +644,9 @@ gfanVectorConfigToString := (L) -> (
 
 gfanRingToString = method()
 gfanRingToString PolynomialRing := (R) -> (
-	(ringMap, newR) := gfanFixPrefixBug R;
-	p := char newR;
+	p := char R;
 	out := if p === 0 then "Q" else "Z/"|p|"Z";
-	out = out | gfanToExternalString(new Array from gens newR) | newline;
+	out = out | gfanToExternalString(new Array from gens R) | newline;
 	return out;
 )
 
@@ -660,8 +659,12 @@ gfanMPLToRingToString List := (L) -> (
 	return out;
 )
 
-gfanFixPrefixBug = method()
-gfanFixPrefixBug (PolynomialRing) := R1 -> (
+--------------------------------------------------------
+-- gfan prefix bug section
+--------------------------------------------------------
+
+gfanConvertToNewRing = method()
+gfanConvertToNewRing (PolynomialRing) := R1 -> (
   R1Gens := gens R1;
   numDigits := length (toString (#R1Gens));
   R2 := (coefficientRing R1) (for i in 1..#R1Gens list (
@@ -672,14 +675,48 @@ gfanFixPrefixBug (PolynomialRing) := R1 -> (
   return (map(R2, R1, generatorMapping), R2);
 )
 
-gfanFixPrefixBug (List) := polys -> (
-  (ringMap, R2) := gfanFixPrefixBug ring polys#0;
+gfanConvertToNewRing (List) := polys -> (
+  (ringMap, R2) := gfanConvertToNewRing ring polys#0;
+  return (ringMap, polys/ringMap);
+)
+gfanConvertToNewRing (List, RingMap) := (polys, ringMap) -> (
   return (ringMap, polys/ringMap);
 )
 
-gfanFixPrefixBug (Ideal) := I -> (
-  (ringMap, R2) := gfanFixPrefixBug ring I;
+gfanConvertToNewRing (Ideal) := I -> (
+  (ringMap, R2) := gfanConvertToNewRing ring I;
   return (ringMap, ringMap I);
+)
+gfanConvertToNewRing (Ideal, RingMap) := (I, ringMap) -> (
+  return (ringMap, ringMap I);
+)
+
+gfanConvertToNewRing (List) := (LMPL) -> (
+
+)
+
+gfanRevertToOriginalRing = method()
+gfanRevertToOriginalRing (PolynomialRing, RingMap) := (R, ringMap) -> (
+  return source ringMap;
+)
+gfanRevertToOriginalRing (Ideal, RingMap) := (I, ringMap) -> (
+  return ringMap^-1 I;
+)
+gfanRevertToOriginalRing (List, RingMap) := (polys, ringMap) -> (
+  return polys/(ringMap^-1);
+)
+
+gfanRevertToOriginalRing (List,RingMap) := (LMPL,ringMap) -> (
+)
+gfanRevertToOriginalRing (List, RingMap) := (MPL, ringMap) -> (
+)
+gfanRevertToOriginalRing (List, RingMap) := (MPLPair, ringMap) -> (
+)
+gfanRevertToOriginalRing (List,RingMap) := (IdealPair, ringMap) -> (
+)
+gfanRevertToOriginalRing (List,RingMap) := (MarkedIdeal, ringMap) -> (
+)
+gfanRevertToOriginalRing (List, RingMap) := (MarkedIdealPair, ringMap) -> (
 )
 
 --------------------------------------------------------
@@ -973,26 +1010,35 @@ gfan = method( Options => {
 )
 
 gfan Ideal := opts -> (I) -> (
+	(ringMap, newI) := gfanConvertToNewRing(I);
+	I = newI;
 	if opts#"g" then error "Polynomials must be marked for the -g option";
 	input := gfanRingToString(ring I)
 		| gfanIdealToString(I)
 		| gfanVectorListToString(opts#"symmetry");
-	gfanParseLMPL first runGfanCommand("gfan _bases", opts, input)
+	LMPL := gfanParseLMPL first runGfanCommand("gfan _bases", opts, input);
+	gfanRevertToOriginalRing(LMPL, ringMap)
 )
 
 gfan MarkedPolynomialList := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanMPLToRingToString(L)
 		| gfanMPLToString(L)
 		| gfanVectorListToString(opts#"symmetry");
-	gfanParseLMPL first runGfanCommand("gfan _bases", opts, input)
+	LMPL := gfanParseLMPL first runGfanCommand("gfan _bases", opts, input);
+	gfanRevertToOriginalRing(LMPL, ringMap)
 )
 
 gfan List := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	if opts#"g" then error "Polynomials must be marked for the -g option";
 	input := gfanRingToString(ring first L)
 		| gfanPolynomialListToString(L)
 		| gfanVectorListToString(opts#"symmetry");
-	gfanParseLMPL first runGfanCommand("gfan _bases", opts, input)
+	LMPL := gfanParseLMPL first runGfanCommand("gfan _bases", opts, input);
+	gfanRevertToOriginalRing(LMPL, ringMap)
 )
 --------------------------------------------------------
 -- MPLConverter
@@ -1024,10 +1070,13 @@ gfanBuchberger = method( Options => {
 )
 
 gfanBuchberger List := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanRingToString(ring first L)
 		| gfanPolynomialListToString(L)
 		| gfanIntegerListToString(opts#"w");
-	gfanParseMPL first runGfanCommand("gfan _buchberger", opts, input)
+	MPL := gfanParseMPL first runGfanCommand("gfan _buchberger", opts, input);
+	gfanRevertToOriginalRing(MPL, ringMap)
 )
 
 gfanBuchberger Ideal := opts -> (I) -> (
@@ -1045,6 +1094,10 @@ gfanBuchberger MarkedPolynomialList := opts -> (L) -> (
 gfanDoesIdealContain = method(Options=>{})
 
 gfanDoesIdealContain (MarkedPolynomialList, List) := opts -> (I,J) -> (
+	(ringMap, newJ) := gfanConvertToNewRing(J);
+	J = newJ;
+	(ringMap2, newI) := gfanConvertToNewRing(I,ringMap);
+	I = newI;
 	input := gfanMPLToRingToString(I)
 		| gfanMPLToString(I)
 		| gfanPolynomialListToString(J);
@@ -1195,6 +1248,11 @@ gfanGroebnerCone = method( Options => {
 )
 
 gfanGroebnerCone (MarkedPolynomialList, MarkedPolynomialList) := opts -> (L,M) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
+	(ringMap2, newM) := gfanConvertToNewRing(M, ringMap);
+	M = newM;
+
 	if not opts#"pair" then (
 		if gfanVerbose then
 			 << "Using --pair option for gfanGroebnerCone." << endl;
@@ -1241,6 +1299,8 @@ gfanGroebnerCone Ideal := opts -> (I) -> (
 )
 
 gfanGroebnerCone MarkedPolynomialList := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	if opts#"pair" then
 		error("The pair option for gfanGroebnerCone should be used along with "
 			| "two MarkedPolynomialLists as arguments.");
@@ -1264,6 +1324,8 @@ gfanGroebnerCone List := opts -> (L) -> (
 gfanHomogeneitySpace = method(Options=>{})
 
 gfanHomogeneitySpace (List) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanRingToString(ring first L) | gfanPolynomialListToString(L);
 	gfanParsePolyhedralFan runGfanCommand("gfan _homogeneityspace", opts, input)
 )
@@ -1331,23 +1393,29 @@ gfanInitialForms = method( Options => {
 )
 
 gfanInitialForms (List, List) := opts -> (L,W) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanRingToString(ring first L)
 		| gfanPolynomialListToString(L)
 		| gfanIntegerListToString(W);
 	if opts#"pair" then
-		gfanParseIdealPair first runGfanCommand("gfan _initialforms", opts, input)
+		out := gfanParseIdealPair first runGfanCommand("gfan _initialforms", opts, input)
 	else
-		gfanParseIdeal first runGfanCommand("gfan _initialforms", opts, input)
+		out = gfanParseIdeal first runGfanCommand("gfan _initialforms", opts, input);
+	gfanRevertToOriginalRing(out,ringMap)
 )
 
 gfanInitialForms (MarkedPolynomialList, List) := opts -> (L,W) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanMPLToRingToString(L)
 		| gfanMPLToString(L)
 		| gfanIntegerListToString(W);
 	if opts#"pair" then
-		gfanParseMPLPair first runGfanCommand("gfan _initialforms", opts, input)
+		out := gfanParseMPLPair first runGfanCommand("gfan _initialforms", opts, input)
 	else
-		gfanParseMPL first runGfanCommand("gfan _initialforms", opts, input)
+		out = gfanParseMPL first runGfanCommand("gfan _initialforms", opts, input);
+	gfanRevertToOriginalRing(out, ringMap)
 )
 
 gfanInitialForms (Ideal, List) := opts -> (I,L) -> (
@@ -1371,6 +1439,8 @@ gfanInteractive := opts -> () -> (
 gfanIsMarkedGroebnerBasis = method( Options => {} )
 
 gfanIsMarkedGroebnerBasis (MarkedPolynomialList) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanMPLToRingToString(L)
 		| gfanMPLToString(L);
 	gfanParseBool first runGfanCommand("gfan _ismarkedgroebnerbasis", opts, input)
@@ -1390,6 +1460,8 @@ gfanIsMarkedGroebnerBasis (List) := opts -> (L) -> (
 gfanKrullDimension = method( Options => {} )
 
 gfanKrullDimension (MarkedPolynomialList) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanMPLToRingToString(L)
 		| gfanMPLToString(L);
 	gfanParseInteger first runGfanCommand("gfan _krulldimension", opts, input)
@@ -1428,11 +1500,14 @@ gfanLeadingTerms = method( Options => {
 )
 
 gfanLeadingTerms (MarkedPolynomialList) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	if opts#"m" then (
 		error "gfanLeadingTerms: Expected a list of MarkedPolynomialLists with the -m option.";
 	) else (
 		input := gfanMPLToRingToString(L) | gfanMPLToString(L);
-		return gfanParseIdeal first runGfanCommand("gfan _leadingterms", opts, input);
+		I := gfanParseIdeal first runGfanCommand("gfan _leadingterms", opts, input);
+		return gfanRevertToOriginalRing(I, ringMap);
 	)
 )
 
@@ -1452,10 +1527,13 @@ gfanLeadingTerms (List) := opts -> (L) -> (
 gfanMarkPolynomialSet = method( Options => {} )
 
 gfanMarkPolynomialSet (List, List) := opts -> (L,W) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanRingToString(ring first L)
 		| gfanPolynomialListToString(L)
 		| gfanIntegerListToString(W);
-	gfanParseMarkedIdeal first runGfanCommand("gfan _markpolynomialset", opts, input)
+	MI := gfanParseMarkedIdeal first runGfanCommand("gfan _markpolynomialset", opts, input);
+	gfanRevertToOriginalRing(MI, ringMap)
 )
 
 --------------------------------------------------------
@@ -1470,6 +1548,8 @@ gfanMinkowskiSum = method( Options => {
 )
 
 gfanMinkowskiSum (List) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanRingToString(ring first L)
 		| gfanPolynomialListToString(L);
 	gfanParsePolyhedralFan runGfanCommand("gfan _minkowskisum", opts, input)
@@ -1524,9 +1604,14 @@ gfanPolynomialSetUnion = method( Options => {
 )
 
 gfanPolynomialSetUnion (MarkedPolynomialList,MarkedPolynomialList) := opts -> (L,K) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
+	(ringMap2, newK) := gfanConvertToNewRing(K, ringMap);
+	K = newK;
 	input := gfanMPLToRingToString(L)
 		| gfanLMPLToString({L,K});
-	gfanParseMarkedIdeal first runGfanCommand("gfan _polynomialsetunion", opts, input)
+	MI := gfanParseMarkedIdeal first runGfanCommand("gfan _polynomialsetunion", opts, input);
+	gfanRevertToOriginalRing(MI,ringMap)
 )
 
 gfanPolynomialSetUnion (List, List) := opts -> (L,M) -> (
@@ -1638,8 +1723,11 @@ gfanSaturation = method( Options => {
 )
 
 gfanSaturation (Ideal) := opts -> (I) -> (
+	(ringMap, newI) := gfanConvertToNewRing(I);
+	I = newI;
 	input := gfanRingToString(ring I) | gfanIdealToString(I);
-	gfanParseIdeal first runGfanCommand("gfan _saturation", opts, input)
+	I = gfanParseIdeal first runGfanCommand("gfan _saturation", opts, input);
+	gfanRevertToOriginalRing(I, ringMap)
 )
 
 --------------------------------------------------------
@@ -1666,6 +1754,8 @@ gfanSecondaryFan (List) := opts -> (L) -> (
 gfanStats = method( Options => {} )
 
 gfanStats (List) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanMPLToRingToString(first L)
 		| gfanLMPLToString(L);
 	first runGfanCommand("gfan _stats", opts, input) -- Parse this?
@@ -1745,9 +1835,12 @@ gfanTropicalBasis = method( Options => {
 )
 
 gfanTropicalBasis (Ideal) := opts -> (I) -> (
+	(ringMap, newI) := gfanConvertToNewRing(I);
+	I = newI;
 	input := gfanRingToString(ring I)
 		| gfanIdealToString(I);
-	gfanParseIdeal first runGfanCommand("gfan _tropicalbasis", opts, input)-- should this be marked? Probably not.
+	I = gfanParseIdeal first runGfanCommand("gfan _tropicalbasis", opts, input);-- should this be marked? Probably not.
+	gfanRevertToOriginalRing(I,ringMap)
 )
 
 
@@ -1758,6 +1851,8 @@ gfanTropicalBasis (Ideal) := opts -> (I) -> (
 gfanTropicalBruteForce = method( Options => {} )
 
 gfanTropicalBruteForce List := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanMPLToRingToString(L) | gfanMPLToString(L);
 	output := runGfanCommand("gfan _tropicalbruteforce", opts, input);
 	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true)
@@ -1786,6 +1881,8 @@ gfanTropicalFunction = method( Options => {} )
 
 gfanTropicalFunction RingElement := opts -> (f) -> (
 	--v0.4
+	(ringMap, newf) := gfanConvertToNewRing(f);
+	f = newf;
 	input := gfanRingToString(ring f) | gfanPolynomialListToString{f};
 	gfanParsePolyhedralFan runGfanCommand("gfan _tropicalfunction", opts, input)
 )
@@ -1799,6 +1896,8 @@ gfanTropicalHyperSurface = method( Options => {} )
 
 gfanTropicalHyperSurface RingElement := opts -> (f) -> (
 	--v0.4
+	(ringMap, newf) := gfanConvertToNewRing(f);
+	f = newf;
 	input := gfanRingToString(ring f) | gfanPolynomialListToString{f};
 	gfanParsePolyhedralFan runGfanCommand("gfan _tropicalhypersurface", opts, input)
 )
@@ -1850,6 +1949,8 @@ gfanTropicalIntersection = method( Options => {
 )
 
 gfanTropicalIntersection (List) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanRingToString(ring first L) | gfanPolynomialListToString(L);
 	gfanParsePolyhedralFan runGfanCommand("gfan _tropicalintersection", opts, input)
 )
@@ -1892,6 +1993,8 @@ gfanTropicalLinearSpace (List, ZZ, ZZ) := opts -> (L, n, d) -> (
 gfanTropicalMultiplicity = method( Options => {} )
 
 gfanTropicalMultiplicity (List) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanMPLToRingToString(L) | gfanMPLToString(L);
 	gfanParseInteger first runGfanCommand("gfan _tropicalmultiplicity", opts, input)
 )
@@ -1924,8 +2027,11 @@ gfanTropicalStartingCone = method( Options => {
 )
 
 gfanTropicalStartingCone (List) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanRingToString(ring first L) | gfanPolynomialListToString(L);
-	gfanParseMarkedIdealPair first runGfanCommand("gfan _tropicalstartingcone", opts, input)
+	MIP := gfanParseMarkedIdealPair first runGfanCommand("gfan _tropicalstartingcone", opts, input);
+	gfanRevertToOriginalRing(MIP, ringMap)
 )
 
 gfanTropicalStartingCone (Ideal) := opts -> (I) -> (
@@ -1946,6 +2052,8 @@ gfanTropicalTraverse = method( Options => {
 )
 
 gfanTropicalTraverse (List) := opts -> (L) -> (
+	(ringMap, newL) := gfanConvertToNewRing(L);
+	L = newL;
 	input := gfanMPLToRingToString(first L)
 		| gfanMPLToString(first L)
 		| gfanMPLToString(last L)
@@ -4246,4 +4354,3 @@ gfanResultantFan (A, "special" => {0,1,1,0,1,1,0,1,1})
 QQ[x,y,z]
 A = {x+y+z,x+y+z,x+y+z}
 gfanResultantFan (A, "special" => {0,1,1,0,1,1,0,1,1})
-
