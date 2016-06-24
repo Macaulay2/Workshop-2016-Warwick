@@ -644,9 +644,10 @@ gfanVectorConfigToString := (L) -> (
 
 gfanRingToString = method()
 gfanRingToString PolynomialRing := (R) -> (
-	p := char R;
+	(ringMap, newR) := gfanFixPrefixBug R;
+	p := char newR;
 	out := if p === 0 then "Q" else "Z/"|p|"Z";
-	out = out | gfanToExternalString(new Array from gens R) | newline;
+	out = out | gfanToExternalString(new Array from gens newR) | newline;
 	return out;
 )
 
@@ -659,6 +660,27 @@ gfanMPLToRingToString List := (L) -> (
 	return out;
 )
 
+gfanFixPrefixBug = method()
+gfanFixPrefixBug (PolynomialRing) := R1 -> (
+  R1Gens := gens R1;
+  numDigits := length (toString (#R1Gens));
+  R2 := (coefficientRing R1) (for i in 1..#R1Gens list (
+    value ("x" | demark ("",for i from 1 to numDigits-(length toString i) list "0") | toString i)
+  ) );
+  R2Gens := gens R2;
+  generatorMapping := for i in 0..#(gens R1) - 1 list (R1Gens#i =>R2Gens#i);
+  return (map(R2, R1, generatorMapping), R2);
+)
+
+gfanFixPrefixBug (List) := polys -> (
+  (ringMap, R2) := gfanFixPrefixBug ring polys#0;
+  return (ringMap, polys/ringMap);
+)
+
+gfanFixPrefixBug (Ideal) := I -> (
+  (ringMap, R2) := gfanFixPrefixBug ring I;
+  return (ringMap, ringMap I);
+)
 
 --------------------------------------------------------
 -- gfanArgumentToString
