@@ -15,7 +15,7 @@ newPackage ( "ResidualIntersections",
 	},
     PackageExports => {"RandomIdeal", "Depth"},
     Headline => "Package for studying conditions associated to Residual Intersection theory",
-    DebuggingMode => true
+    DebuggingMode => false
     )
 
 export {
