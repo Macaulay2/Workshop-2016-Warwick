@@ -18,6 +18,9 @@ getPHCsols (Ideal) := I -> (
     return solveSystem (first entries gens mappedI,Verbose=>true);
 )
 
+roundSols = l -> (
+    return (l/ matrix / clean_1e-14 / entries / flatten);
+)
 doStuff = I -> (
     n := numgens ring I;
     myVars = c_(1,1)..c_(n,n);
@@ -34,12 +37,16 @@ doStuff = I -> (
     newI = substitute(I,S);
     firstPoly = substitute(substitute(I_0,S),subList);
     modded = firstPoly % newI;
-    o145 = first entries gens gb ideal flatten entries (coefficients substitute(modded,csAsCoeffs))_1;
+    --o145 = first entries gens gb ideal flatten entries (coefficients substitute(modded,csAsCoeffs))_1;
+    o145 = flatten entries (coefficients substitute(modded,csAsCoeffs))_1;
+    --return sub(o145,justCs);
     coeffLocus = ideal relationsOnC + substitute(ideal o145,S);
-    return substitute(coeffLocus,justCs);
-
-    --Rounds a list of solutions:
-    --pointList / matrix / clean_1e-14 / entries / flatten
+    --return substitute(coeffLocus,justCs);
+    I1 = sub(ideal relationsOnC,justCs);
+    I2 = sub(ideal o145,justCs);
+    print getPHCsols I1;
+    print roundSols(getPHCsols I2);
+    print roundSols(getPHCsols ideal first entries gens gb (I1+I2));
 )
 
 R = QQ[x,y,z];
