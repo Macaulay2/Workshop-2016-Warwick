@@ -665,6 +665,9 @@ gfanMPLToRingToString List := (L) -> (
 
 gfanConvertToNewRing = method()
 gfanConvertToNewRing (PolynomialRing) := R1 -> (
+  --This method does all of the actual conversions.
+  --Every other gfanConvertToNewRing uses rings 
+  --produced by this method.
   R1Gens := gens R1;
   numDigits := length (toString (#R1Gens));
   R2 := (coefficientRing R1) (for i in 1..#R1Gens list (
@@ -684,10 +687,14 @@ gfanConvertToNewRing (List) := L -> (
     (ringMap, R2) := gfanConvertToNewRing ring L#0;
     toReturn = (ringMap, L/ringMap);
   )
+  else if class L === MarkedPolynomialList then (
+    (ringMap, R2) = gfanConvertToNewRing ring L#0#0;
+    toReturn = (ringMap, new MarkedPolynomialList from {L#0/ringMap, L#1/ringMap});
+  )
   else if class L#0 === MarkedPolynomialList then (
-    (ringMap, R2) = gfanConvertToNewRing ring L#0#1;
-    toReturn = (ringMap, for i in 0..#L-1 list (MarkedPolynomialList {L#i#0, L#i#1/(ringMap^-1)}));
-  ) 
+    (ringMap, R2) = gfanConvertToNewRing ring L#0#0#0;
+    toReturn = (ringMap, for i in 0..#L-1 list (new MarkedPolynomialList from {L#i#0/ringMap, L#i#1/ringMap}));
+  )
   else
     error "Unexpected input to gfanConvertToNewRing";
   toReturn
@@ -697,16 +704,23 @@ gfanConvertToNewRing (List, RingMap) := (L, ringMap) -> (
   if #L == 0 then (
     toReturn := L;
   )
+  --L is a list of polynomials
   else if class class L#0 === PolynomialRing then (
     toReturn = (ringMap, L/ringMap);
   )
+  --L is a MarkedPolynomialList
+  else if class L === MarkedPolynomialList then (
+    toReturn = (ringMap, new MarkedPolynomialList from {L#0/ringMap, L#1/ringMap});
+  )
+  --L is a list of MarkedPolynomialLists
   else if class L#0 === MarkedPolynomialList then (
-    toReturn = (ringMap, for i in 0..#L-1 list (MarkedPolynomialList {L#i#0, L#i#1/(ringMap^-1)}));
-  ) else
+    toReturn = (ringMap, for i in 0..#L-1 list (new MarkedPolynomialList from {L#i#0/ringMap, L#i#1/ringMap}));
+  )
+  else
     error "Unexpected input to gfanConvertToNewRing";
+
   toReturn
 )
-
 gfanConvertToNewRing (Ideal) := I -> (
   (ringMap, R2) := gfanConvertToNewRing ring I;
   return (ringMap, ringMap I);
@@ -715,8 +729,6 @@ gfanConvertToNewRing (Ideal, RingMap) := (I, ringMap) -> (
   return (ringMap, ringMap I);
 )
 
-
-
 gfanRevertToOriginalRing = method()
 gfanRevertToOriginalRing (PolynomialRing, RingMap) := (R, ringMap) -> (
   return source ringMap;
@@ -724,7 +736,6 @@ gfanRevertToOriginalRing (PolynomialRing, RingMap) := (R, ringMap) -> (
 gfanRevertToOriginalRing (Ideal, RingMap) := (I, ringMap) -> (
   return ringMap^-1 I;
 )
-
 gfanRevertToOriginalRing (List, RingMap) := (L, ringMap) -> (
   --If L is empty then return L
   if #L == 0 then (
@@ -736,14 +747,15 @@ gfanRevertToOriginalRing (List, RingMap) := (L, ringMap) -> (
   )
   --Check if L is a list of MarkedPolynomialLists
   else if class L#0 === MarkedPolynomialList then(
-    toReturn = for i in 0..#L-1 list (MarkedPolynomialList {L#i#0, L#i#1/(ringMap^-1)});
+    toReturn = for i in 0..#L-1 list (new MarkedPolynomialList from {L#i#0/(ringMap^-1), (L#i#1/(ringMap^-1))});
   )
   --Check if L is a MarkedPolynomialLists
   else if class L === MarkedPolynomialList then (
-    toReturn = MarkedPolynomialList {L#0, L#1/(ringMap^-1)};
+    toReturn = new MarkedPolynomialList from {L#0/(ringMap^-1), L#1/(ringMap^-1)};
   )
   else
     error "Unexpected input to gfanRevertToOriginalRing";
+  toReturn
 )
 
 --------------------------------------------------------
