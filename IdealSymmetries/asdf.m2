@@ -1,5 +1,15 @@
 --load "phcUtils.m2"
 
+---------------------------------------------------------------------
+----TODO:------------------------------------------------------------
+-------> Use the nice, triangular (decomposed?) Groebner basis-------
+---------to find the ZZ/2 solutions----------------------------------
+-------> Check these against original ideal to make sure they--------
+---------actually satisfy it-----------------------------------------
+-------> Write down S_n elements from these solutions----------------
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
 clearDenoms = p -> (
     return p*lcm(first entries transpose sub((coefficients p)_1,QQ) / denominator);
 )
