@@ -27,28 +27,20 @@ doStuff = I -> (
     justCs = coefficientRing R [myVars];
     csAsCoeffs := justCs[gens R];
     S := R ** justCs;
-    m := matrix pack(3,(gens S)_{n..(n+n^2-1)});
+    m := sub(matrix pack(3,gens justCs),S);
     combo := first entries transpose (m*(transpose matrix {(gens S)_{0..n-1}}));
     subList = for i in 0..n-1 list S_i => combo_i;
-    relationsOnC = flatten for row in entries m list (
-        {sum row - 1,row_0*row_1,row_1*row_2,row_0*row_2}
-        );
-    newI = substitute(I,S)+ideal relationsOnC;
+    relationsOnC = flatten for row in entries m list {sum row - 1};
     newI = substitute(I,S);
     firstPoly = substitute(substitute(I_0,S),subList);
-    modded = firstPoly % newI;
-    --o145 = first entries gens gb ideal flatten entries (coefficients substitute(modded,csAsCoeffs))_1;
-    o145 = flatten entries (coefficients substitute(modded,csAsCoeffs))_1;
-    --return sub(o145,justCs);
-    coeffLocus = ideal relationsOnC + substitute(ideal o145,S);
-    --return substitute(coeffLocus,justCs);
-    I1 = sub(ideal relationsOnC,justCs);
-    I2 = sub(ideal o145,justCs);
-    print getPHCsols I1;
-    print roundSols(getPHCsols I2);
-    print roundSols(getPHCsols ideal first entries gens gb (I1+I2));
+    polys = (I_*) / (a->substitute(substitute(a,S),subList));
+    modded = polys / (a-> a % newI);
+    coeffIdeal = sum (modded / (a->sub(a,csAsCoeffs)) / content);
+    coeffIdeal = coeffIdeal + sub(ideal relationsOnC,justCs);
+    return ideal first entries gens gb sub(coeffIdeal,ZZ/2[myVars,MonomialOrder => Lex]);
 )
 
 R = QQ[x,y,z];
 I = ideal {x+y^2+z^3, z+x^2+y^3,y+z^2+x^3};
 J = doStuff I;
+J
