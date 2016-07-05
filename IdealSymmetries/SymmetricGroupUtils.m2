@@ -1,5 +1,5 @@
-convertToCycles = method()
-convertToCycles (BasicList,ZZ) := (groupElement,n) -> (
+cycleToWordNotation = method()
+cycleToWordNotation (BasicList,ZZ) := (groupElement,n) -> (
     -- Converts a list of lists representing a symmetric group
     -- element sigma in cycle notation, to a list x such that 
     -- sigma sends i to x#i
@@ -12,6 +12,6 @@ convertToCycles (BasicList,ZZ) := (groupElement,n) -> (
     return toList toReturn;
 )
 
---print convertToCycles({{1,2},{3,4}},4);
---print convertToCycles({{1},{2,3,4}},5);
---print convertToCycles({{2,3,4}},6);
+--print cycleToWordNotation({{1,2},{3,4}},4);
+--print cycleToWordNotation({{1},{2,3,4}},5);
+--print cycleToWordNotation({{2,3,4}},6);
