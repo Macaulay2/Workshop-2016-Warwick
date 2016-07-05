@@ -1,0 +1,8 @@
+--Non-1,0 substitutions? i.e. x->2y, etc.
+--Check zero dim? Alternative to slack variables when very overdetermined?
+--Proof that coeff mod thing is valid--i.e. x,y swap works iff appropriate c substitution gives zero coeffs in modded poly
+--Poly mod portion over Z2--what would it mean? Would it find the symmetries?
+--Tests--random, cyclic n, etc.
+--One poly at a time. How to test other polys--actually swap, or find c-locus and substitute?
+
+--Literature on symmetry stuff? "Algorithms in Invariant Theory"?
