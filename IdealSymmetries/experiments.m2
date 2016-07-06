@@ -110,3 +110,38 @@ transpositions = for pt in pts list (
 )
 --load "SymmetricGroupUtils.m2";
 --transpositions / (a->convertToCycles({a},n))
+
+--compute a groebner basis, test permutations of variables
+factorialMethod = I -> (
+  gbI := gb I;
+  << "found gb" << endl;
+  ringI := ring I;
+  varsI := support I;
+  polys := first entries generators gbI;
+  perms := permutations varsI;
+  -- the first element is the trivial permutation, which doesn't need to be checked
+  perms = drop(perms,1);
+  << "number of perms to check: " << #perms << endl;
+
+  ignoreSet := set {};
+  mapList := new MutableList;
+  for i in 0..#polys-1 do (
+    for j in 0..#perms-1 do (
+      if member(j,ignoreSet) then continue;
+      if i == 0 then (
+        mapList#j = map(ringI,ringI,apply(varsI,perms#j, (k,l) -> k => l));
+      );
+      if ((mapList#j (polys#i)) % gbI) != 0 then (
+        ignoreSet = ignoreSet + set {j};
+      );
+    );
+  );
+
+  << "# perms found: " << #perms - #ignoreSet << endl;
+  
+  for i in 0..#perms-1 do (
+    if member(i,ignoreSet) then continue;
+    << perms#i << endl;
+  );
+)
+elapsedTime factorialMethod testIdeal 0
