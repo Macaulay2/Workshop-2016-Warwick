@@ -108,5 +108,6 @@ transpositions = for pt in pts list (
     m = matrix pack(n,pt);
     flatten entries (m*transpose matrix {toList (1..n)})
 )
+print transpositions;
 --load "SymmetricGroupUtils.m2";
 --transpositions / (a->convertToCycles({a},n))
