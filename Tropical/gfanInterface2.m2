@@ -678,14 +678,22 @@ gfanConvertToNewRing (PolynomialRing) := R1 -> (
   return (map(R2, R1, generatorMapping), R2);
 )
 
+gfanConvertToNewRing (RingElement) := f -> (
+  (ringMap, R) := gfanConvertToNewRing ring f;
+  return (ringMap, ringMap f)
+)
+
 gfanConvertToNewRing (List) := L -> (
-  --If L is empty then return L
-  if #L == 0 then (
+  --compute the completely flattened list of L
+  flatL := flattenRecursive L;
+  --If flatL is empty then return L
+  if #flatL == 0 then (
     toReturn := L;
   )
-  else if class class L#0 === PolynomialRing then (
-    (ringMap, R2) := gfanConvertToNewRing ring L#0;
-    toReturn = (ringMap, L/ringMap);
+  --Check if L is a nested list of polynomials
+  else if class class flatL#0 === PolynomialRing then (
+    (ringMap, R2) := gfanConvertToNewRing ring flatL#0;
+    toReturn = (ringMap, ringMapRecursive(L, ringMap));
   )
   else if class L === MarkedPolynomialList then (
     (ringMap, R2) = gfanConvertToNewRing ring L#0#0;
@@ -737,13 +745,15 @@ gfanRevertToOriginalRing (Ideal, RingMap) := (I, ringMap) -> (
   return ringMap^-1 I;
 )
 gfanRevertToOriginalRing (List, RingMap) := (L, ringMap) -> (
-  --If L is empty then return L
-  if #L == 0 then (
+  --compute the completely flattened list of L
+  flatL := flattenRecursive L;
+  --If flatL is empty then return L
+  if #flatL == 0 then (
     toReturn := L;
   )
-  --Check if L is a list of polynomials
-  else if class class L#0 === PolynomialRing then (
-    toReturn = L/(ringMap^-1);
+  --Check if L is a nested list of polynomials
+  else if class class flatL#0 === PolynomialRing then (
+    toReturn = inverseRingMapRecursive(L, ringMap);
   )
   --Check if L is a list of MarkedPolynomialLists
   else if class L#0 === MarkedPolynomialList then(
@@ -756,6 +766,29 @@ gfanRevertToOriginalRing (List, RingMap) := (L, ringMap) -> (
   else
     error "Unexpected input to gfanRevertToOriginalRing";
   toReturn
+)
+
+--applies the ringMap recursively to a nested list
+ringMapRecursive = (L, ringMap) -> (
+	apply(L, e -> if class e === List then ringMapRecursive(e,ringMap) else ringMap e)
+)
+
+--applies the inverse of the ringMap recursively to a nested list
+inverseRingMapRecursive = (L, ringMap) -> (
+	apply(L, e -> if class e === List then inverseRingMapRecursive(e,ringMap) else ringMap^-1 e)
+)
+
+--flattens a list until it does not contain lists any longer
+flattenRecursive = (L) -> (
+	if containsList(L) then return flattenRecursive flatten L;
+	L	
+)
+
+--checks if a list contains a list
+containsList = (L) -> (
+	toReturn := scan(L, e -> if class e === List then break true);
+	if toReturn === true then return true;
+	false
 )
 
 --------------------------------------------------------
