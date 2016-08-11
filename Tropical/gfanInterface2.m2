@@ -17,7 +17,7 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-	PackageExports => {"PolyhedralObjects"},
+	PackageExports => {"Polyhedra"},
 	DebuggingMode => true
 )
 
