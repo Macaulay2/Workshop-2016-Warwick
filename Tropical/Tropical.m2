@@ -141,7 +141,8 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 		    (if opt.computeMultiplicities==false 
 		     then gfanTropicalBruteForce gfanBuchberger I
 		--Cannot currently compute multiplicities for non-prime ideals
-		     else print  " Cannot compute multiplicities if ideal not prime"  )))
+		     else (F:=gfanTropicalBruteForce gfanBuchberger I;
+			 F)  )))
 
 
 --Main function to call for tropicalVariety.  Makes no assumption on ideal
