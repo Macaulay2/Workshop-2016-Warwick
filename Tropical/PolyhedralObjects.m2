@@ -89,10 +89,10 @@ doc ///
 		"PolyhedralObject"
 	Description
 		Text
-			{ PolyhedralObject} is the superclass of @TO"Polyhedron"@, @TO"Cone"@, @TO"Fan"@, and @TO "PolydralComplex"@.
+			{\tt PolyhedralObject} is the superclass of @TO"Polyhedron"@, @TO"Cone"@, @TO"Fan"@, and @TO "PolydralComplex"@.
 			It stores properties of polyhedral objects.
 
-			If the { PolyhedralObject} is obtained as output of the software Gfan via the gfanInterface2 package, then we store their own string representation ({ "GfanFileRawString"}), along with parsed blocks ({ "GfanFileRawBlocks"}) and a separated header ({ "GfanFileHeader"}).  The name of the Gfan file is stored in { "GfanFileName"}.
+			If the {\tt PolyhedralObject} is obtained as output of the software Gfan via the gfanInterface2 package, then we store their own string representation ({\tt "GfanFileRawString"}), along with parsed blocks ({\tt "GfanFileRawBlocks"}) and a separated header ({\tt "GfanFileHeader"}).  The name of the Gfan file is stored in {\tt "GfanFileName"}.
 
 		Example
 	SeeAlso
@@ -105,12 +105,12 @@ doc ///
 		"Fan"
 	Description
 		Text
-			A { Fan} is a type of @TO "PolymakeObject"@ which stores various information
-			about a polyhedral fan. A { Fan} is structured as @TO "HashTable"@ with strings for	keys that point to the stored information.
+			A {\tt Fan} is a type of @TO "PolymakeObject"@ which stores various information
+			about a polyhedral fan. A {\tt Fan} is structured as @TO "HashTable"@ with strings for	keys that point to the stored information.
 
 		Example
 		Text
-			Most of the keys refer to polyhedral information, while the keys starting with {"Gfan"} refers to parsing information.
+			Most of the keys refer to polyhedral information, while the keys starting with {\tt"Gfan"} refers to parsing information.
 
 	SeeAlso
 		PolyhedralObject
@@ -122,13 +122,13 @@ doc ///
 		"Cone"
 	Description
 		Text
-			A { Cone} is a type of @TO "PolyhedralObject"@ which stores various information
-			about a polyhedral cone. A { Cone} is structured as @TO "Hashtable"@ with strings for
+			A {\tt Cone} is a type of @TO "PolyhedralObject"@ which stores various information
+			about a polyhedral cone. A {\tt Cone} is structured as @TO "Hashtable"@ with strings for
 			keys that point to the stored information.
 
 		Example
 		Text
-			Most of the keys refer to polyhedral information, while the keys starting with {"Gfan"} refers to parsing information.
+			Most of the keys refer to polyhedral information, while the keys starting with {\tt"Gfan"} refers to parsing information.
 
 	SeeAlso
 		PolyhedralObject
