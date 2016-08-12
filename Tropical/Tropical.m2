@@ -22,7 +22,7 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-        PackageExports => {"PolyhedralObjects","gfanInterface2"},
+        PackageExports => {"gfanInterface2"},
 	DebuggingMode => true
 )
 
@@ -30,6 +30,7 @@ export {
   "TropicalCycle",
   "tropicalCycle",
   "isBalanced",
+  "isPolyhedralComplex",
   "tropicalPrevariety",
   "computeMultiplicities",
   "Prime",
@@ -39,11 +40,10 @@ export {
   "getRays",
   "getCones",
   "getDim",
+  "getAmbientDim",
   "getFVector",
   "getLinealitySpace",
-  "getMaximalCones",
-  "getPure",
-  "getSimplicial"
+  "getMaximalCones"
 }
 
 --???check syntax - idea is that this is where we should define local symbols
@@ -58,7 +58,7 @@ export {
 
 --Setting up the data type TropicalCycle
 
-TropicalCycle = new Type of Fan
+TropicalCycle = new Type of MutableHashTable
 TropicalCycle.synonym = "tropical cycle"
 TropicalCycle.GlobalAssignHook = globalAssignFunction
 TropicalCycle.GlobalReleaseHook = globalReleaseFunction
@@ -66,23 +66,22 @@ TropicalCycle.GlobalReleaseHook = globalReleaseFunction
 
 --basic operations on a tropical cycle
 
---TODO change to the following: TropicalCycle should not inherit from Fan, but it should have a fan and multiplicities as hash entries
 tropicalCycle = method(TypicalValue => TropicalCycle)
 
 tropicalCycle (Fan, List) := (F,mult)->(
-    if #F#"MaximalCones" != #mult then error("The multiplicity list has the wrong length");
-    T := new TropicalCycle from F;
+    if #maxCones(F) != #mult then error("The multiplicity list has the wrong length");
+    T := new TropicalCycle;
     T#"Multiplicities" = mult;
+    T#"Fan" = F;
     return T
 )    
 
-
 isBalanced = method(TypicalValue => Boolean)
 
-isBalanced (TropicalCycle):= F->(
+isBalanced (TropicalCycle):= T->(
 -- parse object into a polymake script, run polymake and get result back from the same file (which got overwritten by polymake)
 	filename := temporaryFileName();
-	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(F) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
+	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(T) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
@@ -92,14 +91,19 @@ isBalanced (TropicalCycle):= F->(
 
 
 
-
 isWellDefined TropicalCycle := Boolean =>
- F ->(
- -- Check that the fan is pure, and then call isBalanced   
-       if F#"Pure" then return(isBalanced(F)) else return(false);
+ T ->(
+ -- Check that the fan is well-defined and pure, and then call isBalanced   
+       if isPure(T) then return(isBalanced(T)) else return(false);
 )      
 
 
+isPolyhedralComplex = method(TypicalValue => Boolean)
+
+isPolyhedralComplex (TropicalCycle) := T ->(
+ -- Check that the fan is indeed a fan, and not just union of cones   
+	isWellDefined (T#"Fan")
+)      
 
 
 --Computing a tropical prevariety
@@ -245,33 +249,34 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 convertToPolymake = (T) ->(
 -- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
 --
+	F := T#"Fan";
 --check if given cycle is empty
-	if (T#"Dim" < 0) then (return "new Cycle<Min>(PROJECTIVE_VERTICES=>[],MAXIMAL_POLYTOPES=>[],WEIGHTS=>[]);";) else (
+	if (dim(F) < 0) then (return "new Cycle<Min>(PROJECTIVE_VERTICES=>[],MAXIMAL_POLYTOPES=>[],WEIGHTS=>[]);";) else (
 --if not empty, check if min- or max-convention is used
 	str := "new Cycle<";
 	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
-	rays := T#"Rays";
-	numberOfRays := #rays;
-	ambientDim := T#"AmbientDim";
---convert to polymake convection of rays: 1) add origin of the form (1,0,...,0)
+	rs := getRays T;
+	numberOfRays := #rs;
+	ambientDim := ambDim F;
+--convert to polymake convention of rays: 1) add origin of the form (1,0,...,0)
 	str = str|">(PROJECTIVE_VERTICES=>[[1";
 	local ray;
 	scan (ambientDim,i -> str = str|",0");
 	str = str|"]";
 --2) add overy ray with a leading 0
 	scan (numberOfRays,i -> (
-		ray = rays#i;
+		ray = rs#i;
 		str = str|",[0";
 		scan (ambientDim,j -> str = str|","|ray#j);
 		str = str|"]";
 	));
 --every cone must now also be spanned by the origin
 	str = str|"],MAXIMAL_POLYTOPES=>[";
-	maxCones := T#"MaximalCones";
-	numberOfMaxCones := #maxCones;
+	maxCs := maxCones(F);
+	numberOfMaxCones := #maxCs;
 	local cone;
 	scan (numberOfMaxCones,i -> (
-		cone = maxCones#i;
+		cone = maxCs#i;
 		str = str|"[0";
 		scan (#cone,j -> str = str|","|(cone#j+1));
 		str = str|"],";
@@ -293,69 +298,46 @@ convertToPolymake = (T) ->(
 
 
 --functions to get stuff from fans and tropical cycles
---TODO: uncomment getters after TropicalCycle does not inherit from Fan any longer
 
 getRays = method(TypicalValue => List)
 
-getRays (Fan) :=  F -> ( F#"Rays")
-
---getRays (TropicalCycle):= C->( getRays(C#"Fan"))
+getRays (TropicalCycle):= T->( entries transpose rays(T#"Fan"))
 
 
 getCones = method(TypicalValue => List)
 
-getCones (Fan) :=  F -> ( F#"Cones")
-
---getCones (TropicalCycle):= C->( getCones(C#"Fan"))
+getCones (ZZ,TropicalCycle):= (i,T)->( cones(i,T#"Fan"))
 
 
 getDim = method(TypicalValue => ZZ)
 
-getDim (Fan) :=  F -> ( F#"Dim")
-
---getDim (tropicalCycle):= C->( getDim(C#"Fan"))
+getDim (TropicalCycle):= T->( dim(T#"Fan"))
 
 
+getAmbientDim = method(TypicalValue => ZZ)
+
+getAmbientDim (TropicalCycle):= T->( ambDim(T#"Fan"))
+
+--TODO fix
 getFVector = method(TypicalValue => List)
 
-getFVector (Fan) :=  F -> ( F#"FVector")
-
---getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
-
-
-
+getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
 
 
 getLinealitySpace = method(TypicalValue => List)
 
-getLinealitySpace (Fan) :=  F -> ( F#"LinealitySpace")
-
---getLinealitySpace (TropicalCycle):= C->( getLinealitySpace(C#"Fan"))
-
-
+getLinealitySpace (TropicalCycle):= T->( linSpace(T#"Fan"))
 
 
 getMaximalCones = method(TypicalValue => List)
 
-getMaximalCones (Fan) :=  F -> ( F#"MaximalCones")
-
---getMaximalCones (TropicalCycle):= C->( getMaximalCones(C#"Fan"))
+getMaximalCones (TropicalCycle):= T->( maxCones(T#"Fan"))
 
 
-
-getPure = method(TypicalValue => Boolean)
-
-getPure (Fan) :=  F -> ( F#"Pure")
-
---getPure (TropicalCycle):= C->( getPure(C#"Fan"))
+isPure TropicalCycle := Boolean => T->( isPure(T#"Fan"))
 
 
-
-getSimplicial = method(TypicalValue => List)
-
-getSimplicial (Fan) :=  F -> ( F#"Simplicial")
-
---getSimplicial (TropicalCycle):= C->( getSimplicial(C#"Fan"))
+isSimplicial TropicalCycle:= Boolean => T->( isSimplicial(T#"Fan"))
 
 
 
@@ -408,6 +390,26 @@ doc ///
       	Example
 	    1+1	    
 ///
+
+doc ///
+    Key
+	(isPolyhedralComplex,TropicalCycle)
+    Headline
+	whether the underlying fan is really a fan.
+    Usage
+    	isPolyhedralComplex T
+    Inputs
+	T:TropicalCycle
+    Outputs
+    	B:Boolean
+    Description
+	Text
+    	    Checks if the underlying fan is indeed a fan
+    	    and not just a union of cones.
+      	Example
+	    1+1	    
+///
+
 
 doc ///
     Key
@@ -569,7 +571,7 @@ doc///
     Key
 	isTropicalBasis
 	(isTropicalBasis, List)
-	[tropicalPrevariety, Strategy]
+	[isTropicalBasis, Strategy]
     Headline
 	check if a list of polynomials is a tropical basis for the ideal they generate
     Usage
@@ -596,21 +598,19 @@ doc///
 doc///
     Key
 	getRays
-	(getRays, Fan)
+	(getRays, TropicalCycle)
         getCones
-	(getCones, Fan)
+	(getCones, ZZ, TropicalCycle)
 	getDim
-	(getDim, Fan)
+	(getDim, TropicalCycle)
+	getAmbientDim
+	(getAmbientDim, TropicalCycle)
         getFVector
-	(getFVector, Fan)
+	(getFVector, TropicalCycle)
 	getLinealitySpace
-	(getLinealitySpace, Fan)
+	(getLinealitySpace, TropicalCycle)
         getMaximalCones
-	(getMaximalCones, Fan)
-	getPure
-	(getPure, Fan)
-        getSimplicial
-	(getSimplicial, Fan)
+	(getMaximalCones, TropicalCycle)
 ///
 
 
