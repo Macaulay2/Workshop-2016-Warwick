@@ -392,6 +392,7 @@ gfanParseBoolInteger String := (s) -> s == "1\n"
 ------------------------------------------
 -- Gfan Parsing Polymake-style data
 ------------------------------------------
+
 gfanParsePolyhedralFan = method(TypicalValue => PolyhedralObject, Options => {"GfanFileName" => null, "TropicalMinConventionApplies" => false })
 gfanParsePolyhedralFan String := o -> s -> (
 	B := select(sublists(lines s, l -> #l =!= 0, toList, l -> null), l -> l =!= null);
