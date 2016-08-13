@@ -22,7 +22,7 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-        PackageExports => {"gfanInterface2"},
+        PackageExports => {"gfanInterface2","EliminationMatrices"},
 	DebuggingMode => true
 )
 
@@ -126,6 +126,90 @@ tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => fa
 
 --Computing a tropical variety
 
+
+computeCones=(R,M,L)->(
+      ConesOfVariety:={};
+      i:=0;
+      ConeOfVariety:={};
+     --this i is going through the maximal cones
+      while(i<#M) do(
+	  ConeOfVariety={};
+	  j:=0;
+     --this j is going through the rays inside the maximal cone you are in
+	  while(j<#M_i) do(
+	      --creates a list of rays
+	      ConeOfVariety=append(ConeOfVariety, R_(M_i_j));
+	  j=j+1);
+      -- creates a matrix whose rows are the rays of the cone
+     ConeOfVariety= ConeOfVariety|L;
+     -- each cone has to contain also the lineality space since we are not quotienting by it
+      ConeOfVariety = matrix ConeOfVariety ;
+      --add the cone to the list of cones
+      	  ConesOfVariety=append(ConesOfVariety,ConeOfVariety);
+	  i=i+1;
+	);
+    ConesOfVariety
+    )
+
+--input:rays,maximal cones and 
+--lineality space so you put getMaximalCones and getRays so the 
+--inputs are two lists
+--output:list of matrices
+-- note that ConesOfVariety is a local variable also in findMultiplicities
+findMultiplicity=(M,I)->(
+--compute vector w in relative interior in order to get the initial ideal
+    n:=numRows M - 1;
+    w:=flatten entries(-sum(0..n, j->M^{j}));
+--weight the ring according to this w 
+    R:=newRing(ring I, MonomialOrder=>{Weights=>w},Global=>false);
+    J:=sub(I,R);
+    K:=ideal(leadTerm(1,J));
+    InitialIdeal:=sub(K,ring I);
+--saturate the ideal with respect to the product of all the variables
+    listOfVariables:=gens (ring I);
+    j:=0;L:=1; while j<# listOfVariables do(
+	L=L* listOfVariables_j;
+	j=j+1
+	); 
+    Basis:= transpose((maxCol(transpose M))_0);
+    d:=dim (convexHull(Basis));
+    if d==0 
+    then 1
+ --since the volume of a point is 0 and 0! is 1, then you have to divide
+ --by the index but in this case is 1 
+    else 
+    (V:=d! * (volume(convexHull(Basis)));
+    IdealMinors:=minors(numRows Basis,Basis);
+    i:=0;
+    Minors:={};
+    while (i<numColumns gens IdealMinors) do ( 
+	Minors=append(Minors, (gens IdealMinors)_(0,i));i=i+1);
+    l:=gcd(Minors) ;
+    V=V/l;
+    m:=degree(saturate(InitialIdeal,L))/V
+    )    
+)
+--input Matrix whose rows are the generators of the cone and the ideal of the variety
+--output a list of one number that is the multiplicity
+--maths behind it look at exercise 34 chapter 3 Tropical book and [Stu96]
+--(Grobner basis and Convex Polytopes ) 
+findMultiplicities=(I,T)->(
+	ConesOfVariety:={};
+	M:={};
+	ConesOfVariety=computeCones(rays T,maxCones T,linSpace T);
+      --creates a list with matrices that correspond to the maximal cones
+	i:=0;
+	while(i<#ConesOfVariety)do(
+       --for each cone computes the multiplicity and adds this to a list of multiplicities
+	    M=append(M,findMultiplicity(ConesOfVariety_i,I));
+	    i=i+1;
+	    );
+	--call the function tropicalCycle to create a new tropical variety with multiplicities
+	M
+)
+--input: the ideal of the variety and the tropical variety computed by gfanbruteforce
+--output: list with the multiplicities to add to the tropicalCycle 
+
 tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	computeMultiplicities => true,
 	Prime => true
@@ -143,10 +227,17 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 		else
 		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
 		    (if opt.computeMultiplicities==false 
-		     then gfanTropicalBruteForce gfanBuchberger I
-		--Cannot currently compute multiplicities for non-prime ideals
+		     then (F:=gfanTropicalBruteForce gfanBuchberger I;
+			   mult := {{}};
+			   i:=0;
+			   while(i<#maxCones F)do(
+			       mult=append(mult,{});
+			       i=i+1);
+			   tropicalCycle(F,mult)
+	    	    	   )
 		     else (F:=gfanTropicalBruteForce gfanBuchberger I;
-			 F)  )))
+			 tropicalCycle(F,findMultiplicities(I,F))
+			 )  )))
 
 
 --Main function to call for tropicalVariety.  Makes no assumption on ideal
