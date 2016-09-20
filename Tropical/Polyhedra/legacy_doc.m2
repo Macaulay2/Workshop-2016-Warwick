@@ -72,7 +72,7 @@ document {
      
      EXAMPLE {
 	  " rays P",
-	  " linSpace P"
+	  " linealitySpace P"
 	  },
      
      PARA{}, "Furthermore, we can construct the convex hull of a set of points and a set of rays.",
@@ -113,7 +113,7 @@ document {
      EXAMPLE {
 	  " P3 = intersection(HS,v)",
 	  " vertices P3",
-	  " linSpace P3"
+	  " linealitySpace P3"
 	  },
      
      PARA{}, "Note that the vertices are given modulo the lineality space. Besides constructing 
@@ -208,7 +208,8 @@ document {
      
      EXAMPLE {
 	  " L = faces(1,P11)",
-	  " apply(L,vertices)"
+     " vertP11 = vertices P11",
+	  " apply(L, l -> vertP11_(l#0))"
 	  },
      
      PARA{}, "We can compute all lattice points of the polyhedron with ",TO latticePoints,".",
@@ -290,7 +291,7 @@ document {
      EXAMPLE {
 	  " C3 = intersection HS",
 	  " rays C3",
-	  " linSpace C3"
+	  " linealitySpace C3"
 	  },
      
      PARA{}, "Again, the rays are given modulo the lineality space. Also, one can use 
@@ -315,7 +316,7 @@ document {
      EXAMPLE {
 	  " C6 = posHull(C1,C2)",
 	  " rays C6",
-	  " linSpace C6"
+	  " linealitySpace C6"
 	  },
 
      PARA{}, "Furthermore, both functions (",TO intersection," and ",TO posHull,") can 
@@ -327,7 +328,7 @@ document {
 	  " R2 = matrix {{2,-1},{-1,2},{-1,-1}}",
 	  " C7 = posHull {R2,C3,C4}",
 	  " rays C7",
-	  " linSpace C7"
+	  " linealitySpace C7"
 	  },
      
      PARA{}, "Since they are all cones their positive hull is the same as their 
@@ -353,7 +354,7 @@ document {
      EXAMPLE {
 	  " C8 = C * C1",
 	  " rays C8",
-	  " linSpace C8"
+	  " linealitySpace C8"
 	  },
      
      PARA{}, "The result is in QQ^5.",
@@ -374,20 +375,14 @@ document {
      
      EXAMPLE {
 	  " L = faces(1,C8)",
-	  " apply(L,rays)"
+     " raysC8 = rays C8",
+	  " apply(L, l -> raysC8_l)"
 	  },
      
      PARA{}, "We can also check if the cone is smooth:",
      
      EXAMPLE {
 	  " isSmooth C8"
-	  },
-     
-     PARA{}, "Evenmore we can compute the Hilbert basis of the cone with ",TO hilbertBasis,".",
-     
-     EXAMPLE {
-	  " L = hilbertBasis C8",
-	  " #L"
 	  },
      
      PARA{}, "Finally, there is also a function to compute the dual cone, i.e. 
@@ -470,12 +465,6 @@ document {
 	  " F1 = addCone( {C6,C7}, F1)",
 	  },
      
-     PARA{}, "Finally, we can add a whole fan to another fan:",
-     
-     EXAMPLE {
-	  " F1 = addCone(F,F1)"
-	  },
-     
      PARA{}, "So, ",TO fan," and ",TO addCone," are the methods to construct 
      fans ''from scratch'', but there are also methods to get fans directly, for example ",TO normalFan,", 
      which constructs the inner normal fan of a polytope.",
@@ -551,10 +540,10 @@ document {
      }
 
 document {
-     Key => PolyhedraHash,
+     Key => PolyhedralObject,
      Headline => "the class of all polyhedral objects in Polyhedra",
           
-     TT "PolyhedraHash"," is the parent class of the four polyhedral objects in Polyhedra:",
+     TT "PolyhedralObject"," is the parent class of the four polyhedral objects in Polyhedra:",
      
      UL {
 	  {TO "Cone"},
@@ -1081,7 +1070,7 @@ document {
      }
 
 document {
-     Key => {addCone, (addCone,Cone,Fan), (addCone,List,Fan), (addCone,Fan,Fan)},
+     Key => {addCone, (addCone,Cone,Fan), (addCone,List,Fan)},
      Headline => "adds cones to a Fan",
      Usage => " F1 = addCone(C,F) \nF1 = addCone(L,F)",
      Inputs => {
@@ -1132,7 +1121,7 @@ document {
      }
 
 document {
-     Key => {addPolyhedron, (addPolyhedron,Polyhedron,PolyhedralComplex), (addPolyhedron,List,PolyhedralComplex), (addPolyhedron,PolyhedralComplex,PolyhedralComplex)},
+     Key => {addPolyhedron, (addPolyhedron,Polyhedron,PolyhedralComplex), (addPolyhedron,List,PolyhedralComplex)},
      Headline => "adds Polyhedra to a PolyhedralComplex",
      Usage => " PC1 = addPolyhedron(P,PC) \nPC1 = addPolyhedron(L,PC)",
      Inputs => {
@@ -1186,7 +1175,7 @@ document {
      }
 
 document {
-     Key => {ambDim, (ambDim,PolyhedraHash)},
+     Key => {ambDim, (ambDim,PolyhedralObject)},
      Headline => "ambient dimension of a Polyhedron, Cone or Fan",
      Usage => "d = ambDim P \nd = ambDim C \nd = ambDim F",
      Inputs => {
@@ -1232,7 +1221,8 @@ document {
      rays, for example:",
      
      EXAMPLE {
-	  " apply(L,rays)"
+     " raysF = rays F",
+	  " apply(L, c -> raysF_c)"
 	  }
      
      }
@@ -1261,7 +1251,8 @@ document {
      vertices, for example:",
      
      EXAMPLE {
-	  " apply(L,vertices)"
+     " vertPC = vertices PC",
+	  " apply(L, l -> vertPC_(l#0))"
 	  }
      
      }
@@ -1285,7 +1276,8 @@ document {
      EXAMPLE {
 	  " F = normalFan crossPolytope 3",
 	  " L = maxCones F",
-	  " apply(L,rays)"
+     " raysF = rays F",
+	  " apply(L, mc -> raysF_mc)"
 	  }
      
      }
@@ -1309,13 +1301,14 @@ document {
      EXAMPLE {
 	  " PC = skeleton(1,polyhedralComplex hypercube 2)",
 	  " L = maxPolyhedra PC",
-	  " apply(L,vertices)"
+     " vertPC = vertices PC",
+	  " apply(L, mp -> vertPC_(mp#0))"
 	  }
      
      }
 
 document {
-     Key => {halfspaces, (halfspaces,PolyhedralObject)},
+     Key => {halfspaces, (halfspaces, Cone), (halfspaces, Polyhedron)},
      Headline => "computes the defining half-spaces of a Cone or a Polyhedron",
      Usage => " M = halfspaces C \n(M,v) = halfspaces P",
      Inputs => {
@@ -1356,7 +1349,7 @@ document {
      }
 
 document {
-     Key => {hyperplanes, (hyperplanes,PolyhedralObject)},
+     Key => {hyperplanes, (hyperplanes, Cone), (hyperplanes, Polyhedron)},
      Headline => "computes the defining hyperplanes of a Cone or a Polyhedron",
      Usage => " N = hyperplanes C \n(N,w) = hyperplanes P",
      Inputs => {
@@ -1390,19 +1383,17 @@ document {
      }
 
 document {
-     Key => {linSpace, (linSpace,Fan), (linSpace,PolyhedralObject)},
+     Key => {linealitySpace, (linealitySpace, PolyhedralObject)},
      Headline => "computes a basis of the lineality space",
-     Usage => " LS = linSpace C \nLS = linSpace F \nLS = linSpace P",
+     Usage => " LS = linealitySpace C \nLS = linealitySpace F \nLS = linealitySpace P",
      Inputs => {
-	  "C" => Cone,
-	  "F" => Fan,
-	  "P" => Polyhedron
+	  "PO" => PolyhedralObject
 	  },
      Outputs => {
 	  "LS" => Matrix
 	  },
      
-     PARA{}, TT "linSpace", " returns a basis of the lineality space of the 
+     PARA{}, TT "linealitySpace", " returns a basis of the lineality space of the 
      input as the columns of the matrix ", TT "LS", ". The lineality space of a 
      Fan is the lineality space of any Cone of the Fan, since they all have the 
      same lineality space.",
@@ -1411,21 +1402,19 @@ document {
 	  " M = matrix {{1,1,1},{0,1,0},{-1,1,-1},{-1,-1,-1},{0,-1,0},{1,-1,1}};",
 	  " v = matrix {{2},{1},{2},{2},{1},{2}};",
 	  " P = intersection(M,v)",
-	  " linSpace P",
+	  " linealitySpace P",
 	  " C = dualCone intersection M",
-	  " linSpace C"
+	  " linealitySpace C"
 	  }
      
      }
 
 document {
-     Key => {rays, (rays,Fan), (rays,PolyhedralObject)},
+     Key => {(rays,PolyhedralObject)},
      Headline => "displays all rays of a Cone, a Fan, or a Polyhedron",
-     Usage => " R = rays C \nR = rays F \nR = rays P",
+     Usage => " R = rays F \nR = rays P",
      Inputs => {
-	  "C" => Cone,
-	  "F" => Fan,
-	  "P" => Polyhedron
+	  "PO" => PolyhedralObject
 	  },
      Outputs => {
 	  "R" => Matrix
@@ -1621,7 +1610,7 @@ document {
      }
 
 document {
-     Key => {isComplete, (isComplete,PolyhedralObjectFamily)},
+     Key => {isComplete, (isComplete, Fan), (isComplete, PolyhedralComplex)},
      Headline => "checks completeness of a Fan or PolyhedralComplex",
      Usage => " b = isComplete X",
      Inputs => {
@@ -1816,7 +1805,7 @@ document {
      }
 
 document {
-     Key => {isPure,(isPure,PolyhedralObjectFamily)},
+     Key => {isPure,(isPure, Fan), (isPure, PolyhedralComplex)},
      Headline => "checks if a Fan or PolyhedralComplex is of pure dimension",
      Usage => " b = isPure X",
      Inputs => {
@@ -1843,7 +1832,8 @@ document {
      orthant and take the cone generated by this face and ",TT "v"," and add it to the cone:",
      
      EXAMPLE {
-	  " C1 = posHull{(faces(1,C))#0,v}",
+	  " C1 = posHull (rays C)_((faces(1,C))#0)",
+     " C1 = posHull(C1, v)",
 	  " F = addCone(C1,F)",
 	  " isPure F"
 	  }
@@ -1877,14 +1867,14 @@ document {
      }
 
 document {
-     Key => {isSimplicial, (isSimplicial,PolyhedraHash)},
+     Key => {isSimplicial, (isSimplicial,PolyhedralObject)},
      Headline => " checks if a polyhedral object is simplicial",
      Usage => " b = isSimplicial X",
      Inputs => {
-	  "X" => PolyhedraHash
+	  "X" => PolyhedralObject
 	  },
      Outputs => {
-	  "b" => {TO true," if the ",TO PolyhedraHash," is simplicial, ",TO false," otherwise"}
+	  "b" => {TO true," if the ",TO PolyhedralObject," is simplicial, ",TO false," otherwise"}
 	  },
      
      PARA{},"A ",TO Polyhedron," of dimension ",TEX///$d$///," is simplicial if it is compact and 
@@ -1972,174 +1962,17 @@ document {
 	  }
      }	  
 
-document {
-     Key => dualFaceLattice,
-     Headline => "computes the dual face lattice of a cone or polyhedron"
-     }
 
 document {
-     Key => {(dualFaceLattice,ZZ,Cone), (dualFaceLattice,Cone)},
-     Headline => "computes the dual face lattice of a cone",
-     Usage => " L = dualFaceLattice C \nL = dualFaceLattice(k,C)",
-     Inputs => {
-	  "k" => ZZ => {"between 0 and the dimension of ",TT "C"},
-	  "C" => Cone
-   	  },
-     Outputs => {
-	  "L" => List
-	  },
-     
-     PARA{}, "The dual face lattice of a cone ",TT "C"," displays for each",TT "k"," the faces of 
-     dimension ",TT "k"," as a list of integers, indicating the bounding halfspaces of ",TT "C"," that generate 
-     this face together with the hyperplanes. If no integer is given the function returns the faces of all dimensions in a list, 
-     starting with the Cone itself.",
-     
-     EXAMPLE{
-	  " C = posOrthant 4",
-	  " dualFaceLattice(2,C)"
-	  },
-     
-     PARA{}, "Returns the faces of dimension two, where the integers give the rows in the halfspaces
-     matrix of the cone:",
-     
-     EXAMPLE{
-	  " R = halfspaces C"
-	  },
-     
-     PARA{}, "The complete dual face lattice is returned if no integer is given:",
-     
-     EXAMPLE{
-	  " dualFaceLattice C",
-	  }
-     }
-
-document {
-     Key => {(dualFaceLattice,ZZ,Polyhedron), (dualFaceLattice,Polyhedron)},
-     Headline => "computes the dual face lattice of a polyhedron",
-     Usage => " L = dualFaceLattice P \nL = dualFaceLattice(k,P)",
-     Inputs => {
-	  "k" => ZZ => {"between 0 and the dimension of ",TT "X"},
-	  "P" => Polyhedron
-	  },
-     Outputs => {
-	  "L" => List
-	  },
-     
-     PARA{}, "The dual face lattice of a polyhedron ",TT "P"," displays for each",TT "k"," the faces of 
-     dimension ",TT "k"," as a list of integers, indicating the halfspaceces of ",TT "P"," that generate this 
-     face together with the hyperplanes. If no integer is given the function returns the faces of all dimensions 
-     in a list, starting with the polyhedron itself.",
-     
-     EXAMPLE{
-	  " P = convexHull(matrix{{1,1,-1,-1},{1,-1,1,-1},{1,1,1,1}},matrix {{0},{0},{-1}})",
-	  " dualFaceLattice(2,P)"
-	  },
-     
-     PARA{}, "Returns the faces of dimension two where each list of integers gives the rows in the halfspaces
-     matrix of the polyhedron:",
-     
-     EXAMPLE{
-	  " V = halfspaces P"
-	  },
-     
-     PARA{}, "The complete face lattice is returned if no integer is given:",
-     
-     EXAMPLE{
-	  " faceLattice P",
-	  }
-     }
-
-document {
-     Key => faceLattice,
-     Headline => "computes the face lattice of a cone or polyhedron"
-     }
-
-document {
-     Key => {(faceLattice,ZZ,Cone), (faceLattice,Cone)},
-     Headline => "computes the face lattice of a cone",
-     Usage => " L = faceLattice C \nL = faceLattice(k,C)",
-     Inputs => {
-	  "k" => ZZ => {"between 0 and the dimension of ",TT "C"},
-	  "C" => Cone
-	  },
-     Outputs => {
-	  "L" => List
-	  },
-     
-     PARA{}, "The face lattice of a cone ",TT "C"," displays for each",TT "k"," the faces of 
-     codimension ",TT "k"," as a list of integers, indicating the rays of ",TT "C"," that generate 
-     this face together with the lineality space. If no integer is given the function returns the faces of all codimensions in a list, 
-     starting with the 0 dimensional face.",
-     
-     EXAMPLE{
-	  " C = posOrthant 4",
-	  " faceLattice(1,C)"
-	  },
-     
-     PARA{}, "Returns the faces of codimension one where the integers give the columns in the rays 
-     matrix of the cone:",
-     
-     EXAMPLE{
-	  " R = rays C"
-	  },
-     
-     PARA{}, "The complete face lattice is returned if no integer is given:",
-     
-     EXAMPLE{
-	  " faceLattice C",
-	  }
-     }
-
-document {
-     Key => {(faceLattice,ZZ,Polyhedron), (faceLattice,Polyhedron)},
-     Headline => "computes the face lattice of a polyhedron",
-     Usage => " L = faceLattice P \nL = faceLattice(k,P)",
-     Inputs => {
-	  "k" => ZZ => {"between 0 and the dimension of ",TT "P"},
-	  "P" => Polyhedron
-	  },
-     Outputs => {
-	  "L" => List
-	  },
-     
-     PARA{}, "The face lattice of a polyhedron ",TT "P"," displays for each",TT "k"," the faces of 
-     codimension ",TT "k"," as two lists of integers, the first indicating the vertices of ",TT "P"," and 
-     the second indicating the rays of ",TT "P"," that generate this face together with the lineality space. 
-     If no integer is given the function returns the faces of all codimensions in a list, 
-     starting with the 0 dimensional faces",
-     
-     EXAMPLE{
-	  " P = convexHull(matrix{{1,1,-1,-1},{1,-1,1,-1},{1,1,1,1}},matrix {{0},{0},{-1}})",
-	  " faceLattice(1,P)"
-	  },
-     
-     PARA{}, "Returns the faces of codimension one where the first list of integers give the columns in the vertices
-     matrix of the polyhedron and the second list the columns in the rays matrix of the polyhedron:",
-     
-     EXAMPLE{
-	  " V = vertices P",
-	  " R = rays P"
-	  },
-     
-     PARA{}, "The complete face lattice is returned if no integer is given:",
-     
-     EXAMPLE{
-	  " faceLattice P",
-	  }
-     }
-
-
-document {
-     Key => {faces, (faces,ZZ,Cone), (faces,ZZ,Polyhedron)},
+     Key => {faces, (faces,ZZ,Polyhedron), (faces,ZZ,Cone)},
      Headline => "computes all faces of a certain codimension of a Cone or Polyhedron",
      Usage => " L = faces(k,C) \nL = faces(k,P)",
      Inputs => {
 	  "k" => ZZ,
-	  "C" => Cone,
-	  "P" => Polyhedron
+	  "P" => PolyhedralObject
 	  },
      Outputs => {
-	  "L" => List => {"containing the faces of codimension ",TT "k"}
+	  "L" => List => {"containing the indices of the vertices/rays used in the codim  ",TT "k", "faces of ", TT "P"}
 	  },
      
      PARA{}, TT "faces"," computes the faces of codimension ",TT "k"," of the given ",TO Cone," 
@@ -2156,17 +1989,17 @@ document {
      PARA{}, "Since this is only a list of polyhedra we look at their vertices:",
      
      EXAMPLE {
-	  " apply(L,vertices)"
+     " vertP = vertices P",
+	  " apply(L, f -> vertP_(f#0))"
 	  }
      }
 
 document {
-     Key => {fVector, (fVector,Cone), (fVector,Polyhedron)},
+     Key => {fVector, (fVector, Cone), (fVector,Polyhedron)},
      Headline => "computes the f-vector of a Cone or Polyhedron",
      Usage => " f = fVector C \nf = fVector P",
      Inputs => {
-	  "C" => Cone,
-	  "P" => Polyhedron
+	  "P" => PolyhedralObject
 	  },
      Outputs => {
 	  "L" => List => {"containing the number of faces for each codimension"}
@@ -2185,7 +2018,7 @@ document {
      }
 
 document {
-     Key => {hilbertBasis, (hilbertBasis,Cone)},
+     Key => {(hilbertBasis,Cone)},
      Headline => "computes the Hilbert basis of a Cone",
      Usage => " HB = hilbertBasis C",
      Inputs => {
@@ -2657,7 +2490,8 @@ document {
 	  " P = convexHull matrix{{1,0,0,0},{0,1,0,0},{0,0,1,0}}",
 	  " F = normalFan P",
 	  " F1 = skeleton(2,F)",
-	  " apply(maxCones F1,rays)"
+     " raysF = rays F",
+	  " apply(maxCones F1, mc -> raysF_mc)"
 	  },
      
      PARA{}, "For a ",TO PolyhedralComplex,TT " PC"," and an integer ",TT "k"," between 0 and the dimension of ",TT "PC",", 
@@ -2668,7 +2502,8 @@ document {
      EXAMPLE {
 	  " PC = polyhedralComplex hypercube 3",
 	  " PC1 = skeleton(2,PC)",
-	  " apply(maxPolyhedra PC1,vertices)"
+     " vertPC1 = vertices PC1",
+	  " apply(maxPolyhedra PC1, mp -> vertPC1_(mp#0))"
 	  }
      
      }
@@ -2730,7 +2565,8 @@ document {
      
      EXAMPLE {
 	  " F1 = smoothSubfan F",
-	  " apply(maxCones F1, rays)"
+     " raysF1 = rays F1",
+	  " apply(maxCones F1, mc -> raysF1_mc)"
 	  }
      
      }
@@ -2888,7 +2724,7 @@ document {
      EXAMPLE {
 	  " P = stdSimplex 3",
 	  " Q = affineHull P",
-	  " linSpace Q"
+	  " linealitySpace Q"
 	  }
      
      }
@@ -3108,9 +2944,9 @@ document {
      }
 
 document {
-     Key => {coneToPolyhedron, (coneToPolyhedron,Cone)},
+     Key => {(polyhedron,Cone)},
      Headline => "converts a cone to class Polyhedron",
-     Usage => " P = coneToPolyhedron C",
+     Usage => " P = polyhedron C",
      Inputs => {
 	  "C" => Cone
 	  },
@@ -3118,7 +2954,7 @@ document {
 	  "P" => Polyhedron
 	  },
      
-     PARA{}, "Every ",TO Cone," is in particular a ",TO Polyhedron,". ",TT "coneToPolyhedron"," 
+     PARA{}, "Every ",TO Cone," is in particular a ",TO Polyhedron,". ",TT "polyhedron"," 
      converts the cone into the same cone but of class ",TO Polyhedron,".",
      
      PARA{}, "Consider the positive orthant in ",TO QQ,"^3:",
@@ -3128,10 +2964,10 @@ document {
 	  },
      
      PARA{}, "If we want to consider the positive orthant not as cone but as a polyhedron we 
-     apply ",TT "coneToPolyhedron",":",
+     apply ",TT "polyhedron",":",
      
      EXAMPLE {
-	  " P = coneToPolyhedron C"
+	  " P = polyhedron C"
 	  },
      
      PARA{}, "Although, they are the same geometric object but of different classes, Polyhedra 
@@ -3244,7 +3080,8 @@ document {
      EXAMPLE {
 	  " P = hypercube 2",
 	  " F = faceFan P",
-	  "apply(maxCones F, rays)"
+     " raysF = rays F",
+	  "apply(maxCones F, mc -> raysF_mc)"
 	  }
      }
 
@@ -3322,7 +3159,8 @@ document {
      EXAMPLE {
 	  " P = convexHull matrix{{1,0,0},{0,1,0}}",
 	  " F = normalFan P",
-	  " apply(maxCones F,rays)"
+     " raysF = rays F",
+	  " apply(maxCones F, mc -> raysF_mc)"
 	  }
      
      }
@@ -3350,18 +3188,18 @@ document {
      }
 
 document {
-     Key => {polarFace, (polarFace,Polyhedron)},
+     Key => {polarFace, (polarFace,Polyhedron,Polyhedron)},
      Headline => " computes the dual face of the polar polyhedron",
      Usage => " fv = polarFace f",
      Inputs => {
-	  "f" => Polyhedron
+	  "f" => Polyhedron,
+     "P" => Polyhedron
 	  },
      Outputs => {
 	  "fv" => Polyhedron
 	  },
      
-     PARA{}, "When computing a face ",TT "f"," of a polyhedron ",TT "P"," with the function ",TO faces,", 
-     it is stored in the cache that ",TT "f"," is a face of ",TT "P",". Then the function ",TT "polarFace"," 
+     PARA{}, "Given a polyhedron ",TT "f"," which is a face of a polyhedron ",TT "P"," the function ",TT "polarFace"," 
      computes the ",TO polar," ",TT "P'"," of ",TT "P"," and the corresponding face of ",TT "P'"," on which 
      all points of ",TT "f"," attain their minimum. Note that this function only works correctly for polyhedra 
      with the origin in its relative interior.",
@@ -3369,7 +3207,8 @@ document {
      EXAMPLE {
 	  " P = hypercube 3",
 	  " f = first faces(1,P)",
-	  " fv = polarFace f",
+     " f = convexHull (vertices P)_(f#0)",
+	  " fv = polarFace(f, P)",
 	  " vertices fv"
 	  },
      
@@ -3379,7 +3218,7 @@ document {
      
      EXAMPLE {
 	  " P = hypercube 3",
-	  " polarFace P"
+	  " polarFace(P, P)"
 	  }
      
      }
@@ -3581,7 +3420,8 @@ document {
      
      EXAMPLE {
 	  " F = hirzebruch 3",
-	  " apply(maxCones F,rays)"
+     " raysF = rays F",
+	  " apply(maxCones F, mc -> raysF_mc)"
 	  }
      
      }
@@ -4053,11 +3893,11 @@ document {
      }
 
 document {
-     Key => {(dim,PolyhedraHash)},
+     Key => {(dim,PolyhedralObject)},
      Headline => "computes the dimension of a cone, polyhedron, fan or polyhedral complex",
-     Usage => " d = dim PH",
+     Usage => " d = dim PO",
      Inputs => {
-	  "PH" => PolyhedraHash
+	  "PO" => PolyhedralObject
 	  },
      Outputs => {
 	  "d" => ZZ
@@ -4098,85 +3938,6 @@ document {
 }
 
 
-document {
-     Key => (net,Cone),
-     Headline => "displays characteristics of a cone",
-     Usage => " net C",
-     Inputs => {
-	  "C" => Cone
-	  },
-          
-     PARA{}, "Displays an overview of the properties of the 
-     cone, the ambient dimension, the dimension of the lineality 
-     space, the dimension of the cone, the number of facets, and 
-     the number of rays.",
-     
-     EXAMPLE {
-	  " C = posHull matrix {{1,2,3},{2,3,1},{3,1,2},{1,0,1}};",
-	  " net C"
-	  }
-     
-     }
-
-document {
-     Key => (net,Fan),
-     Headline => "displays characteristics of a fan",
-     Usage => " net F",
-     Inputs => {
-	  "F" => Fan
-	  },
-     
-     PARA{}, "Displays an overview of the properties of the 
-     Fan, the ambient dimension, the number of generating 
-     cones, the number of rays, and the top dimension of 
-     the cones.",
-     
-     EXAMPLE {
-	  " F = normalFan cyclicPolytope(3,5);",
-	  " net F"
-	  }
-     
-     }
-
-document {
-     Key => (net,PolyhedralComplex),
-     Headline => "displays characteristics of a polyhedral complex",
-     Usage => " net PC",
-     Inputs => {
-	  "PC" => PolyhedralComplex
-	  },
-     
-     PARA{}, "Displays an overview of the properties of the 
-     PolyhedralComplex, the ambient dimension, the number of generating 
-     polyhedra, and the top dimension of the polyhedra.",
-     
-     EXAMPLE {
-	  " PC = polyhedralComplex faces(2,hypercube 3)",
-	  " net PC"
-	  }
-     
-     }
-
-document {
-     Key => (net,Polyhedron),
-     Headline => "displays characteristics of a polyhedron",
-     Usage => " net P",
-     Inputs => {
-	  "P" => Polyhedron
-	  },
-     
-     PARA{}, "Displays an overview of the properties of the 
-     Polyhedron, the ambient dimension, the dimension of the 
-     lineality space, the dimension of the polyhedron, the 
-     number of facets, the number of rays, and the number of 
-     vertices.",
-     
-     EXAMPLE {
-	  " P = cyclicPolytope(4,6);",
-	  " net P"
-	  }
-     
-     }
 
 document {
      Key => {saveSession,(saveSession,String)},

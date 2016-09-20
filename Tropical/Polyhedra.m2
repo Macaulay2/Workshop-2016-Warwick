@@ -8,7 +8,7 @@
 ---------------------------------------------------------------------------
 newPackage("Polyhedra",
     Headline => "A package for computations with convex polyhedra",
-    Version => "1.3",
+    Version => "1.9",
     Date => "August 21, 2014",
     AuxiliaryFiles => true,
     Certification => {
@@ -28,7 +28,8 @@ newPackage("Polyhedra",
          {Name => "René Birkner",
 	  HomePage => "http://page.mi.fu-berlin.de/rbirkner/index.htm",
 	  Email => "rbirkner@mi.fu-berlin.de"}},
-    DebuggingMode => false
+    DebuggingMode => false,
+    PackageExports=>{"FourTiTwo"}
     )
 
 ---------------------------------------------------------------------------
