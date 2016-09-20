@@ -109,8 +109,6 @@ transpositions = for pt in pts list (
     flatten entries (m*transpose matrix {toList (1..n)})
 )
 print transpositions;
---load "SymmetricGroupUtils.m2";
---transpositions / (a->convertToCycles({a},n))
 
 --compute a groebner basis, test permutations of variables
 factorialMethod = I -> (
@@ -145,4 +143,4 @@ factorialMethod = I -> (
     << perms#i << endl;
   );
 )
-elapsedTime factorialMethod testIdeal 0
+elapsedTime factorialMethod testIdeal 1
