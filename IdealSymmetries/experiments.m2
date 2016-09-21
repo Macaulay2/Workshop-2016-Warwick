@@ -19,7 +19,9 @@ symmetryIdeals = I -> (
     -- variables whose solutions are ideal-respecting
     -- variable swaps. Returns a tuple of this as an ideal
     -- in Z/2 and over the original coefficient ring.
-    n := numgens ring I;
+    curTime = currentTime();
+    R = ring I;
+    n := numgens R;
     myVars := c_(1,1)..c_(n,n);
     justCs := coefficientRing R [myVars];
     csAsCoeffs := justCs[gens R];
@@ -29,6 +31,7 @@ symmetryIdeals = I -> (
     subList := for i in 0..n-1 list S_i => combo_i;
     polys := (I_*) / (a->substitute(substitute(a,S),subList));
 
+    print (currentTime()-curTime);
     diagProd := {product (for i in 1..n list sub(c_(i,i),S))};
     degreeLimiter := for x in gens justCs list sub(x^2-x,S);
     rowSums := flatten for row in entries m list {sum row - 1};
@@ -36,9 +39,12 @@ symmetryIdeals = I -> (
         flatten for i in 0..n-1 list for j in (i+1)..n-1 list row_i*row_j;
     relationsOnC := degreeLimiter | rowSums | diagProd | pairwiseProds;
 
-    newI := ideal relationsOnC + substitute(I,S);
-    --newI := ideal degreeLimiter + substitute(I,S);
+    print (currentTime()-curTime);
+    --newI := ideal relationsOnC + substitute(I,S);
+    newI := ideal degreeLimiter + substitute(I,S);
+    print (currentTime()-curTime);
     modded := polys / (a-> a % newI);
+    print (currentTime()-curTime);
     coeffIdeal := sum (modded / (a->sub(a,csAsCoeffs)) / content);
     coeffIdeal = sub(ideal relationsOnC,justCs) + coeffIdeal;
     coeffIdeal = ideal ((first entries gens coeffIdeal) / clearDenoms);
@@ -88,7 +94,7 @@ testIdeal = choice -> (
     return I;
 )
 
-I = testIdeal 0;
+I = testIdeal 2;
 J = symmetryIdeals I;
 switchOptionRing = opts -> (
     R = ring J_1;
@@ -143,4 +149,4 @@ factorialMethod = I -> (
     << perms#i << endl;
   );
 )
-elapsedTime factorialMethod testIdeal 1
+--elapsedTime factorialMethod testIdeal 1
