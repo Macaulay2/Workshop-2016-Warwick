@@ -119,7 +119,7 @@ findSymmetry List := polys-> (
             coefficientList#i = append(coefficientList#i,term#1);
         );
     );
-    numberOfVariables = #(termList#0#0) + 1;
+    numberOfVariables = #(termList#0#0) ;
 
     polysAsLists := makeConstIntoVar(termList);
     dreadnautStrs := callDreadnaut(createDreadnautString(polysAsLists, coefficientList));
