@@ -87,6 +87,10 @@ testIdeal = choice -> (
         R = QQ[vars {53..60}];
         I = ideal {1/2*x1*x2*x4 + x4^2*x7 - x1*x2 - 19*x3*x8 , -2*x2*x3^2 - 1/3*x3^2*x8 - 19/2*x8^3 - 1/8*x4*x7 - 1/2*x3*x8 , 30*x2^2*x4 + 3/2*x5*x6*x7 + 3*x6^2*x8 - 1/2*x5*x7 , 3*x3^2*x4 - x1*x6*x7 + x1*x2 + 2*x4*x8 , 1/2*x3*x5^2 - x4*x7^2 + x4*x6 + 2*x7 , -1/2*x1*x2*x4 - x2^2*x5 + 403/15*x1*x3*x6 - 4*x1*x7^2};
     )
+    else if choice==3 then (
+        R = QQ[x1,x2,x3,x4];
+        I = ideal {x1 + x2 + x3 + x4, x1*x2 + x2*x3 + x1*x4 + x3*x4, x1*x2*x3 + x1*x2*x4 + x1*x3*x4 + x2*x3*x4, x1*x2*x3*x4 - 1};
+    )
     else (
         R = QQ[x,y,z];
         I = ideal {x+y^2+z^3, z+x^2+y^3,y+z^2+x^3};
@@ -94,7 +98,7 @@ testIdeal = choice -> (
     return I;
 )
 
-I = testIdeal 2;
+I = testIdeal 4;
 J = symmetryIdeals I;
 switchOptionRing = opts -> (
     R = ring J_1;
