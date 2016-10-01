@@ -31,7 +31,6 @@ symmetryIdeals = I -> (
     subList := for i in 0..n-1 list S_i => combo_i;
     polys := (I_*) / (a->substitute(substitute(a,S),subList));
 
-    print (currentTime()-curTime);
     diagProd := {product (for i in 1..n list sub(c_(i,i),S))};
     degreeLimiter := for x in gens justCs list sub(x^2-x,S);
     rowSums := flatten for row in entries m list {sum row - 1};
@@ -39,17 +38,18 @@ symmetryIdeals = I -> (
         flatten for i in 0..n-1 list for j in (i+1)..n-1 list row_i*row_j;
     relationsOnC := degreeLimiter | rowSums | diagProd | pairwiseProds;
 
-    print (currentTime()-curTime);
+    print ("Time after computing ideal setup: "|toString(currentTime()-curTime));
     --newI := ideal relationsOnC + substitute(I,S);
     newI := ideal degreeLimiter + substitute(I,S);
-    print (currentTime()-curTime);
     modded := polys / (a-> a % newI);
-    print (currentTime()-curTime);
+    print ("Time after computing mods: "|toString(currentTime()-curTime));
     coeffIdeal := sum (modded / (a->sub(a,csAsCoeffs)) / content);
     coeffIdeal = sub(ideal relationsOnC,justCs) + coeffIdeal;
     coeffIdeal = ideal ((first entries gens coeffIdeal) / clearDenoms);
     Z2 := ZZ/2[myVars,MonomialOrder => Lex];
-    return (ideal first entries gens gb sub(coeffIdeal,Z2),coeffIdeal);
+    asdf := (ideal first entries gens gb sub(coeffIdeal,Z2),coeffIdeal);
+    print ("Time after computing Z2 gb: "|toString(currentTime()-curTime));
+    return asdf;
 )
 
 solveTriangular = I -> (
@@ -78,6 +78,29 @@ solveTriangular = I -> (
     return recurse(I,0);
 )
 
+
+idealSymmetry = I -> (
+    J := symmetryIdeals I;
+    switchOptionRing := opts -> (
+        return for opt in opts list (
+            sub(opt#0,ring J_1) => opt#1
+        );
+    );
+    testPoints := pts -> return select(pts,a -> sub(J_1,switchOptionRing a)==0);
+    pts := testPoints solveTriangular J_0;
+    pts = (for pt in pts list (
+        pt = new HashTable from pt;
+        apply(gens ring J_0,a->pt#a)
+    ));
+    n := numgens ring I;
+    transpositions := for pt in pts list (
+        m = matrix pack(n,pt);
+        flatten entries (m*transpose matrix {toList (1..n)})
+    );
+    return transpositions;
+)
+
+
 testIdeal = choice -> (
     if choice==1 then (
         R = QQ[vars {53..59}];
@@ -87,38 +110,27 @@ testIdeal = choice -> (
         R = QQ[vars {53..60}];
         I = ideal {1/2*x1*x2*x4 + x4^2*x7 - x1*x2 - 19*x3*x8 , -2*x2*x3^2 - 1/3*x3^2*x8 - 19/2*x8^3 - 1/8*x4*x7 - 1/2*x3*x8 , 30*x2^2*x4 + 3/2*x5*x6*x7 + 3*x6^2*x8 - 1/2*x5*x7 , 3*x3^2*x4 - x1*x6*x7 + x1*x2 + 2*x4*x8 , 1/2*x3*x5^2 - x4*x7^2 + x4*x6 + 2*x7 , -1/2*x1*x2*x4 - x2^2*x5 + 403/15*x1*x3*x6 - 4*x1*x7^2};
     )
-    else if choice==3 then (
-        R = QQ[x1,x2,x3,x4];
-        I = ideal {x1 + x2 + x3 + x4, x1*x2 + x2*x3 + x1*x4 + x3*x4, x1*x2*x3 + x1*x2*x4 + x1*x3*x4 + x2*x3*x4, x1*x2*x3*x4 - 1};
-    )
     else (
         R = QQ[x,y,z];
         I = ideal {x+y^2+z^3, z+x^2+y^3,y+z^2+x^3};
     );
-    return I;
+    return idealSymmetry I;
 )
 
-I = testIdeal 4;
-J = symmetryIdeals I;
-switchOptionRing = opts -> (
-    R = ring J_1;
-    return for opt in opts list (
-        sub(opt#0,R) => opt#1
-    );
+cyclicIdeal = n -> (
+    RX := QQ[vars(10..9+n)];
+    II := ideal (toList apply(1..n-1, d-> sum(0..n-1, 
+        i -> product(d, k -> RX_((i+k)%n))
+        )) | {product gens RX - 1});
+    return II;
+    return idealSymmetry II;
 )
-filterActualPoints = pts -> return select(pts,a -> sub(J_1,switchOptionRing a)==0);
-pts = solveTriangular J_0;
-pts = filterActualPoints pts;
-pts = (for pt in pts list (
-    pt = new HashTable from pt;
-    apply(myVars,a->pt#a)
-))
-n := numgens ring I;
-transpositions = for pt in pts list (
-    m = matrix pack(n,pt);
-    flatten entries (m*transpose matrix {toList (1..n)})
-)
-print transpositions;
+
+print idealSymmetry cyclicIdeal 5
+
+print testIdeal 3
+
+
 
 --compute a groebner basis, test permutations of variables
 factorialMethod = I -> (
@@ -153,4 +165,5 @@ factorialMethod = I -> (
     << perms#i << endl;
   );
 )
+--elapsedTime factorialMethod cyclicIdeal 5
 --elapsedTime factorialMethod testIdeal 1
