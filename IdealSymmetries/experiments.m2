@@ -22,7 +22,7 @@ symmetryIdeals = I -> (
     curTime = currentTime();
     R = ring I;
     n := numgens R;
-    myVars := c_(1,1)..c_(n,n);
+    myVars := cc_(1,1)..cc_(n,n); --#################################
     justCs := coefficientRing R [myVars];
     csAsCoeffs := justCs[gens R];
     S := R ** justCs;
@@ -30,18 +30,22 @@ symmetryIdeals = I -> (
     combo := first entries transpose (m*(transpose matrix {(gens S)_{0..n-1}}));
     subList := for i in 0..n-1 list S_i => combo_i;
     polys := (I_*) / (a->substitute(substitute(a,S),subList));
-
+    return polys;
     diagProd := {product (for i in 1..n list sub(c_(i,i),S))};
     degreeLimiter := for x in gens justCs list sub(x^2-x,S);
     rowSums := flatten for row in entries m list {sum row - 1};
     pairwiseProds := flatten for row in entries m list
         flatten for i in 0..n-1 list for j in (i+1)..n-1 list row_i*row_j;
-    relationsOnC := degreeLimiter | rowSums | diagProd | pairwiseProds;
+    --relationsOnC := degreeLimiter | rowSums | diagProd | pairwiseProds;
 
     print ("Time after computing ideal setup: "|toString(currentTime()-curTime));
     --newI := ideal relationsOnC + substitute(I,S);
     newI := ideal degreeLimiter + substitute(I,S);
-    modded := polys / (a-> a % newI);
+    --modded := polys / (a-> a % newI);
+    modded := for p in polys list (
+        print "hi";
+        p % newI
+    );
     print ("Time after computing mods: "|toString(currentTime()-curTime));
     coeffIdeal := sum (modded / (a->sub(a,csAsCoeffs)) / content);
     coeffIdeal = sub(ideal relationsOnC,justCs) + coeffIdeal;
@@ -126,9 +130,9 @@ cyclicIdeal = n -> (
     return idealSymmetry II;
 )
 
-print idealSymmetry cyclicIdeal 5
+--print idealSymmetry cyclicIdeal 5
 
-print testIdeal 3
+--print testIdeal 3
 
 
 
