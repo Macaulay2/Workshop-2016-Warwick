@@ -14,6 +14,7 @@ newPackage(
   		{Name => "Sara Lamboglia", Email => "", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
+   		{Name => "Jeff Sommars", Email => "", HomePage=>""},
     		{Name => "Paolo Tripoli", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
@@ -604,9 +605,9 @@ doc///
         Example
 	    QQ[x_1,x_2,x_3,x_4]
             L={x_1+x_2+x_3+x_4, x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,  x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2, x_1*x_2*x_3*x_4-1}
-	    tropicalPrevariety L
+--	    tropicalPrevariety L
 	    QQ[x,y]
-            tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
+--            tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
 ///
 
 
@@ -654,11 +655,11 @@ doc///
        --tropicalVariety(I)
        --tropicalVariety(I,computeMultiplicities=>false)  
        J=ideal(x+y+z)
-       tropicalVariety(J,true)
-       tropicalVariety(J,true,computeMultiplicities=>false)
+      -- tropicalVariety(J,true)
+--       tropicalVariety(J,true,computeMultiplicities=>false)
        K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
        isPrime K
-       tropicalVariety(K,true,Prime=>false)
+--       tropicalVariety(K,true,Prime=>false)
 
 ///
 
@@ -712,8 +713,8 @@ doc///
 	    This method checks if the intersection of the tropical hypersurfaces associated to the polynomials in the list equals the tropicalization of the variety corresponding to the ideal they generate.  
         Example
 	    QQ[x,y,z]
-	    isTropicalBasis({x+y+z,2*x+3*y-z})
-	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
+--	    isTropicalBasis({x+y+z,2*x+3*y-z})
+--	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
 ///
 
 

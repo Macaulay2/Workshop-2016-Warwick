@@ -10,7 +10,7 @@ newPackage(
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
-		"path" => "",
+		"path" => "/Users/maclagan/Programs/gfan",
 		"fig2devpath" => "",
 		"keepfiles" => false,
 		"verbose" => false,
@@ -2246,8 +2246,9 @@ gfanFunctions = hashTable {
 --gfanHelp = hashTable apply(keys gfanFunctions, fn ->
 --	gfanFunctions#fn => apply( lines runGfanCommandCaptureError(gfanFunctions#fn, {"--help"}, {true}, "") , l->PARA {l})
 --)
+--WARNING - the word PARA was deleted from the next function (it used to read "l -> PARA {l})
 gfanHelp = (functionStr) ->
-	apply( lines runGfanCommandCaptureError(functionStr, hashTable {"help" => true}, "") , l->PARA {l})
+	apply( lines runGfanCommandCaptureError(functionStr, hashTable {"help" => true}, "") , l-> {l})
 
 
 
@@ -2467,68 +2468,68 @@ doc ///
 	SeeAlso
 		MarkedPolynomialList
 ///
+    
+-- --{*
+-- doc ///
+-- 	Key
+-- 		polymakeConeToCone
+-- 		(polymakeConeToCone, PolymakeCone)
+-- 	Headline
+-- 		converts a PolymakeCone into a Cone from the Polyhedra package
+-- 	Usage
+-- 		G = polymakeConeToCone F
+-- 	Inputs
+-- 		F:PolymakeCone
+-- 	Outputs
+-- 		G:Cone
+-- 	Description
+-- 		Text
+-- 			This method converts a @TO PolymakeCone@, as output by gfan, into a @TO Cone@ from the
+-- 			@TO Polyhedra@ package.
 
-{*
-doc ///
-	Key
-		polymakeConeToCone
-		(polymakeConeToCone, PolymakeCone)
-	Headline
-		converts a PolymakeCone into a Cone from the Polyhedra package
-	Usage
-		G = polymakeConeToCone F
-	Inputs
-		F:PolymakeCone
-	Outputs
-		G:Cone
-	Description
-		Text
-			This method converts a @TO PolymakeCone@, as output by gfan, into a @TO Cone@ from the
-			@TO Polyhedra@ package.
+-- 		Example
+-- 			R = QQ[x,y,z,w];
+-- 			C = gfanGroebnerCone markedPolynomialList {{x*y*z}, { x*y*z + z*w^2*x + y^2*w*x}}
+-- 			G = polymakeConeToCone C
+-- 			rays G
+-- 			linSpace G
 
-		Example
-			R = QQ[x,y,z,w];
-			C = gfanGroebnerCone markedPolynomialList {{x*y*z}, { x*y*z + z*w^2*x + y^2*w*x}}
-			G = polymakeConeToCone C
-			rays G
-			linSpace G
+-- 	SeeAlso
+-- 		polymakeFanToFan
+-- 		PolymakeFan
+-- 		PolymakeCone
+-- ///
 
-	SeeAlso
-		polymakeFanToFan
-		PolymakeFan
-		PolymakeCone
-///
+-- doc ///
+-- 	Key
+-- 		polymakeFanToFan
+-- 		(polymakeFanToFan, PolymakeFan)
+-- 	Headline
+-- 		converts a PolymakeFan into a Fan from the Polyhedra package
+-- 	Usage
+-- 		G = polymakeFanToFan F
+-- 	Inputs
+-- 		F:PolymakeFan
+-- 	Outputs
+-- 		G:Fan
+-- 	Description
+-- 		Text
+-- 			This method converts a @TO PolymakeFan@, as output by gfan, into a @TO Fan@ from the
+-- 			@TO Polyhedra@ package.
 
-doc ///
-	Key
-		polymakeFanToFan
-		(polymakeFanToFan, PolymakeFan)
-	Headline
-		converts a PolymakeFan into a Fan from the Polyhedra package
-	Usage
-		G = polymakeFanToFan F
-	Inputs
-		F:PolymakeFan
-	Outputs
-		G:Fan
-	Description
-		Text
-			This method converts a @TO PolymakeFan@, as output by gfan, into a @TO Fan@ from the
-			@TO Polyhedra@ package.
+-- 		Example
+-- 			R = QQ[x,y,z,w];
+-- 			F = gfanToPolyhedralFan gfan { x*y -z,  z*w - x}
+-- 			G = polymakeFanToFan F
+-- 			rays G
+-- 			linSpace G
 
-		Example
-			R = QQ[x,y,z,w];
-			F = gfanToPolyhedralFan gfan { x*y -z,  z*w - x}
-			G = polymakeFanToFan F
-			rays G
-			linSpace G
+-- 	SeeAlso
+-- 		polymakeConeToCone
+-- 		PolymakeFan
+-- 		PolymakeCone
+-- ///
 
-	SeeAlso
-		polymakeConeToCone
-		PolymakeFan
-		PolymakeCone
-///
-*}
 
 doc ///
 	Key
@@ -2553,24 +2554,25 @@ doc ///
 			all @TO2 {"Marked Groebner Basis Example", "marked reduced Groebner bases"}@ of {\tt I}, {\tt L}, or {\tt M}
 	Description
 		Text
-			This method produces all reduced Groebner bases of a polynomial ideal.
-			The ideal can be given as an {\tt Ideal}, {\tt List} of polynomials, or
-			a {\tt MarkedPolynomialList}.
-			The {\tt "g"=> true} option can be used to inform {\tt gfan} that the input
-			is already a Groebner basis with respect to some monomial order.
-			However, in this case, the input must be a {\tt MarkedPolynomialList}.
-
+			This method produces all reduced Groebner
+			bases of a polynomial ideal.  The ideal can be
+			given as an {\tt Ideal}, {\tt List} of
+			polynomials, or a {\tt MarkedPolynomialList}.
+			The {\tt "g"=> true} option can be used to
+			inform {\tt gfan} that the input is already a
+			Groebner basis with respect to some monomial
+			order.  However, in this case, the input must
+			be a {\tt MarkedPolynomialList}.
 		Example
 			R = QQ[x,y,z];
 			gfan(ideal(x^2*y -y^2, y^2*x - x^2))
 			gfan({x^2*y -y^2, y^2*x - x^2}, "symmetry" => {{0,1,2}, {1,0,2}})
 			gfan(markedPolynomialList {{y^5, x*y^2, x^2},{y^5-y^2,x*y^2 - y^4, x^2 -y^4}}, "g" => true)
-
 		Text
-
 			@STRONG "gfan Documentation"@
 			@gfanHelp "gfan"@
 ///
+
 doc ///
 	Key
 		MPLConverter
