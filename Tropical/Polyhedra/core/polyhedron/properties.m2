@@ -21,11 +21,16 @@ compute#Polyhedron#computedVertices Polyhedron := P -> (
    setProperty(P, lattice, latticeTest);
    vMat := matrixFromVectorList(vList, n, QQ);
    rMat := matrixFromVectorList(rList, n, QQ);
-   setProperty(P, computedRays, rMat);
+   setProperty(P, rays, rMat);
    setProperty(P, empty, numColumns vMat == 0);
    return vMat
 )
 
+
+compute#Polyhedron#lattice = method()
+compute#Polyhedron#lattice Polyhedron := P -> (
+   try (lift(vertices P, ZZ); true) else false
+)
 
 
 compute#Polyhedron#empty = method()
@@ -35,10 +40,10 @@ compute#Polyhedron#empty Polyhedron := P -> (
 )
 
 
-compute#Polyhedron#computedRays = method()
-compute#Polyhedron#computedRays Polyhedron := P -> (
+compute#Polyhedron#rays = method()
+compute#Polyhedron#rays Polyhedron := P -> (
    vertices P;
-   getProperty(P, computedRays)
+   getProperty(P, rays)
 )
 
 
@@ -74,10 +79,10 @@ compute#Polyhedron#underlyingCone Polyhedron := P -> (
       rMat = prependZeros getProperty(P, inputRays);
       result = append(result, inputRays => (pMat | rMat));
    );
-   if hasProperties(P, {computedVertices, computedRays}) then (
+   if hasProperties(P, {computedVertices, rays}) then (
       pMat = prependOnes getProperty(P, computedVertices);
-      rMat = prependZeros getProperty(P, computedRays);
-      result = append(result, computedRays => (pMat | rMat));
+      rMat = prependZeros getProperty(P, rays);
+      result = append(result, rays => (pMat | rMat));
    );
    if hasProperty(P, inputLinealityGenerators) then (
       pMat = prependZeros getProperty(P, inputLinealityGenerators);
@@ -87,8 +92,8 @@ compute#Polyhedron#underlyingCone Polyhedron := P -> (
       pMat = prependZeros getProperty(P, computedLinealityBasis);
       result = append(result, computedLinealityBasis => pMat);
    );
-   if hasProperty(P, computedFacets) then (
-      L = getProperty(P, computedFacets);
+   if hasProperty(P, facets) then (
+      L = getProperty(P, facets);
       pMat = -L#1 | L#0;
       ezero = matrix {flatten {1 , toList ((numgens source L#0):0)}};
       result = append(result, inequalities => ezero || (-pMat));
@@ -115,14 +120,18 @@ compute#Polyhedron#underlyingCone Polyhedron := P -> (
 )
 
 
-compute#Polyhedron#computedFacets = method()
-compute#Polyhedron#computedFacets Polyhedron := P -> (
+compute#Polyhedron#facets = method()
+compute#Polyhedron#facets Polyhedron := P -> (
    C := getProperty(P, underlyingCone);
+   hpC := promote(hyperplanes C, QQ);
    result := promote(facets C, QQ);
    -- Elimination of the trivial half-space
    ezero := matrix {flatten {1 , toList (((numgens source result)-1):0)}};
    ezero = promote(ezero, QQ);
-   trivialIndex := positions(0..(numRows result)-1, i -> (ezero === result^{i} ));
+   trivialIndex := positions(0..(numRows result)-1, i -> 
+      if numRows hpC != 0 then pointInSameDirection(transpose ezero, transpose result^{i}, transpose hpC)
+      else ezero === result^{i}
+   );
    if #trivialIndex > 0 then (
       trivialIndex = trivialIndex#0;
    ) else (
@@ -159,6 +168,13 @@ compute#Polyhedron#verticesThroughFacets Polyhedron := P -> (
 )
 
 
+compute#Polyhedron#isWellDefined = method()
+compute#Polyhedron#isWellDefined Polyhedron := P -> (
+   C := getProperty(P, underlyingCone);
+   return isWellDefined C
+)
+
+
 compute#Polyhedron#facetToFacetMap = method()
 compute#Polyhedron#facetToFacetMap Polyhedron := P -> (
    facetsP := facets P;
@@ -175,7 +191,7 @@ compute#Polyhedron#computedNormalFan Polyhedron := P -> (
    raysC := rays C;
    raysNF := - transpose (facets P)#0;
    facetMap := getProperty(P, facetToFacetMap);
-   maximalConesNF := getProperty(C, computedRaysThroughFacets);
+   maximalConesNF := getProperty(C, raysThroughFacets);
    goodConeIndices := select(numColumns raysC, i -> (raysC_i)_0 > 0);
    maximalConesNF = maximalConesNF_goodConeIndices;
    maximalConesNF = apply(maximalConesNF,
@@ -236,7 +252,7 @@ compute#Polyhedron#computedFacesThroughRays Polyhedron := P -> (
       facesPcodim = select(facesPcodim, face -> #(face#0) > 0);
       codim  => facesPcodim
    );
-   new MutableHashTable from result
+   new HashTable from result
 )
 
 
@@ -262,6 +278,17 @@ compute#Polyhedron#simplicial Polyhedron := P -> (
    all(facetsP, m -> numColumns m == rank m)
 )
 
+
+compute#Polyhedron#nFacets = method()
+compute#Polyhedron#nFacets Polyhedron := P -> (
+   numRows ((facets P)#0)
+)
+
+
+compute#Polyhedron#nVertices = method()
+compute#Polyhedron#nVertices Polyhedron := P ->(
+   numColumns vertices P
+)
 
 
 

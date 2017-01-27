@@ -37,25 +37,12 @@ compute#Polyhedron#computedVeryAmple Polyhedron := P -> (
          Ev = matrix{Ev};
          HSV := matrix for h in HS list if all(flatten entries(h*Ev), e -> e >= 0) then {h} else continue;
          CH := new HashTable from {
-            computedRays => Ev,
+            rays => Ev,
             computedLinealityBasis => map(ZZ^(numRows Ev),ZZ^0,0),
-            computedFacets => HSV,
+            facets => HSV,
             computedHyperplanes => map(ZZ^0,ZZ^(numRows Ev),0)
          };
          C := cone CH;
-         -- C := new Cone from {
-         -- "ambient dimension" => numRows Ev,
-         -- "dimension" => numRows Ev,
-         -- "dimension of lineality space" => 0,
-         -- "linealitySpace" => map(ZZ^(numRows Ev),ZZ^0,0),
-         -- "number of rays" => numColumns Ev,
-         -- "rays" => Ev,
-         -- "number of facets" => numColumns HSV,
-         -- "halfspaces" => HSV,
-         -- "hyperplanes" => map(ZZ^0,ZZ^(numRows Ev),0),
-         -- "genrays" => (Ev,map(ZZ^(numRows Ev),ZZ^0,0)),
-         -- "dualgens" => (-(transpose HSV),map(ZZ^(numRows Ev),ZZ^0,0)),
-         -- symbol cache => new CacheTable};
          HB := hilbertBasis C;
          all(HB, e -> contains(P,e+v))))
       )
@@ -66,12 +53,14 @@ compute#Polyhedron#computedVeryAmple Polyhedron := P -> (
 compute#Polyhedron#computedEhrhart = method(TypicalValue => RingElement)
 compute#Polyhedron#computedEhrhart Polyhedron := P -> (
 	n := dim P;
+	R := QQ[getSymbol "x"];
+	x := R_"x";
+   if n==0 and (not isEmpty P) then return 1 + 0*x;
+   if isEmpty P then return 0 + 0*x;
 	v := matrix apply(n,k -> {-1+#latticePoints( (k+1)*P)});
    v = promote(v, QQ);
 	M := promote(matrix apply(n,i -> reverse apply(n, j -> (i+1)^(j+1))),QQ);
 	M = flatten entries ((inverse M)*v);
-	R := QQ[getSymbol "x"];
-	x := R_"x";
 	1+sum apply(n,i -> M#i * x^(n-i))
 )
 
@@ -84,5 +73,35 @@ compute#Polyhedron#computedPolar Polyhedron := P -> (
       underlyingCone => CD
    };
    polyhedron result
+)
+
+
+compute#Polyhedron#latticeVolume = method()
+compute#Polyhedron#latticeVolume Polyhedron := P -> (
+   d := dim P;
+   if d == 0 and (not isEmpty P) then return 1;
+   if isEmpty P then return 0;
+   -- Checking for input errors
+   if  not isCompact P then error("The polyhedron must be compact, i.e. a polytope.");
+   -- If P is not full dimensional then project it down
+   if d != ambDim P then (
+      A := substitute((hyperplanes P)#0,ZZ);
+      A = inverse (smithNormalForm A)#2;
+      n := ambDim P;
+      A = A^{n-d..n-1};
+      P = affineImage(A,P);
+   );
+   -- Computing the triangulation of P
+   P = triangulate P;
+   -- Computing the volume of each simplex without the dimension factor, by 
+   -- taking the absolute of the determinant of |v_1-v_0..v_d-v_0|
+   P = apply(P, 
+      p -> (
+         if #p == 0 then 1
+         else abs det matrix transpose apply(toList(1..d), i -> flatten entries(p#i - p#0))
+      )
+   );
+   -- Summing up the volumes
+   (sum P)
 )
 

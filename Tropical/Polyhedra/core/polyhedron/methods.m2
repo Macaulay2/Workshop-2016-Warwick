@@ -51,7 +51,7 @@ latticePoints Polyhedron := P -> (
 --          completely, avoid fourierMotzkin. Always pick best possible data.
 getSufficientVertexData = method()
 getSufficientVertexData Polyhedron := P -> (
-   if hasProperties(P, {computedVertices, computedRays, computedLinealityBasis}) then (
+   if hasProperties(P, {computedVertices, rays, computedLinealityBasis}) then (
       return(vertices P, rays P, linealitySpace P)
    ) else if hasProperties(P, {points, inputRays, inputLinealityGenerators}) then (
       return (
@@ -77,15 +77,48 @@ facesAsPolyhedra(ZZ, Polyhedron) := (d, P) -> (
 hyperplanes Polyhedron := P -> getProperty(P, computedHyperplanes)
 linSpace Polyhedron := P -> linealitySpace P
 halfspaces Polyhedron := P -> facets P
-facets Polyhedron := P -> getProperty(P, computedFacets)
-fVector Polyhedron := P -> getProperty(P, computedFVector)
-faces Polyhedron := P -> getProperty(P, computedFacesThroughRays)
+facets Polyhedron := P -> getProperty(P, facets)
 
---   INPUT : 'k'  an integer between 0 and the dimension of
---     	     'C'  a cone
---  OUTPUT : a List, containing the indices of rays used for the faces
-faces(ZZ, Polyhedron) := (k,P) -> (
-   result := faces P;
-   if result#?k then result#k
-   else {}
+
+-- PURPOSE : Scaling respectively the multiple Minkowski sum of a polyhedron
+--   INPUT : '(k,P)',  where 'k' is a strictly positive rational or integer number and 
+--     	    	             'P' is a Polyhedron
+--  OUTPUT : The polyehdron 'P' scaled by 'k'
+QQ * Polyhedron := (k,P) -> (
+   -- Checking for input errors
+   if k <= 0 then error("The factor must be strictly positiv");
+   vertP := vertices P;
+   vertP = promote(vertP, QQ);
+   raysP := promote(rays P, QQ);
+   linP := promote(linealitySpace P, QQ);
+   convexHull(k * vertP, raysP, linP)
+)
+
+ZZ * Polyhedron := (k,P) -> promote(k,QQ) * P
+
+
+-- PURPOSE : Checks if the polyhedron is a lattice polytope
+--   INPUT : 'P'  a Polyhedron
+--  OUTPUT : 'true' or 'false'
+-- COMMENT : Tests if the vertices are in ZZ
+isLatticePolytope = method()
+isLatticePolytope Polyhedron := Boolean => P -> getProperty(P, lattice)
+
+
+-- PURPOSE : Computing the interior lattice points of a compact Polyhedron
+--   INPUT : 'P',  a Polyhedron
+--  OUTPUT : 'L',  a list containing the interior lattice points
+interiorLatticePoints = method(TypicalValue => List)
+interiorLatticePoints Polyhedron := (cacheValue symbol interiorLatticePoints)(P -> (
+     L := latticePoints P;
+     select(L,e -> inInterior(e,P))))
+
+
+isWellDefined Polyhedron := P -> getProperty(P, isWellDefined)
+
+
+nVertices Polyhedron := P -> getProperty(P, nVertices)
+
+cone (Polyhedron) := P->(
+   getProperty(P,underlyingCone)
 )

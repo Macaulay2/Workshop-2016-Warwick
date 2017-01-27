@@ -18,16 +18,23 @@ compute#PolyhedralComplex#computedVertices PolyhedralComplex := PC -> (
    );
    vMat := matrixFromVectorList(vList, n, QQ);
    rMat := matrixFromVectorList(rList, n, QQ);
-   setProperty(PC, computedRays, rMat);
+   setProperty(PC, rays, rMat);
    setProperty(PC, empty, numColumns vMat == 0);
    return vMat
 )
 
 
-compute#PolyhedralComplex#computedRays = method()
-compute#PolyhedralComplex#computedRays PolyhedralComplex := PC -> (
+compute#PolyhedralComplex#isWellDefined = method()
+compute#PolyhedralComplex#isWellDefined PolyhedralComplex := PC -> (
+   F := getProperty(PC, underlyingFan);
+   return isWellDefined F
+)
+
+
+compute#PolyhedralComplex#rays = method()
+compute#PolyhedralComplex#rays PolyhedralComplex := PC -> (
    vertices PC;
-   getProperty(PC, computedRays)
+   getProperty(PC, rays)
 )
 
 
@@ -77,8 +84,8 @@ compute#PolyhedralComplex#generatingObjects PolyhedralComplex := PC -> (
 )
 
 
-compute#PolyhedralComplex#computedFacesThroughVertices = method()
-compute#PolyhedralComplex#computedFacesThroughVertices PolyhedralComplex := PC -> (
+compute#PolyhedralComplex#computedFacesThroughRays = method()
+compute#PolyhedralComplex#computedFacesThroughRays PolyhedralComplex := PC -> (
    F := getProperty(PC, underlyingFan);
    vertPC := vertices PC;
    raysPC := rays PC;
@@ -99,7 +106,7 @@ compute#PolyhedralComplex#computedFacesThroughVertices PolyhedralComplex := PC -
          )
       )
    );
-   result
+   hashTable pairs result
 )
 
 compute#PolyhedralComplex#honestMaxObjects = method()

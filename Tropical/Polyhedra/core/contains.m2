@@ -22,7 +22,7 @@ contains(Cone,Cone) := (C1,C2) -> (
    local C1ineq;
    local C1eq;
    -- Extracting inequalities of C1
-   if hasProperty(C1, computedFacets) then C1ineq = facets C1
+   if hasProperty(C1, facets) then C1ineq = facets C1
    else if hasProperty(C1, inequalities) then C1ineq = getProperty(C1, inequalities)
    else C1ineq = facets C1;
    -- Extracting equations of C1
@@ -32,7 +32,7 @@ contains(Cone,Cone) := (C1,C2) -> (
    local C2rays;
    local C2lineality;
    -- Extracting rays of C2
-   if hasProperty(C2, computedRays) then C2rays = rays C2
+   if hasProperty(C2, rays) then C2rays = rays C2
    else if hasProperty(C2, inputRays) then C2rays = getProperty(C2, inputRays)
    else C2rays = rays C2;
    -- Extracting lineality of C2
@@ -56,7 +56,7 @@ contains(Cone,Polyhedron) := (C,P) -> (
       -- Saving the equations of C and vertices/rays of P
       M := makePrimitiveMatrix vertices(P) | rays(P);
       LS := linSpace(P);
-      C1 := posHull(M,LS);
+      C1 := coneFromVData(M,LS);
       contains(C,C1))
 
 

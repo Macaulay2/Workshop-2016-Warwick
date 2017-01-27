@@ -29,11 +29,12 @@ Fan == Fan := (F1, F2) -> (
 --  OUTPUT : The fan of all Cones in 'L' and all Cones in of the fans in 'L' and all their faces
 fan = method(TypicalValue => Fan)
 fan(Matrix, Matrix, List) := (irays, linealityGens, icones) -> (
-   rays := makeRaysPrimitive(irays);
+   if numRows irays != numRows linealityGens then error("Rays and lineality must have same ambient dimension.");
+   irays = makeRaysPrimitive(irays);
    lineality := makeRaysPrimitive(linealityGens);
    result := new HashTable from {
       ambientDimension => numRows irays,
-      computedRays => rays,
+      rays => irays,
       computedLinealityBasis => lineality,
       generatingObjects => icones
    };
@@ -63,7 +64,7 @@ fan HashTable := inputProperties -> (
 
 sanitizeFanInput = method()
 sanitizeFanInput HashTable := given -> (
-   rayProperties := {inputRays, inputLinealityGenerators, computedRays, computedLinealityBasis};
+   rayProperties := {inputRays, inputLinealityGenerators, rays, computedLinealityBasis};
    remainingProperties := keys given;
    remainingProperties = select(remainingProperties, p -> all(rayProperties, rp -> rp=!=p));
    result := apply(remainingProperties, rp -> rp=>given#rp);
@@ -104,7 +105,7 @@ addCone(Fan, Cone) := (F, C) -> (
    mc = append(mc, newCone);
    result := new HashTable from {
       ambientDimension => ambDim F,
-      computedRays => joinedRays,
+      rays => joinedRays,
       computedLinealityBasis => linF,
       inputCones => mc
    };

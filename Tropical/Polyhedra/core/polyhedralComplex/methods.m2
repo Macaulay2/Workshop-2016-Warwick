@@ -5,7 +5,7 @@ polyhedra = method(TypicalValue => List)
 polyhedra(ZZ,PolyhedralComplex) := (k,PC) -> (
    -- Checking for input errors
    if k < 0 or dim PC < k then error("k must be between 0 and the dimension of the fan.");
-   L := getProperty(PC, computedFacesThroughVertices);
+   L := getProperty(PC, computedFacesThroughRays);
    -- Collecting the 'k'-dim faces of all generating polyhedra of dimension greater than 'k'
    dk := dim(PC) - k;
    if L#?dk then return L#dk
@@ -44,3 +44,8 @@ objectsOfDim(ZZ, PolyhedralComplex) := (k,PC) -> (
 	L := select(getProperty(PC, honestMaxObjects), C -> dim C >= k);
 	-- Collecting the 'k'-dim faces of all generating cones of dimension greater than 'k'
 	unique flatten apply(L, C -> faces(dim(C)-k,C)))
+
+
+isWellDefined PolyhedralComplex := PC -> getProperty(PC, isWellDefined)
+
+fan (PolyhedralComplex) := PC -> getProperty(PC, underlyingFan)

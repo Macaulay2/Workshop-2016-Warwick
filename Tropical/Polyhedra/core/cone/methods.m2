@@ -1,4 +1,12 @@
 
+facesAsCones = method();
+facesAsCones(ZZ, Cone) := (d, C) -> (
+   raysC := rays C;
+   linC := linealitySpace C;
+   result := faces(d, C);
+   apply(result, f -> coneFromVData(raysC_f, linC))
+)
+
 
 --   INPUT : 'C'  a Cone
 --  OUTPUT : 'true' or 'false'
@@ -45,7 +53,7 @@ minFace (Matrix,Cone) := (v,C) -> (
 	  -- Take the rays of the cone that are orthogonal to 'v'
 	  Rind := flatten entries ((transpose v)*R);
 	  Rind = positions(Rind, e -> e == 0);
-	  posHull(R_Rind,LS))
+	  coneFromVData(R_Rind,LS))
      else emptyPolyhedron ambDim C)   
 
 
@@ -106,9 +114,9 @@ dualCone Cone := C -> (
    if hasProperty(C, equations) then result#inputLinealityGenerators = transpose getProperty(C, equations);
    if hasProperty(C, inputRays) then result#inequalities = transpose getProperty(C, inputRays);
    if hasProperty(C, inputLinealityGenerators) then result#equations = transpose getProperty(C, inputLinealityGenerators);
-   if hasProperty(C, computedRays) then result#computedFacets = transpose getProperty(C, computedRays);
+   if hasProperty(C, rays) then result#facets = transpose getProperty(C, rays);
    if hasProperty(C, computedLinealityBasis) then result#computedHyperplanes = transpose getProperty(C, computedLinealityBasis);
-   if hasProperty(C, computedFacets) then result#computedRays = transpose getProperty(C, computedFacets);
+   if hasProperty(C, facets) then result#rays = transpose getProperty(C, facets);
    if hasProperty(C, computedHyperplanes) then result#computedLinealityBasis = transpose getProperty(C, computedHyperplanes);
    return new Cone from {ambientDimension => ambDim C, cache => result}
 )
@@ -117,7 +125,7 @@ dualCone Cone := C -> (
 --          avoid fourierMotzkin. Always pick best possible data.
 getSufficientRayData = method()
 getSufficientRayData Cone := C -> (
-   if hasProperties(C, {computedRays, computedLinealityBasis}) then (
+   if hasProperties(C, {rays, computedLinealityBasis}) then (
       return (rays C, linealitySpace C)
    ) else if hasProperties(C, {inputRays, inputLinealityGenerators}) then (
       return (getProperty(C, inputRays), getProperty(C, inputLinealityGenerators))
@@ -131,15 +139,6 @@ getSufficientRayData Cone := C -> (
 hyperplanes Cone := C -> getProperty(C, computedHyperplanes)
 linSpace Cone := P -> linealitySpace P
 halfspaces Cone := P -> facets P
-facets Cone := C -> getProperty(C, computedFacets)
-fVector Cone := C -> getProperty(C, computedFVector)
-faces Cone := C -> getProperty(C, computedFacesThroughRays)
+facets Cone := C -> getProperty(C, facets)
 
---   INPUT : 'k'  an integer between 0 and the dimension of
---     	     'C'  a cone
---  OUTPUT : a List, containing the indices of rays used for the faces
-faces(ZZ, Cone) := (k,C) -> (
-   result := faces C;
-   if result#?k then result#k
-   else {}
-)
+isWellDefined Cone := C -> getProperty(C, isWellDefined)

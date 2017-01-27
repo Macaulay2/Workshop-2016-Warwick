@@ -57,7 +57,7 @@ TEST ///
 P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
 Q = intersection(matrix{{1,0},{-1,0},{0,1},{0,-1}},matrix{{1},{1},{1},{1}});
 assert(P == Q)
-C1 = posHull matrix {{1,2},{2,1}};
+C1 = coneFromVData matrix {{1,2},{2,1}};
 C2 =intersection matrix {{2,-1},{-1,2}};
 assert(C1 == C2)
 ///
@@ -111,11 +111,11 @@ assert(latticePoints P == {})
 TEST ///
 M = matrix {{1,1,1,1,-1,-1,-1,-1},{1,1,-1,-1,1,1,-1,-1},{1,-1,1,-1,1,-1,1,-1}};
 P = convexHull M;
-assert(ring getProperty(P, points) === QQ)
+assert(ring vertices P === QQ)
 v = matrix {{1},{1},{1}};
 I = (M,v);
 P = intersection I;
-l = getProperty(P,inequalities);
+l = facets P;
 assert(ring l#0 === QQ)
 assert(ring l#1 === QQ)
 ///

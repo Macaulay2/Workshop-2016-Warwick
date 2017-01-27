@@ -14,11 +14,6 @@ minkowskiSum(Polyhedron,Polyhedron) := (P1,P2) -> (
    else return pointwiseMinkowskiSum(P1,P2)
 )
 
-export{
-   "getSufficientVertexData",
-   "linealitySpace"
-}
-
 pointwiseMinkowskiSum = (P1,P2) -> (
      vertexData1 := getSufficientVertexData(P1);
      vertexData2 := getSufficientVertexData(P2);
@@ -45,7 +40,7 @@ minkowskiSum(Cone,Cone) := (C1,C2) -> (
      -- Saving the vertices and rays
      R := rays(C1) | rays(C2);
      LS := linSpace(C1) | linSpace(C2);
-     posHull(R,LS))
+     coneFromVData(R,LS))
 
 
 --   INPUT : '(C,P)',  a cone and a polyhedron
