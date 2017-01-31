@@ -10,7 +10,7 @@ newPackage(
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
-		"path" => "/Users/maclagan/Programs/gfan",
+		"path" => "",
 		"fig2devpath" => "",
 		"keepfiles" => false,
 		"verbose" => false,
