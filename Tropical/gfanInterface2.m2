@@ -4266,21 +4266,32 @@ doc ///
 -- TEST tropical min/max convention
 
 TEST /// -- by default the convention should be TROPICAL-MIN
-QQ[x,y,z];
-loadPackage("gfanInterface2", Reload=>true); -- the min convention is used by default
-fan := gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
-assert( member({2,-1,-1}, fan#"Rays"));
+  QQ[x,y,z];
+  loadPackage("gfanInterface2", Reload=>true, Configuration=>{ "tropicalMax"=> false });  
+  fan1 = gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
+  assert( member({2,-1,-1}, fan1#"Rays"));
 ///
 
 TEST /// -- alternatively TROPICAL-MAX can be specified on loading the package
-QQ[x,y,z];
-loadPackage("gfanInterface2", Reload=>true, Configuration=>{ "tropicalMax"=> true });
-fan := gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
-assert( member({-2,1,1}, fan#"Rays"));
+  QQ[x,y,z];
+  loadPackage("gfanInterface2", Reload=>true, Configuration=>{ "tropicalMax"=> true });
+  fan1 = gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
+  assert( member({-2,1,1}, fan1#"Rays"));
 ///
 
-end
+end--
 
+restart
+--path = prepend(".",path)
+uninstallPackage "Polyhedra"
+uninstallPackage "gfanInterface2"
+restart
+--path = prepend(".",path)
+installPackage "Polyhedra"
+installPackage "gfanInterface2"
+restart
+loadPackage "gfanInterface2"
+check gfanInterface2
 
 -------------------------------------------------------------
 -------------------------------------------------------------
