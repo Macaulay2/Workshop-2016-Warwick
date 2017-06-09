@@ -582,32 +582,33 @@ doc///
 
 
 doc///
-    Key
-	tropicalPrevariety
-	(tropicalPrevariety, List)
-	[tropicalPrevariety, Strategy]
-    Headline
-	the intersection of the tropical hypersurfaces of polynomials in L
-    Usage
-	tropicalPrevariety(L)
-	tropicalPrevariety(L,Strategy=>S)
-    Inputs
-	L:List
-	    of polynomials        
-	Strategy=>String
-	    Strategy (currently only "gfan")
-    Outputs
-	F:Fan
-	    the intersection of the tropical hypersurfaces of polynomials in L
-    Description
-	Text
-	    This method intersects a list of tropical hypersurfaces. The input is a list of polynomials whose 		    tropicalizations give the hypersurfaces.
-        Example
-	    QQ[x_1,x_2,x_3,x_4]
-            L={x_1+x_2+x_3+x_4, x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,  x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2, x_1*x_2*x_3*x_4-1}
---	    tropicalPrevariety L
-	    QQ[x,y]
---            tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
+  Key
+    tropicalPrevariety
+    (tropicalPrevariety, List)
+    [tropicalPrevariety, Strategy]
+  Headline
+    the intersection of the tropical hypersurfaces of polynomials in L
+  Usage
+    tropicalPrevariety(L)
+    tropicalPrevariety(L,Strategy=>S)
+  Inputs
+    L:List
+      of polynomials        
+    Strategy=>String
+      Strategy (currently only "gfan")
+  Outputs
+    F:Fan
+      the intersection of the tropical hypersurfaces of polynomials in L
+  Description
+    Text
+      This method intersects a list of tropical hypersurfaces. The input is a
+      list of polynomials whose tropicalizations give the hypersurfaces.
+    Example
+      QQ[x_1,x_2,x_3,x_4]
+      L={x_1+x_2+x_3+x_4,x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2,x_1*x_2*x_3*x_4-1}
+      tropicalPrevariety L
+      QQ[x,y]
+      tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
 ///
 
 
