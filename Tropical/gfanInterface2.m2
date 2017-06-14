@@ -404,6 +404,8 @@ gfanParseBoolInteger String := (s) -> s == "1\n"
 
 gfanParsePolyhedralFan = method(TypicalValue => PolyhedralObject, Options => {"GfanFileName" => null, "TropicalMinConventionApplies" => false })
 gfanParsePolyhedralFan String := o -> s -> (
+    	if debugLevel>0 then (print s);
+	
 	B := select(sublists(lines s, l -> #l =!= 0, toList, l -> null), l -> l =!= null);
 	header := first B; --first list of lines
 	if #B < 2 and #header < 2 then error(concatenate header);
@@ -449,16 +451,17 @@ gfanParsePolyhedralFan String := o -> s -> (
 	--now we turn this hashtable into a fan according to polyhedra
 	--this S is the local object that will be the fan
 	S:={};
-        if P#?"Multiplicities" then (
-    	    if  P#"Rays"=={} then 	
-	      (S=fanFromGfan({map(ZZ^(P#"AmbientDim"),ZZ^0,0),transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),P#"Multiplicities")
-	      else
-	      (S=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),P#"Multiplicities"))
-	else ( if  P#"Rays"=={} then 	
-	      (S=fanFromGfan({map(ZZ^(P#"AmbientDim"),ZZ^0,0),transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),{})
-	      else
-	      (S=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),{}))
-	      
+
+            if P#?"Multiplicities" then (
+    	    	if  P#"Rays"=={} then 	
+	      	(S=fanFromGfan({map(ZZ^(P#"AmbientDim"),ZZ^0,0),transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),P#"Multiplicities")
+	      	else
+	      	(S=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),P#"Multiplicities"))
+	    else ( if  P#"Rays"=={} then 	
+	      	   (S=fanFromGfan({map(ZZ^(P#"AmbientDim"),ZZ^0,0),transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),{})
+	      	   else
+	      	   (S=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),{}))
+	  
 	      
 )
 
