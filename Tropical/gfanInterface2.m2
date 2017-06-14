@@ -253,6 +253,15 @@ net MarkedPolynomialList := L -> net expression L
 
 RingMap MarkedPolynomialList := (F, L) -> L/(a-> a/F)
 
+
+
+
+
+
+
+
+
+
 --------------------------------------------------------
 --------------------------------------------------------
 -- PARSING FUNCTIONS
