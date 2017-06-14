@@ -68,8 +68,8 @@ tropicalCycle = method(TypicalValue => TropicalCycle)
 tropicalCycle (Fan, List) := (F,mult)->(
     if #maxCones(F) != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle;
-    T#"Multiplicities" = mult;
-    T#"Fan" = F;
+    multiplicities(T) = mult;
+    fan(T) = F;
     return T
 )    
 
@@ -101,7 +101,7 @@ isPolyhedralComplex = method(TypicalValue => Boolean)
 
 isPolyhedralComplex (TropicalCycle) := T ->(
  -- Check that the fan is indeed a fan, and not just union of cones   
-	isWellDefined (T#"Fan")
+	isWellDefined (fan(T))
 )      
 
 
@@ -360,7 +360,7 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 convertToPolymake = (T) ->(
 -- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
 --
-	F := T#"Fan";
+	F := fan(T);
 --check if given cycle is empty
 	if (dim(F) < 0) then (return "new Cycle<Min>(PROJECTIVE_VERTICES=>[],MAXIMAL_POLYTOPES=>[],WEIGHTS=>[]);";) else (
 --if not empty, check if min- or max-convention is used
@@ -396,7 +396,7 @@ convertToPolymake = (T) ->(
 	str = substring(0,#str-1,str);
 	str = str|"],WEIGHTS=>[";
 --the multiplicities stay unchanged
-	mult := T#"Multiplicities";
+	mult := multiplicities(T);
 	scan (numberOfMaxCones,i -> str = str|mult#i|",");
 	str = substring(0,#str-1,str);
 	str = str | "]);";
@@ -440,10 +440,10 @@ multiplicities = method(TypicalValue => TropicalCycle)
 multiplicities (TropicalCycle) := T -> (T#"Multiplicities")
 
 
-isPure TropicalCycle := Boolean => T->( isPure(T#"Fan"))
+isPure TropicalCycle := Boolean => T->( isPure(fan(T)))
 
 
-isSimplicial TropicalCycle:= Boolean => T->( isSimplicial(T#"Fan"))
+isSimplicial TropicalCycle:= Boolean => T->( isSimplicial(fan(T)))
 
 
 
