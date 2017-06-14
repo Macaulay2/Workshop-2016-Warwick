@@ -124,9 +124,8 @@ tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => fa
 --using strategy gfan
     if (o.Strategy=="gfan") then (
     	F:= gfanTropicalIntersection(L, gfanopt); 
---remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle)
-        remove(F,"Multiplicities");
-        return F)
+--gives only the fan and not the fan plus multiplicities which are wrongly computed in gfan
+       F_0)
     else error "options not valid"
 )
 
