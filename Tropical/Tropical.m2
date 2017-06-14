@@ -123,7 +123,7 @@ tropicalPrevariety = method(TypicalValue => Fan,  Options => {
 tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
 --using strategy gfan
     if (o.Strategy=="gfan") then (
-    	F:=parseFanFromGfanToPolyhedraFormat gfanTropicalIntersection(L, gfanopt); 
+    	F:= gfanTropicalIntersection(L, gfanopt); 
 --remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle)
         remove(F,"Multiplicities");
         return F)
@@ -236,20 +236,21 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 	       (if (opt.Prime== true)
 		then (
 		    F= gfanTropicalTraverse( gfanTropicalStartingCone I);
-	            tropicalCycle(parseFanFromGfanToPolyhedraFormat F,F#"Multiplicities"))
+	            tropicalCycle(F))
 		else
 		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
 		    (if opt.computeMultiplicities==false 
-		     then (F=parseFanFromGfanToPolyhedraFormat gfanTropicalBruteForce gfanBuchberger I;
+		     then (F= gfanTropicalBruteForce gfanBuchberger I;
 			   mult := {};
 			   i:=0;
-			   while(i<#maxCones F)do(
+			   while(i<#maxCones (F_0))do(
 			       mult=append(mult,{});
 			       i=i+1);
-			   tropicalCycle(F,mult)
+			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities 
+			   tropicalCycle(F_0,mult)
 	    	    	   )
-		     else (F=parseFanFromGfanToPolyhedraFormat gfanTropicalBruteForce gfanBuchberger I;
-			 tropicalCycle(F,findMultiplicities(I,F))
+		     else (F= gfanTropicalBruteForce gfanBuchberger I;
+			 tropicalCycle(F_0,findMultiplicities(I,F_0))
 			 )  )))
 
 
@@ -348,21 +349,21 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
-	parseFanFromGfanToPolyhedraFormat gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
+ 	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
 	
 )    
 
-parseFanFromGfanToPolyhedraFormat = method(TypicalValue => Fan)
-parseFanFromGfanToPolyhedraFormat PolyhedralObject := P -> (
-	oldR := P#"Rays";
-	local newR;
-	if (#oldR > 0) then newR = transpose matrix oldR else newR = matrix{{}};
-	oldL := P#"LinealitySpace";
-	local newL;
-	if (#oldL > 0) then newL = transpose matrix oldL else newL = matrix{{}};
-	F := fan(newR,newL,P#"MaximalCones");
-	F
-)
+--parseFanFromGfanToPolyhedraFormat = method(TypicalValue => Fan)
+--parseFanFromGfanToPolyhedraFormat PolyhedralObject := P -> (
+--	oldR := P#"Rays";
+--	local newR;
+--	if (#oldR > 0) then newR = transpose matrix oldR else newR = matrix{{}};
+--	oldL := P#"LinealitySpace";
+--	local newL;
+--	if (#oldL > 0) then newL = transpose matrix oldL else newL = matrix{{}};
+--	F := fan(newR,newL,P#"MaximalCones");
+--	F
+--)
 
 convertToPolymake = (T) ->(
 -- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
@@ -439,7 +440,7 @@ getAmbientDim (TropicalCycle):= T->( ambDim(T#"Fan"))
 --TODO fix
 getFVector = method(TypicalValue => List)
 
-getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
+getFVector (TropicalCycle):= C->( fVector(C#"Fan"))
 
 
 getLinealitySpace = method(TypicalValue => List)
