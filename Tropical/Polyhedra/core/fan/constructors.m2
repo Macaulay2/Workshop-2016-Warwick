@@ -77,10 +77,10 @@ fanFromGfan List := gfanOutput -> (
 -- 6 simplicial -> bool
 -- 7 fVector -> List
    result := fan(gfanOutput#0, gfanOutput#1, gfanOutput#2);
-   setProperty(result, ambDim, gfanOutput#4);
-   setProperty(result, computedFVector, gfanOutput#7);
-   setProperty(result, pure, gfanOutput#5);
-   setProperty(result, simplicial, gfanOutput#6);
+ --  setProperty(result, ambDim, gfanOutput#4);
+   setProperty(result, computedFVector, gfanOutput#6);
+   setProperty(result, pure, gfanOutput#4);
+   setProperty(result, simplicial, gfanOutput#5);
    setProperty(result, computedDimension, gfanOutput#3);
    return result;
 )
