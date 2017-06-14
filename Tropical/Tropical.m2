@@ -429,7 +429,7 @@ fVector TropicalCycle:= T->( fVector fan T)
 fan TropicalCycle := T -> (T#"Fan")
 
 
-linealitySpace (TropicalCycle):= T->( entries transpose linSpace fan T)
+linealitySpace (TropicalCycle):= T->( linSpace fan T)
 
 
 maxCones (TropicalCycle):= T->( maxCones fan T)
