@@ -438,7 +438,12 @@ gfanParsePolyhedralFan String := o -> s -> (
 		);
    	if gfanKeepFiles and o#?"GfanFileName" and o#"GfanFileName" =!= null then P#"GfanFileName" = o#"GfanFileName";
 	--now we turn this hashtable into a fan according to polyhedra
-	S:=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"});
+	--this S is the local object that will be the fan
+	S:={};
+    	if  P#"Rays"=={} then 	
+	      (S=fanFromGfan({map(ZZ^(P#"AmbientDim"),ZZ^0,0),transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}))
+	      else
+	      (S=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}));
 	return S
 )
 
@@ -2031,7 +2036,7 @@ gfanTropicalIntersection (List) := opts -> (L) -> (
 )
 
 --------------------------------------------------------
--- gfan_tropiciallifting
+-- gfan_tropicallifting
 --------------------------------------------------------
 
 gfanTropicalLifting = method( Options => {} )
@@ -2041,7 +2046,7 @@ gfanTropicalLifting := opts -> () -> (
 )
 
 --------------------------------------------------------
--- gfan_tropiciallinearspace
+-- gfan_tropicallinearspace
 --------------------------------------------------------
 
 gfanTropicalLinearSpace = method( Options => {
