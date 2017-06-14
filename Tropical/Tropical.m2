@@ -268,7 +268,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
     	--Then remove lineality space
 	--The following lines will need to be changed once the
 	--Polyhedra package has been updated (hopefully summer 2016)
-    	Trays:=rays(T);
+    	Trays:=entries transpose rays(T);
 	--Add a multiple of the all-ones vector to each ray to make the first
 	-- coordinate zero, drop the first coordinate, and divide by the 
 	-- gcd.
@@ -366,7 +366,7 @@ convertToPolymake = (T) ->(
 --if not empty, check if min- or max-convention is used
 	str := "new Cycle<";
 	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
-	rs := rays T;
+	rs := entries transpose rays T;
 	numberOfRays := #rs;
 	ambientDim := ambDim F;
 --convert to polymake convention of rays: 1) add origin of the form (1,0,...,0)
@@ -411,7 +411,7 @@ convertToPolymake = (T) ->(
 --functions to get stuff from fans and tropical cycles
 
 
-rays TropicalCycle:= T->( entries transpose rays fan T)
+rays TropicalCycle:= T->( rays fan T)
 
 
 cones (ZZ,TropicalCycle):= (i,T)->( cones(i,fan T))
