@@ -68,8 +68,8 @@ tropicalCycle = method(TypicalValue => TropicalCycle)
 tropicalCycle (Fan, List) := (F,mult)->(
     if #maxCones(F) != #mult then error("The multiplicity list has the wrong length");
     T := new TropicalCycle;
-    multiplicities(T) = mult;
-    fan(T) = F;
+    T#"Multiplicities" = mult;
+    T#"Fan" = F;
     return T
 )    
 
