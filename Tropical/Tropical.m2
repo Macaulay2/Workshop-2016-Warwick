@@ -33,7 +33,6 @@ export {
   "TropicalCycle",
   "tropicalCycle",
   "isBalanced",
-  "isPolyhedralComplex",
   "tropicalPrevariety",
   "computeMultiplicities",
   "Prime",
@@ -90,19 +89,8 @@ isBalanced (TropicalCycle):= T->(
 
 
 
-isWellDefined TropicalCycle := Boolean =>
- T ->(
- -- Check that the fan is well-defined and pure, and then call isBalanced   
-       if isPure(T) then return(isBalanced(T)) else return(false);
-)      
 
 
-isPolyhedralComplex = method(TypicalValue => Boolean)
-
-isPolyhedralComplex (TropicalCycle) := T ->(
- -- Check that the fan is indeed a fan, and not just union of cones   
-	isWellDefined (fan(T))
-)      
 
 
 --Computing a tropical prevariety
@@ -477,44 +465,9 @@ doc ///
 	   MaximalCones list.
 ///	   
 
-doc ///
-    Key
-	(isWellDefined,TropicalCycle)
-    Headline
-	whether a tropical cycle is well defined.
-    Usage
-    	isWellDefined T
-    Inputs
-	T:TropicalCycle
-    Outputs
-    	B:Boolean
-    Description
-	Text
-    	    A TropicalCycle is well defined if the underlying Fan is
-    	    pure, and the multiplicity function makes the fan
-    	    balanced.
-      	Example
-	    1+1	    
-///
 
-doc ///
-    Key
-	(isPolyhedralComplex,TropicalCycle)
-    Headline
-	whether the underlying fan is really a fan.
-    Usage
-    	isPolyhedralComplex T
-    Inputs
-	T:TropicalCycle
-    Outputs
-    	B:Boolean
-    Description
-	Text
-    	    Checks if the underlying fan is indeed a fan
-    	    and not just a union of cones.
-      	Example
-	    1+1	    
-///
+
+
 
 
 doc ///
