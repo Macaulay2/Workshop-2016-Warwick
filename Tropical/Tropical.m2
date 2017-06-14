@@ -40,14 +40,7 @@ export {
   "stableIntersection",
   "tropicalVariety",
   "isTropicalBasis",
-  "getRays",
-  "getCones",
-  "getDim",
-  "getAmbientDim",
-  "getFVector",
-  "getLinealitySpace",
-  "getMaximalCones",
-  "getMultiplicities"
+  "multiplicities"
 }
 
 --???check syntax - idea is that this is where we should define local symbols
@@ -157,7 +150,7 @@ computeCones=(R,M,L)->(
     )
 
 --input:rays,maximal cones and 
---lineality space so you put getMaximalCones and getRays so the 
+--lineality space so you put maximalCones and rays so the 
 --inputs are two lists
 --output:list of matrices
 -- note that ConesOfVariety is a local variable also in findMultiplicities
@@ -275,7 +268,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
     	--Then remove lineality space
 	--The following lines will need to be changed once the
 	--Polyhedra package has been updated (hopefully summer 2016)
-    	Trays:=getRays(T);
+    	Trays:=rays(T);
 	--Add a multiple of the all-ones vector to each ray to make the first
 	-- coordinate zero, drop the first coordinate, and divide by the 
 	-- gcd.
@@ -287,7 +280,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
        	    ));
     	--The next line in particular should be replaced by a constructor.
     	T#"Rays" = newTrays;
-	T#"Dim" = getDim(T)-1;
+	T#"Dim" = dim(T)-1;
 	T#"AmbientDim" = T#"AmbientDim"-1;
 	--For the next one, if we want to remember the lineality space
 	--we should instead quotient by the all ones vector
@@ -373,7 +366,7 @@ convertToPolymake = (T) ->(
 --if not empty, check if min- or max-convention is used
 	str := "new Cycle<";
 	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
-	rs := getRays T;
+	rs := rays T;
 	numberOfRays := #rs;
 	ambientDim := ambDim F;
 --convert to polymake convention of rays: 1) add origin of the form (1,0,...,0)
@@ -417,44 +410,34 @@ convertToPolymake = (T) ->(
 
 --functions to get stuff from fans and tropical cycles
 
-getRays = method(TypicalValue => List)
 
-getRays (TropicalCycle):= T->( entries transpose rays(T#"Fan"))
-
-
-getCones = method(TypicalValue => List)
-
-getCones (ZZ,TropicalCycle):= (i,T)->( cones(i,T#"Fan"))
+rays TropicalCycle:= T->( entries transpose rays fan T)
 
 
-getDim = method(TypicalValue => ZZ)
-
-getDim (TropicalCycle):= T->( dim(T#"Fan"))
+cones (ZZ,TropicalCycle):= (i,T)->( cones(i,fan T))
 
 
-getAmbientDim = method(TypicalValue => ZZ)
-
-getAmbientDim (TropicalCycle):= T->( ambDim(T#"Fan"))
-
---TODO fix
-getFVector = method(TypicalValue => List)
-
-getFVector (TropicalCycle):= C->( fVector(C#"Fan"))
+dim TropicalCycle:= T->( dim fan T)
 
 
-getLinealitySpace = method(TypicalValue => List)
-
-getLinealitySpace (TropicalCycle):= T->( entries transpose linSpace(T#"Fan"))
+ambDim TropicalCycle:= T->( ambDim fan T)
 
 
-getMaximalCones = method(TypicalValue => List)
-
-getMaximalCones (TropicalCycle):= T->( maxCones(T#"Fan"))
+fVector TropicalCycle:= T->( fVector fan T)
 
 
-getMultiplicities = method(TypicalValue => List)
+fan TropicalCycle := T -> (T#"Fan")
 
-getMultiplicities (TropicalCycle) := T -> (T#"Multiplicities")
+
+linealitySpace (TropicalCycle):= T->( entries transpose linSpace fan T)
+
+
+maxCones (TropicalCycle):= T->( maxCones fan T)
+
+
+multiplicities = method(TypicalValue => TropicalCycle)
+
+multiplicities (TropicalCycle) := T -> (T#"Multiplicities")
 
 
 isPure TropicalCycle := Boolean => T->( isPure(T#"Fan"))
@@ -721,22 +704,15 @@ doc///
 
 doc///
     Key
-	getRays
-	(getRays, TropicalCycle)
-        getCones
-	(getCones, ZZ, TropicalCycle)
-	getDim
-	(getDim, TropicalCycle)
-	getAmbientDim
-	(getAmbientDim, TropicalCycle)
-        getFVector
-	(getFVector, TropicalCycle)
-	getLinealitySpace
-	(getLinealitySpace, TropicalCycle)
-        getMaximalCones
-	(getMaximalCones, TropicalCycle)
-	getMultiplicities
-	(getMultiplicities, TropicalCycle)
+	(rays, TropicalCycle)
+        (cones, ZZ, TropicalCycle)
+	(dim, TropicalCycle)
+	(ambDim, TropicalCycle)
+        (fVector, TropicalCycle)
+	(linealitySpace, TropicalCycle)
+        (maxCones, TropicalCycle)
+	multiplicities
+	(multiplicities, TropicalCycle)
 ///
 
 
