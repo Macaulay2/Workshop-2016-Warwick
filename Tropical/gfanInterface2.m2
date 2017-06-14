@@ -451,17 +451,14 @@ gfanParsePolyhedralFan String := o -> s -> (
 	--now we turn this hashtable into a fan according to polyhedra
 	--this S is the local object that will be the fan
 	S:={};
-
-            if P#?"Multiplicities" then (
-    	    	if  P#"Rays"=={} then 	
-	      	(S=fanFromGfan({map(ZZ^(P#"AmbientDim"),ZZ^0,0),transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),P#"Multiplicities")
-	      	else
-	      	(S=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),P#"Multiplicities"))
-	    else ( if  P#"Rays"=={} then 	
-	      	   (S=fanFromGfan({map(ZZ^(P#"AmbientDim"),ZZ^0,0),transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),{})
-	      	   else
-	      	   (S=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"}),{}))
-	  
+    	    myrays:={};
+	    mylinspace:={};
+	    if  P#"Rays"=={} then myrays=map(ZZ^(P#"AmbientDim"),ZZ^0,0) else  myrays=transpose matrix P#"Rays";
+	    if P#"LinealitySpace"=={} then  mylinspace=map(ZZ^(P#"AmbientDim"),ZZ^0,0)  else mylinspace=transpose matrix P#"LinealitySpace";
+	    S=fanFromGfan({myrays,mylinspace,P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"});
+	    if  P#?"Multiplicities" then 
+	    (S,P#"Multiplicities" )
+	    else  (S,{})
 	      
 )
 
