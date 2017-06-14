@@ -437,7 +437,9 @@ gfanParsePolyhedralFan String := o -> s -> (
 		P#"GfanFileRawBlocks" = rawBlocks;
 		);
    	if gfanKeepFiles and o#?"GfanFileName" and o#"GfanFileName" =!= null then P#"GfanFileName" = o#"GfanFileName";
-	P
+	--now we turn this hashtable into a fan according to polyhedra
+	S:=fanFromGfan({transpose matrix P#"Rays",transpose matrix P#"LinealitySpace",P#"MaximalCones",P#"Dim",P#"AmbientDim",P#"Pure",P#"Simplicial",P#"FVector"});
+	return S
 )
 
 gfanParseHeader = method(TypicalValue => Type)
@@ -2133,8 +2135,9 @@ gfanTropicalTraverse (List) := opts -> (L) -> (
 		| gfanVectorListToString(opts#"symmetry");
 
 	output := runGfanCommand("gfan _tropicaltraverse", opts, input);
-
+	
 	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true )
+	
 )
 
 --------------------------------------------------------
