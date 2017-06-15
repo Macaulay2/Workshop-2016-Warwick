@@ -1,3 +1,18 @@
+compute#Fan#isWellDefined = method()
+compute#Fan#isWellDefined Fan := F -> (
+   cones := getProperty(F, honestMaxObjects);
+   n := #cones;
+   for i from 0 to n-1 do (
+      Ci := cones#i;
+      for j from i to n-1 do (
+         Cj := cones#j;
+         if not commonFace(Ci, Cj) then return false
+      )
+   );
+   return true
+)
+
+
 compute#Fan#smooth = method()
 compute#Fan#smooth Fan := F -> (
    R := rays F;
@@ -6,6 +21,13 @@ compute#Fan#smooth Fan := F -> (
    MC = apply(MC, m -> R_m);
    all(MC, r -> spanSmoothCone(transpose r, L))
 )
+
+
+compute#Fan#computedFVector = method()
+compute#Fan#computedFVector Fan := F -> (
+   reverse apply(dim F + 1, d -> #faces(dim F - d,F))
+)
+
 
 compute#Fan#simplicial = method()
 compute#Fan#simplicial Fan := F -> (
@@ -54,7 +76,7 @@ compute#Fan#honestMaxObjects Fan := F -> (
    R := rays F;
    MC := maxCones F;
    L := linealitySpace F;
-   apply(MC, m -> posHull(R_m, L))
+   apply(MC, m -> coneFromVData(R_m, L))
 )
 
 compute#Fan#computedComplete = method()
@@ -74,8 +96,8 @@ compute#Fan#computedComplete Fan := F -> (
          if dim C == n then (
             R := rays C;
             L := linealitySpace C;
-            CFacets := toList getProperty(C, computedFacetsThroughRays);
-            CFacets = apply(CFacets, facet -> posHull(R_facet, L));
+            CFacets := toList getProperty(C, facetsThroughRayData);
+            CFacets = apply(CFacets, facet -> coneFromVData(R_facet, L));
             CFsave = flatten {CFsave, {CFacets}};
             Lfaces = symmDiff(Lfaces, CFacets);
          )
@@ -85,8 +107,9 @@ compute#Fan#computedComplete Fan := F -> (
    Lfaces == {}
 )
 
-compute#Fan#computedRays = method()
-compute#Fan#computedRays Fan := F -> (
+
+compute#Fan#rays = method()
+compute#Fan#rays Fan := F -> (
    if hasProperty(F, inputRays) then (
       given := getProperty(F, inputRays);
       makeRaysUniqueAndPrimitive given
@@ -95,6 +118,7 @@ compute#Fan#computedRays Fan := F -> (
       error("No input rays given.")
    )
 )
+
 
 compute#Fan#computedFacesThroughRays = method()
 compute#Fan#computedFacesThroughRays Fan := F -> (
@@ -118,7 +142,7 @@ compute#Fan#computedFacesThroughRays Fan := F -> (
          result#i = sort unique flatten {result#i, codimiCones};
       );
    );
-   return result
+   return hashTable pairs result
 )
 
 compute#Fan#generatingObjects = method()
@@ -176,9 +200,16 @@ compute#Fan#smoothCones Fan := F -> (
 
 compute#Fan#ambientDimension = method()
 compute#Fan#ambientDimension Fan := F -> (
-   if hasProperty(F, computedRays) then return numRows rays F
+   if hasProperty(F, rays) then return numRows rays F
    else if hasProperty(F, computedLinealityBasis) then return numRows linealitySpace F
    else if hasProperty(F, inputRays) then return numRows getProperty(F, inputRays)
    else if hasProperty(F, inputLinealityGenerators) then return numRows getProperty(F, inputLinealityGenerators)
    else error("No property available to compute ambient dimension.")
 )
+
+
+compute#Fan#pointed = method()
+compute#Fan#pointed Fan := F -> (
+   all(getProperty(F, honestMaxObjects), C -> isPointed C)
+)
+

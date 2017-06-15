@@ -33,7 +33,7 @@ hypercube(ZZ,QQ) := (d,s) -> (
      if d < 1 then error("dimension must at least be 1");
      if s <= 0 then error("size of the hypercube must be positive");
      -- Generating half-spaces matrix and vector
-     intersection(map(QQ^d,QQ^d,1) || -map(QQ^d,QQ^d,1),matrix toList(2*d:{s})))
+     polyhedronFromHData(map(QQ^d,QQ^d,1) || -map(QQ^d,QQ^d,1),matrix toList(2*d:{s})))
 
 
 
@@ -57,7 +57,7 @@ newtonPolytope RingElement := p -> convexHull transpose matrix exponents p
 --   INPUT : 'n",  a strictly positive integer
 --  OUTPUT : The cone that is the positive orthant in n-space
 posOrthant = method(TypicalValue => Cone)
-posOrthant ZZ := n -> posHull map(QQ^n,QQ^n,1)
+posOrthant ZZ := n -> coneFromVData map(QQ^n,QQ^n,1)
 
 
 	  
@@ -138,7 +138,7 @@ bipyramid Polyhedron := P -> (
    newvertices := makePrimitiveMatrix(matrix {{1,1}} || v || matrix {{1,-1}});
    M = (M || zerorow) | newvertices;
    LS = LS || map(r^1,source LS,0);
-   newC := posHull(M, LS);
+   newC := coneFromVData(M, LS);
    result := new HashTable from {
       underlyingCone => newC
    };
@@ -161,7 +161,7 @@ pyramid Polyhedron := P -> (
    newvertex := 1 || map(ZZ^((numRows M)-1),ZZ^1,0) || 1;
    M = (M || zerorow) | newvertex;
    LS = LS || map(ZZ^1,source LS,0);
-   newC := posHull(M, LS);
+   newC := coneFromVData(M, LS);
    result := new HashTable from {
       underlyingCone => newC
    };
@@ -185,9 +185,9 @@ crossPolytope(ZZ,QQ) := (d,s) -> (
    homHalf := ( sort makePrimitiveMatrix transpose( matrix toList(2^d:{-s}) | promote(matrix constructMatrix(d,{}),QQ)),map(ZZ^(d+1),ZZ^0,0));
    homVert := (sort makePrimitiveMatrix (matrix {toList(2*d:1_QQ)} || (map(QQ^d,QQ^d,s) | map(QQ^d,QQ^d,-s))),map(ZZ^(d+1),ZZ^0,0));
    C := new HashTable from {
-      computedRays => homVert#0,
+      rays => homVert#0,
       computedLinealityBasis => homVert#1,
-      computedFacets => transpose(-homHalf#0),
+      facets => transpose(-homHalf#0),
       computedHyperplanes => transpose(homHalf#1)
    };
    C = cone C;
@@ -215,7 +215,7 @@ emptyPolyhedron = method(TypicalValue => Polyhedron)
 emptyPolyhedron ZZ := n -> (
    -- Checking for input errors
    if n < 1 then error("The ambient dimension must be positive");
-   C := posHull map(ZZ^(n+1), ZZ^0,0);
+   C := coneFromVData map(ZZ^(n+1), ZZ^0,0);
    result := new HashTable from {
       underlyingCone => C
    };

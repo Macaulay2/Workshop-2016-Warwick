@@ -18,44 +18,56 @@ raySort = rays -> rays _ (reverse sortColumns (- matrix {rays}))
 -- Helper methods
 load "./helpers.m2"
 
--- Methods declarations for methods defined for several objects, but not all of polyhedraHash
-load "./declarations.m2"
 
--- Core
-load "./core/engine.m2"
+-------------------------------------------------------------------------------
+-- Engine
+--
+load "./engine/properties.m2"
+load "./engine/alternatives.m2"
+-- load "./engine/display.m2"  -- For displaying polyhedra, probably not needed anymore
+
+-------------------------------------------------------------------------------
+-- Core functionality
+--
+load "./core/globalMethods.m2"
+   -- Cone
    load "./core/cone/constructors.m2"
    load "./core/cone/properties.m2"
    load "./core/cone/methods.m2"
+   -- Polyhedron (relies on cone)
    load "./core/polyhedron/constructors.m2"
    load "./core/polyhedron/properties.m2"
    load "./core/polyhedron/methods.m2"
-   load "./core/polyhedron.m2"
+   -- Fan
    load "./core/fan/constructors.m2"
    load "./core/fan/methods.m2"
    load "./core/fan/properties.m2"
-   load "./core/fan.m2"
+   -- PolyhedralComplex (relies on Fan)
    load "./core/polyhedralComplex/constructors.m2"
    load "./core/polyhedralComplex/properties.m2"
    load "./core/polyhedralComplex/methods.m2"
 load "./core/contains.m2"
 load "./core/intersection.m2"
 
+-------------------------------------------------------------------------------
 -- Extended
+--
 load "./extended/directProduct.m2"
 load "./extended/minkowskiSum.m2"
 load "./extended/polyhedron/properties.m2"
 load "./extended/polyhedron/methods.m2"
+load "./extended/fan/methods.m2"
+load "./extended/standardConstructions.m2"
+load "./extended/commonFace.m2"
+load "./extended/incompare.m2"
+load "./extended/affineImages.m2"
+load "./extended/legacy.m2"
+load "./extended/not_refactored.m2"
 
-load "./standardConstructions.m2"
-load "./commonFace.m2"
-load "./incompare.m2"
-load "./affineImages.m2"
-
--- Legacy code
-load "./legacy.m2"
-load "./not_refactored.m2"
-
+-------------------------------------------------------------------------------
 -- Tests
+--
+-- Core:
 load "./tests/core/cone_basics.m2"
 load "./tests/core/polyhedron_basics.m2"
 load "./tests/core/fan_basics.m2"
@@ -64,21 +76,28 @@ load "./tests/core/tests_from_polymake/representation.m2"
 load "./tests/core/tests_from_polymake/hilbert_basis.m2"
 load "./tests/core/tests_from_polymake/lattice_points.m2"
 load "./tests/core/tests_from_polymake/normal_fan.m2"
- 
+-- Extended:
 load "./tests/extended/polyhedron.m2"
 load "./tests/extended/tests_from_polymake/minkowskiSum.m2"
 load "./tests/extended/mixedVolume.m2"
-
+load "./tests/extended/tests_from_polymake/ehrhart_and_volume.m2"
+-- Other:
 load "./tests/legacy_tests_working.m2"
+load "./tests/shouldFail.m2"
+load "./tests/isWellDefined.m2"
 
--- Failing tests
--- load "./tests/failing.m2"
 
-load "./alternatives/lrs.m2"
--- alternative#fourierMotzkin = lrsZZ
+-------------------------------------------------------------------------------
+-- Interfaces to other software
+--
+load "./alternatives/fourierMotzkinAlternatives.m2"
+load "./alternatives/normaliz.m2"
 
+-------------------------------------------------------------------------------
 -- Documentation
-load "./legacy_doc.m2"
+--
+load "./documentation.m2"
+load "./new_documentation.m2"
 
 end
 
@@ -86,6 +105,32 @@ end
 restart
 loadPackage "Polyhedra"
 check "Polyhedra"
+
+restart
+loadPackage "Polyhedra"
+verticesP = matrix {{3},{4}};
+raysP = map(QQ^2, QQ^0, 0);
+linealityP = map(QQ^2, QQ^0, 0);
+P = convexHull(verticesP,raysP,linealityP);
+ineqlhsPd = matrix {{0,0}};
+ineqrhsPd = matrix {{1}};
+eqlhsPd = matrix {{-1,0},{0,-1}};
+eqrhsPd = matrix {{-3},{-4}};
+Pd = intersection(ineqlhsPd, ineqrhsPd, eqlhsPd, eqrhsPd);
+assert(volume P == 1)
+assert(volume Pd == 1)
+LE = {1};
+etest = vector apply(LE, e->promote(e, QQ));
+ep = vector apply(flatten entries (coefficients ehrhart P)#1, e->lift(e, QQ));
+epd = vector apply(flatten entries (coefficients ehrhart Pd)#1, e->lift(e, QQ));
+assert(ep == etest)
+assert(epd == etest)
+
+
+t = transpose matrix {{1,0},{1,1},{0,1}}
+L = {{0,2},{1,2}}
+F = fan(R,L)
+isWellDefined F
 
 restart
 loadPackage "Polyhedra"
@@ -111,15 +156,15 @@ mixedVolume({P1,P2, P3,P4, P5})
 
 
 -- debugLevel = 3
-C = posHull matrix {{1,0,0},{0,1,0},{0,0,1}};
-C1 = posHull matrix {{1,0,0},{0,-1,0},{0,0,1}};
-C2 = posHull matrix {{-1,0,0},{0,1,0},{0,0,1}};
-C3 = posHull matrix {{1,0,0},{0,1,0},{0,0,-1}};
+C = coneFromVData matrix {{1,0,0},{0,1,0},{0,0,1}};
+C1 = coneFromVData matrix {{1,0,0},{0,-1,0},{0,0,1}};
+C2 = coneFromVData matrix {{-1,0,0},{0,1,0},{0,0,1}};
+C3 = coneFromVData matrix {{1,0,0},{0,1,0},{0,0,-1}};
 F = fan {C,C1,C2,C3};
-C = posHull matrix {{-1,0,0},{0,-1,0},{0,0,-1}};
-C1 = posHull matrix {{-1,0,0},{0,1,0},{0,0,-1}};
-C2 = posHull matrix {{1,0,0},{0,-1,0},{0,0,-1}};
-C3 = posHull matrix {{-1,0,0},{0,-1,0},{0,0,1}};
+C = coneFromVData matrix {{-1,0,0},{0,-1,0},{0,0,-1}};
+C1 = coneFromVData matrix {{-1,0,0},{0,1,0},{0,0,-1}};
+C2 = coneFromVData matrix {{1,0,0},{0,-1,0},{0,0,-1}};
+C3 = coneFromVData matrix {{-1,0,0},{0,-1,0},{0,0,1}};
 F = addCone({C,C1,C2,C3},F);
 A = isPolytopal F
 B = id_(ZZ^12)
@@ -137,8 +182,8 @@ F1 = convexHull matrix {{1},{1},{1}};
 F2 = convexHull matrix {{-1},{-1},{-1}};
 assert(F1 == maxFace(w,P))
 assert(F2 == minFace(w,P))
-C = posHull matrix {{2,-1,1},{-1,1,1},{0,-1,1}};
-C1 = posHull matrix {{-1,2},{1,-1},{-1,0}};
+C = coneFromVData matrix {{2,-1,1},{-1,1,1},{0,-1,1}};
+C1 = coneFromVData matrix {{-1,2},{1,-1},{-1,0}};
 assert(C1 == minFace(w,C))
 
 
@@ -150,42 +195,42 @@ fv = polarFace f
 
 restart
 loadPackage "Polyhedra"
-C = posHull matrix {{1,0,0},{0,1,1},{0,0,1}};
+C = coneFromVData matrix {{1,0,0},{0,1,1},{0,0,1}};
 F = fan C
-C = posHull matrix {{-1,0,0},{0,1,0},{0,0,1}};
+C = coneFromVData matrix {{-1,0,0},{0,1,0},{0,0,1}};
 incompCones(C,F)
 
 restart
 loadPackage "Polyhedra"
-C2 = posHull matrix {{-1,0,0},{0,1,0},{0,0,1}};
-C3 = posHull matrix {{-1,0,0},{0,1,0},{0,0,-1}};
-C4 = posHull matrix {{-1,0,0},{0,-1,0},{0,0,1}};
-C5 = posHull matrix {{-1,0,0},{0,-1,0},{0,0,-1}};
+C2 = coneFromVData matrix {{-1,0,0},{0,1,0},{0,0,1}};
+C3 = coneFromVData matrix {{-1,0,0},{0,1,0},{0,0,-1}};
+C4 = coneFromVData matrix {{-1,0,0},{0,-1,0},{0,0,1}};
+C5 = coneFromVData matrix {{-1,0,0},{0,-1,0},{0,0,-1}};
 F1 = fan {C2,C3,C4,C5}
-C6 = posHull matrix {{1,0,0},{0,-1,0},{0,0,1}};
-C7 = posHull matrix {{1,0,0},{0,-1,0},{0,0,-1}};
+C6 = coneFromVData matrix {{1,0,0},{0,-1,0},{0,0,1}};
+C7 = coneFromVData matrix {{1,0,0},{0,-1,0},{0,0,-1}};
 F1 = addCone( {C6,C7}, F1)
-F3 = fan {posHull matrix {{1}},posHull matrix {{-1}}}
+F3 = fan {coneFromVData matrix {{1}},coneFromVData matrix {{-1}}}
 F1 = F3 * F1
 
 
 restart
 loadPackage "Polyhedra"
 R = matrix {{1,1,2},{2,1,1}}
-C = posHull R
+C = coneFromVData R
 HS = halfspaces C
 R1 = R || matrix {{0,0,0}}
 LS = matrix {{1},{1},{1}}
-C1 = posHull(R1,LS)
+C1 = coneFromVData(R1,LS)
 HS = transpose R1
 hyperplanesTmp = matrix {{1,1,1}}
 C2 = intersection(HS,hyperplanesTmp)
 C3 = intersection HS
 C4 = posOrthant 3
 C5 = intersection(C1,C2)
-C6 = posHull(C1,C2)
+C6 = coneFromVData(C1,C2)
 R2 = matrix {{2,-1},{-1,2},{-1,-1}}
-C7 = posHull {R2,C3,C4}
+C7 = coneFromVData {R2,C3,C4}
 P = crossPolytope 3
 P1 = C6 + P
 C8 = C * C1

@@ -87,7 +87,8 @@ fig2devPath = gfanInterface2#Options#Configuration#"fig2devpath"
 gfanVerbose = gfanInterface2#Options#Configuration#"verbose"
 gfanKeepFiles = gfanInterface2#Options#Configuration#"keepfiles"
 gfanCachePolyhedralOutput = gfanInterface2#Options#Configuration#"cachePolyhedralOutput"
-gfanTropicalMin = not gfanInterface2#Options#Configuration#"tropicalMax"
+--minmax switch disabled
+-- gfanTropicalMin = not gfanInterface2#Options#Configuration#"tropicalMax"
 
 GfanTypes = {
 	{	"sym" => "AmbientDim",
@@ -253,6 +254,15 @@ net MarkedPolynomialList := L -> net expression L
 
 RingMap MarkedPolynomialList := (F, L) -> L/(a-> a/F)
 
+
+
+
+
+
+
+
+
+
 --------------------------------------------------------
 --------------------------------------------------------
 -- PARSING FUNCTIONS
@@ -393,8 +403,13 @@ gfanParseBoolInteger String := (s) -> s == "1\n"
 -- Gfan Parsing Polymake-style data
 ------------------------------------------
 
-gfanParsePolyhedralFan = method(TypicalValue => PolyhedralObject, Options => {"GfanFileName" => null, "TropicalMinConventionApplies" => false })
+--minmax switch is now disabled
+--gfanParsePolyhedralFan = method(TypicalValue => PolyhedralObject, Options => {"GfanFileName" => null, "TropicalMinConventionApplies" => false })
+
+gfanParsePolyhedralFan = method(TypicalValue => PolyhedralObject, Options => {"GfanFileName" => null})
 gfanParsePolyhedralFan String := o -> s -> (
+    	if debugLevel>0 then (print s);
+	
 	B := select(sublists(lines s, l -> #l =!= 0, toList, l -> null), l -> l =!= null);
 	header := first B; --first list of lines
 	if #B < 2 and #header < 2 then error(concatenate header);
@@ -404,25 +419,26 @@ gfanParsePolyhedralFan String := o -> s -> (
 	parsedBlocks := apply(select(blocks, Q -> last Q =!= null), P -> GfanNameToPolyhedralName#(first P) => last P);
 	myhash := new MutableHashTable from parsedBlocks;
 
-	if gfanTropicalMin and o#"TropicalMinConventionApplies" then (
---		print("tropical min convention invoked while parsing polyhedral fan");
-
-	-- adjust the fan
-		myhash#"Rays" = apply(myhash#"Rays", ray-> -ray);
-
-	-- adjust rawBlocks
-		myList := {"RAYS"};
-		apply(length myhash#"Rays", i -> (
-			myVector := between(" ", apply(myhash#"Rays"#i, coord -> toString(coord)));
-			myString := concatenate(myVector) | "  # " | toString(i);
-			myList = append(myList, myString);
-		));
-		rawBlocks#"RAYS" = myList;
-
-	-- adjust raw-string
-			myBlocks := prepend(header, values rawBlocks);
-			s = concatenate between("\n\n", apply(myBlocks, lines -> between("\n", lines)));
-	);
+--minmax switch disabled
+--	if gfanTropicalMin and o#"TropicalMinConventionApplies" then (
+--		--print("tropical min convention invoked while parsing polyhedral fan");
+--
+--	-- adjust the fan
+--		myhash#"Rays" = apply(myhash#"Rays", ray-> -ray);
+--
+--	-- adjust rawBlocks
+--		myList := {"RAYS"};
+--		apply(length myhash#"Rays", i -> (
+--			myVector := between(" ", apply(myhash#"Rays"#i, coord -> toString(coord)));
+--			myString := concatenate(myVector) | "  # " | toString(i);
+--			myList = append(myList, myString);
+--		));
+--		rawBlocks#"RAYS" = myList;
+--
+--	-- adjust raw-string
+--			myBlocks := prepend(header, values rawBlocks);
+--			s = concatenate between("\n\n", apply(myBlocks, lines -> between("\n", lines)));
+--	);
 
 	P := new gfanParseHeader(header) from myhash;
    	if gfanCachePolyhedralOutput then (
@@ -437,7 +453,18 @@ gfanParsePolyhedralFan String := o -> s -> (
 		P#"GfanFileRawBlocks" = rawBlocks;
 		);
    	if gfanKeepFiles and o#?"GfanFileName" and o#"GfanFileName" =!= null then P#"GfanFileName" = o#"GfanFileName";
-	P
+	--now we turn this hashtable into a fan according to polyhedra
+	--this S is the local object that will be the fan
+	S:={};
+    	    myrays:={};
+	    mylinspace:={};
+	    if  P#"Rays"=={} then myrays=map(ZZ^(P#"AmbientDim"),ZZ^0,0) else  myrays=transpose matrix P#"Rays";
+	    if P#"LinealitySpace"=={} then  mylinspace=map(ZZ^(P#"AmbientDim"),ZZ^0,0)  else mylinspace=transpose matrix P#"LinealitySpace";
+	    S=fanFromGfan({myrays,mylinspace,P#"MaximalCones",P#"Dim",P#"Pure",P#"Simplicial",P#"FVector"});
+	    if  P#?"Multiplicities" then 
+	    (S,P#"Multiplicities" )
+	    else  (S,{})
+	      
 )
 
 gfanParseHeader = method(TypicalValue => Type)
@@ -1196,6 +1223,8 @@ gfanFanCommonRefinement = method( Options => {
 	}
 )
 
+--This has been broken by our changes to gfanInterface2 to make
+--the output be Fans in the new sense.
 gfanFanCommonRefinement (Fan, Fan) := opts -> (F,G) -> (
      fileF := "";
      fileG := "";
@@ -1928,7 +1957,9 @@ gfanTropicalBruteForce List := opts -> (L) -> (
 	L = newL;
 	input := gfanMPLToRingToString(L) | gfanMPLToString(L);
 	output := runGfanCommand("gfan _tropicalbruteforce", opts, input);
-	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true)
+--minmax switch disabled
+--	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true)
+	gfanParsePolyhedralFan output
 )
 
 
@@ -2025,11 +2056,21 @@ gfanTropicalIntersection (List) := opts -> (L) -> (
 	(ringMap, newL) := gfanConvertToNewRing(L);
 	L = newL;
 	input := gfanRingToString(ring first L) | gfanPolynomialListToString(L);
-	gfanParsePolyhedralFan runGfanCommand("gfan _tropicalintersection", opts, input)
+	s:=runGfanCommand("gfan _tropicalintersection", opts, input);
+	if ((opts#"t")==false) then (return gfanParsePolyhedralFan s)
+	else 
+	 if (toString substring(0,13, toString (s#0))=="The following") then false
+	    else (
+		if (toString substring(0,13, toString (s#0))=="_application ") then true
+--In case something has changed in 'gfan' or 'gfanInterface'
+	        else error "Algorithm fail"
+		)
+	    
+
 )
 
 --------------------------------------------------------
--- gfan_tropiciallifting
+-- gfan_tropicallifting
 --------------------------------------------------------
 
 gfanTropicalLifting = method( Options => {} )
@@ -2039,7 +2080,7 @@ gfanTropicalLifting := opts -> () -> (
 )
 
 --------------------------------------------------------
--- gfan_tropiciallinearspace
+-- gfan_tropicallinearspace
 --------------------------------------------------------
 
 gfanTropicalLinearSpace = method( Options => {
@@ -2133,8 +2174,11 @@ gfanTropicalTraverse (List) := opts -> (L) -> (
 		| gfanVectorListToString(opts#"symmetry");
 
 	output := runGfanCommand("gfan _tropicaltraverse", opts, input);
-
-	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true )
+	
+--minmax switch disabled
+--	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true )
+	gfanParsePolyhedralFan output
+	
 )
 
 --------------------------------------------------------
@@ -2246,8 +2290,9 @@ gfanFunctions = hashTable {
 --gfanHelp = hashTable apply(keys gfanFunctions, fn ->
 --	gfanFunctions#fn => apply( lines runGfanCommandCaptureError(gfanFunctions#fn, {"--help"}, {true}, "") , l->PARA {l})
 --)
+--WARNING - the word PARA was deleted from the next function (it used to read "l -> PARA {l})
 gfanHelp = (functionStr) ->
-	apply( lines runGfanCommandCaptureError(functionStr, hashTable {"help" => true}, "") , l->PARA {l})
+	apply( lines runGfanCommandCaptureError(functionStr, hashTable {"help" => true}, "") , l-> {l})
 
 
 
@@ -2338,11 +2383,7 @@ doc ///
 		Text
 			Again, the path should end in a slash.
 
-		Text
-			The package now uses tropical-MIN convention by default, however tropical-MAX can be specified on loading the package as follows:
-		
-		Example
-			loadPackage("gfanInterface2", Configuration => { "tropicalMax" => true }, Reload=> true)
+
 ///
 
 doc ///
@@ -2467,68 +2508,68 @@ doc ///
 	SeeAlso
 		MarkedPolynomialList
 ///
+    
+-- --{*
+-- doc ///
+-- 	Key
+-- 		polymakeConeToCone
+-- 		(polymakeConeToCone, PolymakeCone)
+-- 	Headline
+-- 		converts a PolymakeCone into a Cone from the Polyhedra package
+-- 	Usage
+-- 		G = polymakeConeToCone F
+-- 	Inputs
+-- 		F:PolymakeCone
+-- 	Outputs
+-- 		G:Cone
+-- 	Description
+-- 		Text
+-- 			This method converts a @TO PolymakeCone@, as output by gfan, into a @TO Cone@ from the
+-- 			@TO Polyhedra@ package.
 
-{*
-doc ///
-	Key
-		polymakeConeToCone
-		(polymakeConeToCone, PolymakeCone)
-	Headline
-		converts a PolymakeCone into a Cone from the Polyhedra package
-	Usage
-		G = polymakeConeToCone F
-	Inputs
-		F:PolymakeCone
-	Outputs
-		G:Cone
-	Description
-		Text
-			This method converts a @TO PolymakeCone@, as output by gfan, into a @TO Cone@ from the
-			@TO Polyhedra@ package.
+-- 		Example
+-- 			R = QQ[x,y,z,w];
+-- 			C = gfanGroebnerCone markedPolynomialList {{x*y*z}, { x*y*z + z*w^2*x + y^2*w*x}}
+-- 			G = polymakeConeToCone C
+-- 			rays G
+-- 			linSpace G
 
-		Example
-			R = QQ[x,y,z,w];
-			C = gfanGroebnerCone markedPolynomialList {{x*y*z}, { x*y*z + z*w^2*x + y^2*w*x}}
-			G = polymakeConeToCone C
-			rays G
-			linSpace G
+-- 	SeeAlso
+-- 		polymakeFanToFan
+-- 		PolymakeFan
+-- 		PolymakeCone
+-- ///
 
-	SeeAlso
-		polymakeFanToFan
-		PolymakeFan
-		PolymakeCone
-///
+-- doc ///
+-- 	Key
+-- 		polymakeFanToFan
+-- 		(polymakeFanToFan, PolymakeFan)
+-- 	Headline
+-- 		converts a PolymakeFan into a Fan from the Polyhedra package
+-- 	Usage
+-- 		G = polymakeFanToFan F
+-- 	Inputs
+-- 		F:PolymakeFan
+-- 	Outputs
+-- 		G:Fan
+-- 	Description
+-- 		Text
+-- 			This method converts a @TO PolymakeFan@, as output by gfan, into a @TO Fan@ from the
+-- 			@TO Polyhedra@ package.
 
-doc ///
-	Key
-		polymakeFanToFan
-		(polymakeFanToFan, PolymakeFan)
-	Headline
-		converts a PolymakeFan into a Fan from the Polyhedra package
-	Usage
-		G = polymakeFanToFan F
-	Inputs
-		F:PolymakeFan
-	Outputs
-		G:Fan
-	Description
-		Text
-			This method converts a @TO PolymakeFan@, as output by gfan, into a @TO Fan@ from the
-			@TO Polyhedra@ package.
+-- 		Example
+-- 			R = QQ[x,y,z,w];
+-- 			F = gfanToPolyhedralFan gfan { x*y -z,  z*w - x}
+-- 			G = polymakeFanToFan F
+-- 			rays G
+-- 			linSpace G
 
-		Example
-			R = QQ[x,y,z,w];
-			F = gfanToPolyhedralFan gfan { x*y -z,  z*w - x}
-			G = polymakeFanToFan F
-			rays G
-			linSpace G
+-- 	SeeAlso
+-- 		polymakeConeToCone
+-- 		PolymakeFan
+-- 		PolymakeCone
+-- ///
 
-	SeeAlso
-		polymakeConeToCone
-		PolymakeFan
-		PolymakeCone
-///
-*}
 
 doc ///
 	Key
@@ -2553,24 +2594,25 @@ doc ///
 			all @TO2 {"Marked Groebner Basis Example", "marked reduced Groebner bases"}@ of {\tt I}, {\tt L}, or {\tt M}
 	Description
 		Text
-			This method produces all reduced Groebner bases of a polynomial ideal.
-			The ideal can be given as an {\tt Ideal}, {\tt List} of polynomials, or
-			a {\tt MarkedPolynomialList}.
-			The {\tt "g"=> true} option can be used to inform {\tt gfan} that the input
-			is already a Groebner basis with respect to some monomial order.
-			However, in this case, the input must be a {\tt MarkedPolynomialList}.
-
+			This method produces all reduced Groebner
+			bases of a polynomial ideal.  The ideal can be
+			given as an {\tt Ideal}, {\tt List} of
+			polynomials, or a {\tt MarkedPolynomialList}.
+			The {\tt "g"=> true} option can be used to
+			inform {\tt gfan} that the input is already a
+			Groebner basis with respect to some monomial
+			order.  However, in this case, the input must
+			be a {\tt MarkedPolynomialList}.
 		Example
 			R = QQ[x,y,z];
 			gfan(ideal(x^2*y -y^2, y^2*x - x^2))
 			gfan({x^2*y -y^2, y^2*x - x^2}, "symmetry" => {{0,1,2}, {1,0,2}})
 			gfan(markedPolynomialList {{y^5, x*y^2, x^2},{y^5-y^2,x*y^2 - y^4, x^2 -y^4}}, "g" => true)
-
 		Text
-
 			@STRONG "gfan Documentation"@
 			@gfanHelp "gfan"@
 ///
+
 doc ///
 	Key
 		MPLConverter
@@ -4262,23 +4304,34 @@ doc ///
 
 -- mytest
 -- TEST tropical min/max convention
-
+--this test is obsolete as minmax switch is now disabled
 TEST /// -- by default the convention should be TROPICAL-MIN
-QQ[x,y,z];
-loadPackage("gfanInterface2", Reload=>true); -- the min convention is used by default
-fan := gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
-assert( member({2,-1,-1}, fan#"Rays"));
+--  QQ[x,y,z];
+-- loadPackage("gfanInterface2", Reload=>true, Configuration=>{ "tropicalMax"=> false });  
+--  fan1 = gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
+--  assert( member({2,-1,-1}, fan1#"Rays"));
 ///
 
 TEST /// -- alternatively TROPICAL-MAX can be specified on loading the package
-QQ[x,y,z];
-loadPackage("gfanInterface2", Reload=>true, Configuration=>{ "tropicalMax"=> true });
-fan := gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
-assert( member({-2,1,1}, fan#"Rays"));
+  QQ[x,y,z];
+  loadPackage("gfanInterface2", Reload=>true, Configuration=>{ "tropicalMax"=> true });
+  fan1 = gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
+  assert( member({-2,1,1}, fan1#"Rays"));
 ///
 
-end
+end--
 
+restart
+--path = prepend(".",path)
+uninstallPackage "Polyhedra"
+uninstallPackage "gfanInterface2"
+restart
+--path = prepend(".",path)
+installPackage "Polyhedra"
+installPackage "gfanInterface2"
+restart
+loadPackage "gfanInterface2"
+check gfanInterface2
 
 -------------------------------------------------------------
 -------------------------------------------------------------

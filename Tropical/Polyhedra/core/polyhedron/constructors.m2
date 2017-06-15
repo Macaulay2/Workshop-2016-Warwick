@@ -34,10 +34,11 @@ polyhedron HashTable := inputProperties -> (
 
      
 --   INPUT : 'P'  a Polyhedron
-posHull Polyhedron := P -> (
+coneFromVData Polyhedron := P -> (
      Mrays := makePrimitiveMatrix vertices(P) | rays(P);
      Mlinspace := linSpace(P);
-     posHull(Mrays,Mlinspace))
+     coneFromVData(Mrays,Mlinspace)
+)
 
 -- PURPOSE : Computing the Convex Hull of a given set of points and rays
 convexHull = method(TypicalValue => Polyhedron)
@@ -82,7 +83,7 @@ convexHull(Polyhedron,Polyhedron) := (P1,P2) -> (
    C2 := getProperty(P2, underlyingCone);
    result := new HashTable from {
       ambientDimension => ambDim P1,
-      underlyingCone => posHull(C1, C2)
+      underlyingCone => coneFromVData(C1, C2)
    };
    polyhedron result
 )
@@ -97,7 +98,7 @@ convexHull List := L -> (
       )
    );
    cones := apply(polyhedra, p -> getProperty(p, underlyingCone));
-   underLyingResult := posHull(cones);
+   underLyingResult := coneFromVData(cones);
    result := new HashTable from {
       underlyingCone => underLyingResult
    };
@@ -112,3 +113,30 @@ polyhedron Cone := C -> (
    convexHull(vertex, rayData#0, rayData#1)
 )
 
+
+polyhedronFromHData = method()
+polyhedronFromHData(Matrix, Matrix) := (M,v) -> (
+   r := ring M;
+   Nw := map(r^0, source M, 0);
+   w := map(r^0, r^1, 0);
+   polyhedronFromHData(M, v, Nw, w)
+)
+
+--   INPUT : '(M,v,N,w)',  where all four are matrices (although v and w are only vectors), such
+--     	    	      	  that the polyhedron is given by P={x | Mx<=v and Nx=w} 
+--  OUTPUT : 'P', the polyhedron
+polyhedronFromHData(Matrix,Matrix,Matrix,Matrix) := (M,v,N,w) -> (
+	-- checking for input errors
+	if numColumns M =!= numColumns N then error("equations of half-spaces and hyperplanes must have the same dimension");
+	if numRows M =!= numRows v or numColumns v =!= 1 then error("invalid condition vector for half-spaces");
+	if numRows N =!= numRows w or numColumns w =!= 1 then error("invalid condition vector for hyperplanes");
+	ineq := v | M;
+   ezero := matrix {flatten {1 , toList ((numgens source M):0)}};
+   ineq = ineq ||  ezero;
+	eq := w | N;
+   result := new HashTable from {
+      inequalities => (M,v),
+      equations => (N,w)
+   };
+   polyhedron result
+)

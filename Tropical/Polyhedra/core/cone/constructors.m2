@@ -14,10 +14,11 @@ cone HashTable := inputProperties -> (
    constructTypeFromHash(Cone, resultHash)
 )
 
+
 sanitizeConeInput = method()
 sanitizeConeInput HashTable := given -> (
-   rayProperties := {inputRays, inputLinealityGenerators, computedRays, computedLinealityBasis};
-   facetProperties := {inequalities, equations, computedFacets, computedHyperplanes};
+   rayProperties := {inputRays, inputLinealityGenerators, rays, computedLinealityBasis};
+   facetProperties := {inequalities, equations, facets, computedHyperplanes};
    remainingProperties := keys given;
    remainingProperties = select(remainingProperties, p -> all(rayProperties, rp -> rp=!=p));
    remainingProperties = select(remainingProperties, p -> all(facetProperties, rp -> rp=!=p));
@@ -38,25 +39,25 @@ sanitizeConeInput HashTable := given -> (
 )
 
 
-coneFromRayData = method(TypicalValue => Cone)
-coneFromRayData(Matrix, Matrix) := (iRays, linealityGenerators) -> (
+coneFromMinimalVData = method(TypicalValue => Cone)
+coneFromMinimalVData(Matrix, Matrix) := (iRays, linealityGenerators) -> (
      -- checking for input errors
      if numRows iRays =!= numRows linealityGenerators then error("rays and linSpace generators must lie in the same space");
      result := new HashTable from {
          ambientDimension => numRows iRays,
-         computedRays => iRays,
+         rays => iRays,
          computedLinealityBasis => linealityGenerators
      };
      cone result
 )
 
 
-coneFromFacetData = method(TypicalValue => Cone)
-coneFromFacetData(Matrix, Matrix) := (ineq, eq) -> (
+coneFromMinimalHData = method(TypicalValue => Cone)
+coneFromMinimalHData(Matrix, Matrix) := (ineq, eq) -> (
    if numColumns ineq =!= numColumns eq then error("facets and hyperplanes must lie in same space");
    result := new HashTable from {
       ambientDimension => numColumns ineq,
-      computedFacets => ineq,
+      facets => ineq,
       computedHyperplanes => eq
    };
    cone result
@@ -65,7 +66,7 @@ coneFromFacetData(Matrix, Matrix) := (ineq, eq) -> (
 
 -- PURPOSE : Computing the positive hull of a given set of rays lineality 
 --		 space generators
-posHull = method(TypicalValue => Cone)
+coneFromVData = method(TypicalValue => Cone)
 
 --   INPUT : 'Mrays'  a Matrix containing the generating rays as column vectors
 --		 'LS'  a Matrix containing the generating rays of the 
@@ -73,7 +74,7 @@ posHull = method(TypicalValue => Cone)
 --  OUTPUT : 'C'  a Cone
 -- COMMENT : The description by rays and lineality space is stored in C as well 
 --		 as the description by defining half-spaces and hyperplanes.
-posHull(Matrix,Matrix) := (Mrays,LS) -> (
+coneFromVData(Matrix,Matrix) := (Mrays,LS) -> (
    if numRows Mrays =!= numRows LS then error("rays and linSpace generators must lie in the same space");
    result := new HashTable from {
       ambientDimension => numRows Mrays,
@@ -85,29 +86,38 @@ posHull(Matrix,Matrix) := (Mrays,LS) -> (
 
 --   INPUT : 'M',  a matrix, such that the Cone is given by C={x | Mx>=0} 
 --  OUTPUT : 'C', the Cone
-intersection Matrix := M -> (
-   r := ring M;
-   N := transpose map(source M, r^0, 0); 
-   intersection(M, N)
+coneFromHData = method(TypicalValue => Cone)
+
+coneFromHData Matrix := ineq -> (
+   coneFromHData(ineq, map(ZZ^0,ZZ^(numColumns ineq), 0))
 )
 
+coneFromHData(Matrix, Matrix) := (ineq, eq) -> (
+   if numColumns ineq != numColumns eq then error("Column dimensions of inequalities and equations do not agree.");
+   result := new HashTable from {
+      inequalities => ineq,
+      equations => eq
+   };
+   return cone result
+
+)
 
 
 
 --   INPUT : 'R'  a Matrix containing the generating rays as column vectors
-posHull Matrix := R -> (
+coneFromVData Matrix := R -> (
    r := ring R;
    -- Generating the zero lineality space LS
    LS := map(target R, r^0,0);
-   posHull(R,LS)
+   coneFromVData(R,LS)
 )
 
 
 --   INPUT : '(C1,C2)'  two cones
-posHull(Cone,Cone) := (C1,C2) -> (
+coneFromVData(Cone,Cone) := (C1,C2) -> (
    local iRays;
    local linealityGens;
-   if hasProperties(C1, {computedRays, computedLinealityBasis}) then (
+   if hasProperties(C1, {rays, computedLinealityBasis}) then (
       iRays = rays C1;
       linealityGens = linealitySpace C1;
    ) else if hasProperties(C1, {inputRays, inputLinealityGenerators}) then (
@@ -117,7 +127,7 @@ posHull(Cone,Cone) := (C1,C2) -> (
       iRays = rays C1;
       linealityGens = linealitySpace C1;
    );
-   if hasProperties(C2, {computedRays, computedLinealityBasis}) then (
+   if hasProperties(C2, {rays, computedLinealityBasis}) then (
       iRays = iRays | rays C2;
       linealityGens = linealityGens | linealitySpace C2;
    ) else if hasProperties(C2, {inputRays, inputLinealityGenerators}) then (
@@ -127,17 +137,17 @@ posHull(Cone,Cone) := (C1,C2) -> (
       iRays = iRays | rays C2;
       linealityGens = linealityGens | linealitySpace C2;
    );
-   posHull(iRays, linealityGens)
+   coneFromVData(iRays, linealityGens)
 )
 
 
 --   INPUT : 'L',   a list of Cones, Polyhedra, rays given by R, 
 --     	    	    and (rays,linSpace) given by '(R,LS)'
-posHull List := L -> (
+coneFromVData List := L -> (
    -- Turn everything into cones.
    cones := apply(L, 
       l -> (
-         if not instance(l, Cone) then posHull l
+         if not instance(l, Cone) then coneFromVData l
          else l
       )
    );
@@ -146,7 +156,7 @@ posHull List := L -> (
    -- Adding the cones is not expensive, since we will not do fourierMotzkin
    -- every time.
    for cone in cones do (
-      result = posHull(result, cone);
+      result = coneFromVData(result, cone);
    );
    result
 )

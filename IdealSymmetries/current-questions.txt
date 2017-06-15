@@ -4,5 +4,6 @@
 --Poly mod portion over Z2--what would it mean? Would it find the symmetries?
 --Tests--random, cyclic n, etc.
 --One poly at a time. How to test other polys--actually swap, or find c-locus and substitute?
+--Complexity?
 
 --Literature on symmetry stuff? "Algorithms in Invariant Theory"?

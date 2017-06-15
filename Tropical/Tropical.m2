@@ -14,6 +14,7 @@ newPackage(
   		{Name => "Sara Lamboglia", Email => "", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
+   		{Name => "Jeff Sommars", Email => "", HomePage=>""},
     		{Name => "Paolo Tripoli", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
@@ -24,7 +25,7 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-        PackageExports => {"gfanInterface2","EliminationMatrices"},
+        PackageExports => {"gfanInterface2","EliminationMatrices","Binomials"},
 	DebuggingMode => true
 )
 
@@ -32,25 +33,16 @@ export {
   "TropicalCycle",
   "tropicalCycle",
   "isBalanced",
-  "isPolyhedralComplex",
   "tropicalPrevariety",
-  "computeMultiplicities",
+  "ComputeMultiplicities",
   "Prime",
   "stableIntersection",
   "tropicalVariety",
   "isTropicalBasis",
-  "getRays",
-  "getCones",
-  "getDim",
-  "getAmbientDim",
-  "getFVector",
-  "getLinealitySpace",
-  "getMaximalCones",
-  "getMultiplicities"
+  "multiplicities"
 }
 
---???check syntax - idea is that this is where we should define local symbols
---protect Maclagan
+
 
 
 
@@ -79,6 +71,24 @@ tropicalCycle (Fan, List) := (F,mult)->(
     return T
 )    
 
+
+
+
+
+--functions to switch to min-convention
+
+minmaxSwitch = method ()
+
+minmaxSwitch (Fan) := F -> fanFromGfan({- rays F, linSpace F, maxCones F ,dim F,isPure F,isSimplicial F,fVector F});
+
+minmaxSwitch (TropicalCycle) := T -> tropicalCycle(minmaxSwitch fan T, multiplicities T);
+
+
+
+
+
+
+
 isBalanced = method(TypicalValue => Boolean)
 
 isBalanced (TropicalCycle):= T->(
@@ -95,19 +105,7 @@ isBalanced (TropicalCycle):= T->(
 
 
 
-isWellDefined TropicalCycle := Boolean =>
- T ->(
- -- Check that the fan is well-defined and pure, and then call isBalanced   
-       if isPure(T) then return(isBalanced(T)) else return(false);
-)      
 
-
-isPolyhedralComplex = method(TypicalValue => Boolean)
-
-isPolyhedralComplex (TropicalCycle) := T ->(
- -- Check that the fan is indeed a fan, and not just union of cones   
-	isWellDefined (T#"Fan")
-)      
 
 
 --Computing a tropical prevariety
@@ -121,10 +119,9 @@ tropicalPrevariety = method(TypicalValue => Fan,  Options => {
 tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
 --using strategy gfan
     if (o.Strategy=="gfan") then (
-    	F:=parseFanFromGfanToPolyhedraFormat gfanTropicalIntersection(L, gfanopt); 
---remove the key "Multiplicities" since it does not make sense for a prevariety (in contrast to TropicalCycle)
-        remove(F,"Multiplicities");
-        return F)
+    	F:= gfanTropicalIntersection(L, gfanopt); 
+--gives only the fan and not the fan plus multiplicities which are wrongly computed in gfan
+	if (Tropical#Options#Configuration#"tropicalMax" == true) then return F_0 else return minmaxSwitch (F_0))
     else error "options not valid"
 )
 
@@ -156,47 +153,30 @@ computeCones=(R,M,L)->(
     )
 
 --input:rays,maximal cones and 
---lineality space so you put getMaximalCones and getRays so the 
+--lineality space so you put maximalCones and rays so the 
 --inputs are two lists
 --output:list of matrices
 -- note that ConesOfVariety is a local variable also in findMultiplicities
 findMultiplicity=(M,I)->(
---compute vector w in relative interior in order to get the initial ideal
+--compute vector w in relative interior in order to get the initial ideal in_w(I) with w in the maximal cone M
     n:=numRows M - 1;
-    w:=flatten entries(-sum(0..n, j->M^{j}));
---weight the ring according to this w 
+    w:=flatten entries(sum(0..n, j->M^{j}));
+--weight the ring according to this w , we are using leadTerm that is why we consider -sum of rays
     R:=newRing(ring I, MonomialOrder=>{Weights=>w},Global=>false);
     J:=sub(I,R);
     K:=ideal(leadTerm(1,J));
-    InitialIdeal:=sub(K,ring I);
---saturate the ideal with respect to the product of all the variables
-    listOfVariables:=gens (ring I);
-    j:=0;L:=1; while j<# listOfVariables do(
-	L=L* listOfVariables_j;
-	j=j+1
-	); 
-    Basis:= transpose((maxCol(transpose M))_0);
-    d:=dim (convexHull(Basis));
-    if d==0 
-    then 1
- --since the volume of a point is 0 and 0! is 1, then you have to divide
- --by the index but in this case is 1 
-    else 
-    (V:=d! * (volume(convexHull(Basis)));
-    IdealMinors:=minors(numRows Basis,Basis);
-    i:=0;
-    Minors:={};
-    while (i<numColumns gens IdealMinors) do ( 
-	Minors=append(Minors, (gens IdealMinors)_(0,i));i=i+1);
-    l:=gcd(Minors) ;
-    V=V/l;
-    m:=degree(saturate(InitialIdeal,L))/V;
+    InitialIdeal:= saturate(sub(K,ring I),ideal product gens ring I);
+--this is the the basis of the lattice associated to the toric ideal we are going to compute
+    Basis:= (maxCol( generators kernel M))_0;
+    --this is where we use  Binomials package
+    toricIdeal:=saturate(latticeBasisIdeal(ring InitialIdeal,Basis),ideal product gens ring I);
+    m:=degree(InitialIdeal)/degree (toricIdeal);
 --return multiplicity m as integer, since it lives currently in QQ
 --if m is an integer (as it should be), then the following command parses it to ZZ
 --otherwise, an errow will be returned "rational number is not an integer"
     lift(m,ZZ) 
     )    
-)
+
 --input Matrix whose rows are the generators of the cone and the ideal of the variety
 --output a list of one number that is the multiplicity
 --maths behind it look at exercise 34 chapter 3 Tropical book and [Stu96]
@@ -222,7 +202,7 @@ findMultiplicities=(I,T)->(
 --TODO: check multiplicity computation in the case that the variety has no rays but only lineality space
 --(see example for ideal K in tropicalVariety) 
 tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
-	computeMultiplicities => true,
+	ComputeMultiplicities => true,
 	Prime => true
 	})
 tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
@@ -234,20 +214,21 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 	       (if (opt.Prime== true)
 		then (
 		    F= gfanTropicalTraverse( gfanTropicalStartingCone I);
-	            tropicalCycle(parseFanFromGfanToPolyhedraFormat F,F#"Multiplicities"))
+	            if (Tropical#Options#Configuration#"tropicalMax" == true) then return tropicalCycle(F) else return minmaxSwitch tropicalCycle (F))
 		else
 		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
-		    (if opt.computeMultiplicities==false 
-		     then (F=parseFanFromGfanToPolyhedraFormat gfanTropicalBruteForce gfanBuchberger I;
+		    (if opt.ComputeMultiplicities==false 
+		     then (F= gfanTropicalBruteForce gfanBuchberger I;
 			   mult := {};
 			   i:=0;
-			   while(i<#maxCones F)do(
+			   while(i<#maxCones (F_0))do(
 			       mult=append(mult,{});
 			       i=i+1);
-			   tropicalCycle(F,mult)
+			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities 
+			   if (Tropical#Options#Configuration#"tropicalMax" == true) then return  tropicalCycle(F_0,mult) else return minmaxSwitch tropicalCycle(F_0,mult)
 	    	    	   )
-		     else (F=parseFanFromGfanToPolyhedraFormat gfanTropicalBruteForce gfanBuchberger I;
-			 tropicalCycle(F,findMultiplicities(I,F))
+		     else (F= gfanTropicalBruteForce gfanBuchberger I;
+			 if (Tropical#Options#Configuration#"tropicalMax" == true) then return tropicalCycle(F_0,findMultiplicities(I,F_0)) else return minmaxSwitch tropicalCycle(F_0,findMultiplicities(I,F_0))
 			 )  )))
 
 
@@ -260,7 +241,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	--First homogenize
     	R:=ring I;
 --	KK:=coefficientRing R;
---    	AA:= symbol AA;
+    	AA:= symbol AA;
     	S:= first flattenRing( R[getSymbol "AA", Join=>false]);
 	J:=substitute(I,S);
 	J=homogenize(J,S_0);
@@ -268,12 +249,26 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	--Then compute tropical variety of homogenized ideal calling
         --the other function
 --I'm worried about the use S here - this might be broken.
-	use S;
+	--use S;
 	T:=tropicalVariety(J,true);
+	TProperties := {dehomogenise(rays T),
+			dehomogenise(linealitySpace T),
+			maxCones T,
+			dim(T)-1,
+			isPure T,
+			isSimplicial T,
+			fVector T};
+	UFan:=fanFromGfan(TProperties);
+	U:= tropicalCycle(UFan,multiplicities(T));
+	return(U);
+	)
+)
+
+{* Old tropicalVariety code
     	--Then remove lineality space
 	--The following lines will need to be changed once the
 	--Polyhedra package has been updated (hopefully summer 2016)
-    	Trays:=getRays(T);
+    	Trays:=entries transpose rays(T);
 	--Add a multiple of the all-ones vector to each ray to make the first
 	-- coordinate zero, drop the first coordinate, and divide by the 
 	-- gcd.
@@ -284,18 +279,27 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	    newv = apply(newv,i->(lift(i,ZZ)))
        	    ));
     	--The next line in particular should be replaced by a constructor.
-    	T#"Rays" = newTrays;
-	T#"Dim" = getDim(T)-1;
-	T#"AmbientDim" = T#"AmbientDim"-1;
+    	(fan(T))#cache#"Rays" = newTrays;
+	(fan(T))#cache#"computedDimension" = dim(T)-1;
+	(fan(T))#cache#"ambientDimension" = (fan(T))#cache#"ambientDimension"-1;
 	--For the next one, if we want to remember the lineality space
 	--we should instead quotient by the all ones vector
-	remove(T,"LinealitySpace");
-	remove(T,"OrthLinealitySpace");
-	remove(T,"LinealityDim");
-	return(T);
-    )
-)
+	--remove(T,"LinealitySpace");
+	--remove(T,"OrthLinealitySpace");
+	--remove(T,"LinealityDim");
+	--return(T);
+*}
 
+dehomogenise=(M) -> (
+	vectorList:= entries transpose M;
+	dehomog:= apply(vectorList, L->(
+		newL := apply(#L-1,i->(L#(i+1)-L#0));
+		gcdL := gcd(newL);
+		newL = newL/gcdL;
+		newL = apply(newL,i->(lift(i,ZZ)))
+	));
+	transpose matrix dehomog
+)
 
 --Check if a list of polynomials is a tropical basis for the ideal they generate
 
@@ -307,16 +311,8 @@ isTropicalBasis = method(TypicalValue => Boolean,  Options => {
 isTropicalBasis (List) := o -> L -> (
 	if (o.Strategy=="gfan") then (
 	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false}; if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneous polynomials yet";
- 	    F:=gfanTropicalIntersection(L, gfanopt); 
---Under current version of 'gfan', the information is only kept in #GfanFileHeader, checking the first 13 characters.
-	    if (toString substring(0,13, toString F#"GfanFileHeader")=="The following") then false
-	    else (
-		if (toString substring(0,13, toString F#"GfanFileHeader")=="_application ") then true
---In case something has changed in 'gfan' or 'gfanInterface'
-	        else error "Algorithm fail"
-		)
+ 	    return gfanTropicalIntersection(L, gfanopt); 
 	)
-	else error "options not valid"
 	)
 
 
@@ -324,8 +320,8 @@ stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+    if (o.Strategy=="atint") then (
 -- does not work yet! Problems with intersection in atint (polymake)
-
 -- TODO: rewrite complety after Polyhedra is done and gfanInterface2 got adapted to Polyhedra
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
@@ -346,32 +342,32 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
-	parseFanFromGfanToPolyhedraFormat gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
-	
+ 	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
+    );
 )    
 
-parseFanFromGfanToPolyhedraFormat = method(TypicalValue => Fan)
-parseFanFromGfanToPolyhedraFormat PolyhedralObject := P -> (
-	oldR := P#"Rays";
-	local newR;
-	if (#oldR > 0) then newR = transpose matrix oldR else newR = matrix{{}};
-	oldL := P#"LinealitySpace";
-	local newL;
-	if (#oldL > 0) then newL = transpose matrix oldL else newL = matrix{{}};
-	F := fan(newR,newL,P#"MaximalCones");
-	F
-)
+--parseFanFromGfanToPolyhedraFormat = method(TypicalValue => Fan)
+--parseFanFromGfanToPolyhedraFormat PolyhedralObject := P -> (
+--	oldR := P#"Rays";
+--	local newR;
+--	if (#oldR > 0) then newR = transpose matrix oldR else newR = matrix{{}};
+--	oldL := P#"LinealitySpace";
+--	local newL;
+--	if (#oldL > 0) then newL = transpose matrix oldL else newL = matrix{{}};
+--	F := fan(newR,newL,P#"MaximalCones");
+--	F
+--)
 
 convertToPolymake = (T) ->(
 -- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
 --
-	F := T#"Fan";
+	F := fan(T);
 --check if given cycle is empty
 	if (dim(F) < 0) then (return "new Cycle<Min>(PROJECTIVE_VERTICES=>[],MAXIMAL_POLYTOPES=>[],WEIGHTS=>[]);";) else (
 --if not empty, check if min- or max-convention is used
 	str := "new Cycle<";
 	if Tropical#Options#Configuration#"tropicalMax" then str=str|"Max" else str=str|"Min";
-	rs := getRays T;
+	rs := entries transpose rays T;
 	numberOfRays := #rs;
 	ambientDim := ambDim F;
 --convert to polymake convention of rays: 1) add origin of the form (1,0,...,0)
@@ -401,7 +397,7 @@ convertToPolymake = (T) ->(
 	str = substring(0,#str-1,str);
 	str = str|"],WEIGHTS=>[";
 --the multiplicities stay unchanged
-	mult := T#"Multiplicities";
+	mult := multiplicities(T);
 	scan (numberOfMaxCones,i -> str = str|mult#i|",");
 	str = substring(0,#str-1,str);
 	str = str | "]);";
@@ -415,50 +411,40 @@ convertToPolymake = (T) ->(
 
 --functions to get stuff from fans and tropical cycles
 
-getRays = method(TypicalValue => List)
 
-getRays (TropicalCycle):= T->( entries transpose rays(T#"Fan"))
-
-
-getCones = method(TypicalValue => List)
-
-getCones (ZZ,TropicalCycle):= (i,T)->( cones(i,T#"Fan"))
+rays TropicalCycle:= T->( rays fan T)
 
 
-getDim = method(TypicalValue => ZZ)
-
-getDim (TropicalCycle):= T->( dim(T#"Fan"))
+cones (ZZ,TropicalCycle):= (i,T)->( cones(i,fan T))
 
 
-getAmbientDim = method(TypicalValue => ZZ)
-
-getAmbientDim (TropicalCycle):= T->( ambDim(T#"Fan"))
-
---TODO fix
-getFVector = method(TypicalValue => List)
-
-getFVector (TropicalCycle):= C->( getFVector(C#"Fan"))
+dim TropicalCycle:= T->( dim fan T)
 
 
-getLinealitySpace = method(TypicalValue => List)
-
-getLinealitySpace (TropicalCycle):= T->( entries transpose linSpace(T#"Fan"))
+ambDim TropicalCycle:= T->( ambDim fan T)
 
 
-getMaximalCones = method(TypicalValue => List)
-
-getMaximalCones (TropicalCycle):= T->( maxCones(T#"Fan"))
+fVector TropicalCycle:= T->( fVector fan T)
 
 
-getMultiplicities = method(TypicalValue => List)
-
-getMultiplicities (TropicalCycle) := T -> (T#"Multiplicities")
+fan TropicalCycle := T -> (T#"Fan")
 
 
-isPure TropicalCycle := Boolean => T->( isPure(T#"Fan"))
+linealitySpace (TropicalCycle):= T->( linSpace fan T)
 
 
-isSimplicial TropicalCycle:= Boolean => T->( isSimplicial(T#"Fan"))
+maxCones (TropicalCycle):= T->( maxCones fan T)
+
+
+multiplicities = method(TypicalValue => TropicalCycle)
+
+multiplicities (TropicalCycle) := T -> (T#"Multiplicities")
+
+
+isPure TropicalCycle := Boolean => T->( isPure(fan(T)))
+
+
+isSimplicial TropicalCycle:= Boolean => T->( isSimplicial(fan(T)))
 
 
 
@@ -492,44 +478,9 @@ doc ///
 	   MaximalCones list.
 ///	   
 
-doc ///
-    Key
-	(isWellDefined,TropicalCycle)
-    Headline
-	whether a tropical cycle is well defined.
-    Usage
-    	isWellDefined T
-    Inputs
-	T:TropicalCycle
-    Outputs
-    	B:Boolean
-    Description
-	Text
-    	    A TropicalCycle is well defined if the underlying Fan is
-    	    pure, and the multiplicity function makes the fan
-    	    balanced.
-      	Example
-	    1+1	    
-///
 
-doc ///
-    Key
-	(isPolyhedralComplex,TropicalCycle)
-    Headline
-	whether the underlying fan is really a fan.
-    Usage
-    	isPolyhedralComplex T
-    Inputs
-	T:TropicalCycle
-    Outputs
-    	B:Boolean
-    Description
-	Text
-    	    Checks if the underlying fan is indeed a fan
-    	    and not just a union of cones.
-      	Example
-	    1+1	    
-///
+
+
 
 
 doc ///
@@ -580,32 +531,33 @@ doc///
 
 
 doc///
-    Key
-	tropicalPrevariety
-	(tropicalPrevariety, List)
-	[tropicalPrevariety, Strategy]
-    Headline
-	the intersection of the tropical hypersurfaces of polynomials in L
-    Usage
-	tropicalPrevariety(L)
-	tropicalPrevariety(L,Strategy=>S)
-    Inputs
-	L:List
-	    of polynomials        
-	Strategy=>String
-	    Strategy (currently only "gfan")
-    Outputs
-	F:Fan
-	    the intersection of the tropical hypersurfaces of polynomials in L
-    Description
-	Text
-	    This method intersects a list of tropical hypersurfaces. The input is a list of polynomials whose 		    tropicalizations give the hypersurfaces.
-        Example
-	    QQ[x_1,x_2,x_3,x_4]
-            L={x_1+x_2+x_3+x_4, x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,  x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2, x_1*x_2*x_3*x_4-1}
-	    tropicalPrevariety L
-	    QQ[x,y]
-            tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
+  Key
+    tropicalPrevariety
+    (tropicalPrevariety, List)
+    [tropicalPrevariety, Strategy]
+  Headline
+    the intersection of the tropical hypersurfaces of polynomials in L
+  Usage
+    tropicalPrevariety(L)
+    tropicalPrevariety(L,Strategy=>S)
+  Inputs
+    L:List
+      of polynomials        
+    Strategy=>String
+      Strategy (currently only "gfan")
+  Outputs
+    F:Fan
+      the intersection of the tropical hypersurfaces of polynomials in L
+  Description
+    Text
+      This method intersects a list of tropical hypersurfaces. The input is a
+      list of polynomials whose tropicalizations give the hypersurfaces.
+    Example
+      QQ[x_1,x_2,x_3,x_4]
+      L={x_1+x_2+x_3+x_4,x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2,x_1*x_2*x_3*x_4-1}
+      tropicalPrevariety L
+      QQ[x,y]
+      tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
 ///
 
 
@@ -615,7 +567,7 @@ doc///
       tropicalVariety    
       (tropicalVariety, Ideal)
       (tropicalVariety, Ideal, Boolean)
-      [tropicalVariety, computeMultiplicities]
+      [tropicalVariety, ComputeMultiplicities]
       [tropicalVariety, Prime]
 
     Headline
@@ -623,14 +575,14 @@ doc///
     Usage
       tropicalVariety(I)
       tropicalVariety(I,IsHomogIdeal)
-      tropicalVariety(I,computeMultiplicities=>true)
+      tropicalVariety(I,ComputeMultiplicities=>true)
       tropicalVariety(I,Prime=>true)
     Inputs
       I:Ideal
         of polynomials
       IsHomogIdeal:Boolean
         a boolean that ensures whether the ideal is already homogeneous   
-      computeMultiplicities =>Boolean
+      ComputeMultiplicities =>Boolean
         a boolean that confirms whether the multiplicities will be computed
       Prime=>Boolean
         a boolean that ensures whether the ideal is already prime
@@ -641,7 +593,7 @@ doc///
          This method takes an ideal and computes the tropical variety associated to it. 
          By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
          In this case use optional inputs Prime=>false.
-         By default it computes multiplicities but setting computeMultiplicities=>false
+         By default it computes multiplicities but setting ComputeMultiplicities=>false
          turns this off.
 	 The ideal I is not assumed to be homogeneous but with tropicalVariety(I,true)
 	 the user can confirm it is homogeneous to the function does not check it.
@@ -651,13 +603,13 @@ doc///
        QQ[x,y,z]
        --I=ideal(x+y+1) 
        --tropicalVariety(I)
-       --tropicalVariety(I,computeMultiplicities=>false)  
+       --tropicalVariety(I,ComputeMultiplicities=>false)  
        J=ideal(x+y+z)
-       tropicalVariety(J,true)
-       tropicalVariety(J,true,computeMultiplicities=>false)
+      -- tropicalVariety(J,true)
+--       tropicalVariety(J,true,ComputeMultiplicities=>false)
        K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
        isPrime K
-       tropicalVariety(K,true,Prime=>false)
+--       tropicalVariety(K,true,Prime=>false)
 
 ///
 
@@ -711,40 +663,152 @@ doc///
 	    This method checks if the intersection of the tropical hypersurfaces associated to the polynomials in the list equals the tropicalization of the variety corresponding to the ideal they generate.  
         Example
 	    QQ[x,y,z]
-	    isTropicalBasis({x+y+z,2*x+3*y-z})
-	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
+--	    isTropicalBasis({x+y+z,2*x+3*y-z})
+--	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
 ///
 
 
 doc///
     Key
-	getRays
-	(getRays, TropicalCycle)
-        getCones
-	(getCones, ZZ, TropicalCycle)
-	getDim
-	(getDim, TropicalCycle)
-	getAmbientDim
-	(getAmbientDim, TropicalCycle)
-        getFVector
-	(getFVector, TropicalCycle)
-	getLinealitySpace
-	(getLinealitySpace, TropicalCycle)
-        getMaximalCones
-	(getMaximalCones, TropicalCycle)
-	getMultiplicities
-	(getMultiplicities, TropicalCycle)
+	(rays, TropicalCycle)
+        (cones, ZZ, TropicalCycle)
+	(dim, TropicalCycle)
+	(ambDim, TropicalCycle)
+        (fVector, TropicalCycle)
+	(linealitySpace, TropicalCycle)
+        (maxCones, TropicalCycle)
+	multiplicities
+	(multiplicities, TropicalCycle)
 ///
 
 
 
+----- TESTS -----
+
+-----------------------
+--tropicalCycle
+-----------------------
 TEST ///
-    assert (1+1==2)
-    assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
-    assert(R:=QQ[x,y,z]; not isTropicalBasis({x+y+z,2*x+3*y-z}))
+
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+assert((tropicalCycle(F,{1,1,1}))#"Fan"== F)
+assert((tropicalCycle(F,{1,1,1}))#"Multiplicities"== {1,1,1})
+--case when it is not a tropical cycle
+F=fan(matrix{{1,0,-1},{0,1,-1}},{{0,1},{0,2},{1,2}})
+--assert(tropicalCycle(F,{1,1,1})#"Fan"== F)
+///
+
+-----------------------
+--isTropicalBasis
+-----------------------
+ 
+TEST ///
+assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l]))==true)
+R:=QQ[x,y,z]
+assert( not isTropicalBasis({x+y+z,2*x+3*y-z}))
+///
+   
+-----------------------
+--isBalanced
+-----------------------
+--TEST///
 --The following two tests are commented until their functions can work in a computer without polymake
     --assert(isBalanced tropicalVariety (ideal {6*x^2+3*x*y+8*y^2+x*z+6*y*z+3*z^2+2*x*t+5*z*t+3*t^2,5*x^2+x*y+8*y^2+x*z+4*y*z+9*z^2+5*x*t+8*y*t+z*t}, true)) 
+
     --assert(R:=QQ[x,y,z,t]; I=ideal(x+y+z+t); J=ideal(4*x+y-2*z+5*t); 
-	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
-///    	    	
-       
+--	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
+   -- assert(R:=QQ[x,y,z]; rays(tropicalVariety(ideal(x+y+1)))==matrix{{-3,3,0},{-3,0,3},{-2,1,1}})
+--///    	    	
+
+
+
+-----------------------
+--tropicalPrevariety
+-----------------------
+
+
+
+
+
+-----------------------
+--stableIntersection
+-----------------------
+
+
+--The following two tests are commented until their functions can work in a computer without polymake
+--R:=QQ[x,y,z,t];
+--I=ideal(x+y+z+t); 
+--J=ideal(4*x+y-2*z+5*t); 
+--assert(stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
+  
+
+-----------------------
+--tropicalVariety
+-----------------------
+
+
+
+
+
+    
+
+
+-----------------------
+--getters
+-----------------------
+--multiplicities
+--rays
+--cones
+--dim
+--ambDim
+--fVector
+--fan
+--linealitySpace
+--maxCones
+--multiplicities
+
+
+-----------------------
+--findMultiplicities
+--findMultiplicity
+--computeCones
+-----------------------
+
+
+
+
+
+-----------------------
+--isPure
+-----------------------
+
+
+
+
+-----------------------
+--isSimplicial
+-----------------------
+
+
+
+
+
+-----------------------
+--convertToPolymake
+-----------------------
+
+
+
+
+
+
+
+
+
+
+end
+
+    
+    
+    
+ 	    	

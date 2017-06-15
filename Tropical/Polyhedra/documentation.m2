@@ -28,7 +28,7 @@ document {
 	     },
 	
 	PARA{}, "For an introduction to polyhedra and cones, we recommend ",
-	HREF("http://www.math.tu-berlin.de/~ziegler/", "Gunter
+	HREF("http://www.mi.fu-berlin.de/math/groups/discgeom/ziegler/", "Gunter
 	M. Ziegler's"), " ", EM "Lectures on Polytopes", ", Graduate
 	Texts in Mathematics 152, Springer-Verlag, New York, 1995.",
 	
@@ -239,11 +239,11 @@ document {
 document {
      Key => "Working with cones",
      
-     "We start with a cone in 2-space which is the positive hull (",TO posHull,") of a given set of rays.",
+     "We start with a cone in 2-space which is the positive hull (",TO coneFromVData,") of a given set of rays.",
      
      EXAMPLE {
 	  " R = matrix {{1,1,2},{2,1,1}}",
-	  " C = posHull R",
+	  " C = coneFromVData R",
 	  " ambDim C"
 	  },
      
@@ -267,7 +267,7 @@ document {
      EXAMPLE {
 	  " R1 = R || matrix {{0,0,0}}",
 	  " LS = matrix {{1},{1},{1}}",
-	  " C1 = posHull(R1,LS)",
+	  " C1 = coneFromVData(R1,LS)",
 	  " rays C1"
 	  },
      
@@ -311,22 +311,22 @@ document {
 	  " rays C5"
 	  },
      
-     PARA{}, "On the other hand, we can take their positive hull by using ",TO posHull,":",
+     PARA{}, "On the other hand, we can take their positive hull by using ",TO coneFromVData,":",
      
      EXAMPLE {
-	  " C6 = posHull(C1,C2)",
+	  " C6 = coneFromVData(C1,C2)",
 	  " rays C6",
 	  " linealitySpace C6"
 	  },
 
-     PARA{}, "Furthermore, both functions (",TO intersection," and ",TO posHull,") can 
+     PARA{}, "Furthermore, both functions (",TO intersection," and ",TO coneFromVData,") can 
      be applied to a list containing any number of cones and matrices defining 
      rays and lineality space or linear half-spaces and hyperplanes. These must be in the 
      same ambient space. For example:",
      
      EXAMPLE {
 	  " R2 = matrix {{2,-1},{-1,2},{-1,-1}}",
-	  " C7 = posHull {R2,C3,C4}",
+	  " C7 = coneFromVData {R2,C3,C4}",
 	  " rays C7",
 	  " linealitySpace C7"
 	  },
@@ -402,7 +402,7 @@ document {
      faces:",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,0,0},{0,1,0},{0,0,1}}",
+	  " C = coneFromVData matrix {{1,0,0},{0,1,0},{0,0,1}}",
 	  " F = fan C"
 	  },
      
@@ -417,7 +417,7 @@ document {
      PARA{}, "Now we could expand the fan by adding more cones, for example the following:",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,0,0},{1,1,0},{0,0,-1}}"
+	  " C1 = coneFromVData matrix {{1,0,0},{1,1,0},{0,0,-1}}"
 	  },
      
      PARA{}, "But in this case we can not, because the two cones are not compatible, 
@@ -442,7 +442,7 @@ document {
      PARA{}, "So we can make the cone compatible and add it to the fan.",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,0,0},{0,1,0},{0,0,-1}}",
+	  " C1 = coneFromVData matrix {{1,0,0},{0,1,0},{0,0,-1}}",
 	  " F = addCone(C1,F)"
 	  },
      
@@ -450,18 +450,18 @@ document {
      can also make a fan out of a list of cones:",
      
      EXAMPLE {
-	  " C2 = posHull matrix {{-1,0,0},{0,1,0},{0,0,1}};",
-	  " C3 = posHull matrix {{-1,0,0},{0,1,0},{0,0,-1}};",
-	  " C4 = posHull matrix {{-1,0,0},{0,-1,0},{0,0,1}};",
-	  " C5 = posHull matrix {{-1,0,0},{0,-1,0},{0,0,-1}};",
+	  " C2 = coneFromVData matrix {{-1,0,0},{0,1,0},{0,0,1}};",
+	  " C3 = coneFromVData matrix {{-1,0,0},{0,1,0},{0,0,-1}};",
+	  " C4 = coneFromVData matrix {{-1,0,0},{0,-1,0},{0,0,1}};",
+	  " C5 = coneFromVData matrix {{-1,0,0},{0,-1,0},{0,0,-1}};",
 	  " F1 = fan {C2,C3,C4,C5}"
 	  },
      
      PARA{}, "Furthermore, we could add a list of cones to an existing fan:",
      
      EXAMPLE {
-	  " C6 = posHull matrix {{1,0,0},{0,-1,0},{0,0,1}};",
-	  " C7 = posHull matrix {{1,0,0},{0,-1,0},{0,0,-1}};",
+	  " C6 = coneFromVData matrix {{1,0,0},{0,-1,0},{0,0,1}};",
+	  " C7 = coneFromVData matrix {{1,0,0},{0,-1,0},{0,0,-1}};",
 	  " F1 = addCone( {C6,C7}, F1)",
 	  },
      
@@ -478,7 +478,7 @@ document {
      for example the direct product (",TO directProduct,":",
      
      EXAMPLE {
-	  " F3 = fan {posHull matrix {{1}},posHull matrix {{-1}}}",
+	  " F3 = fan {coneFromVData matrix {{1}},coneFromVData matrix {{-1}}}",
 	  " F1 = F3 * F1"},
      
      PARA{}, "The result is in the direct product of the ambient spaces.",
@@ -503,10 +503,10 @@ document {
      "Now we construct a new fan to show some other functions.",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,1,-1,-1},{1,-1,1,-1},{1,1,1,1}};",
-	  " C2 = posHull matrix {{1,1,1},{0,1,-1},{-1,1,1}};",
-	  " C3 = posHull matrix {{-1,-1,-1},{0,1,-1},{-1,1,1}};",
-	  " C4 = posHull matrix {{1,-1},{0,0},{-1,-1}};",
+	  " C1 = coneFromVData matrix {{1,1,-1,-1},{1,-1,1,-1},{1,1,1,1}};",
+	  " C2 = coneFromVData matrix {{1,1,1},{0,1,-1},{-1,1,1}};",
+	  " C3 = coneFromVData matrix {{-1,-1,-1},{0,1,-1},{-1,1,1}};",
+	  " C4 = coneFromVData matrix {{1,-1},{0,0},{-1,-1}};",
 	  " F = fan {C1,C2,C3,C4}"
 	  },
      
@@ -521,8 +521,8 @@ document {
      PARA{}, "If we add two more cones the fan becomes complete.",
      
      EXAMPLE {
-	  " C5 = posHull matrix {{1,-1,1,-1},{-1,-1,0,0},{1,1,-1,-1}};",
-	  " C6 = posHull matrix {{1,-1,1,-1},{1,1,0,0},{1,1,-1,-1}};",
+	  " C5 = coneFromVData matrix {{1,-1,1,-1},{-1,-1,0,0},{1,1,-1,-1}};",
+	  " C6 = coneFromVData matrix {{1,-1,1,-1},{1,1,0,0},{1,1,-1,-1}};",
 	  " F = addCone({C5,C6},F)",
 	  " isComplete F"
 	  },
@@ -553,7 +553,7 @@ document {
 	},
    
      EXAMPLE {
-	  " posHull matrix {{1,2},{2,1}}",
+	  " coneFromVData matrix {{1,2},{2,1}}",
 	  " convexHull matrix {{1,1,0,0},{1,0,1,0}}",
 	  " hirzebruch 3",
 	  " polyhedralComplex crossPolytope 3",
@@ -631,24 +631,24 @@ document {
      Cone looks like this:",
      
      EXAMPLE {
-	  " posHull matrix {{0,0,-1,-1,1},{2,-2,1,-1,0},{1,1,1,1,0}}",
+	  " coneFromVData matrix {{0,0,-1,-1,1},{2,-2,1,-1,0},{1,1,1,1,0}}",
 	  },
      
      PARA{}, "This table displays a short summary of the properties of the Cone. The number 
      of rays is modulo the lineality space. However, one can not access the above information 
      directly, because this is just a virtual hash table generated for the output. The data 
      describing a Cone is extracted by the functions included in this package. A Cone 
-     can be constructed as the positive hull (",TO posHull,")of a set of rays or as the intersection 
+     can be constructed as the positive hull (",TO coneFromVData,")of a set of rays or as the intersection 
      (",TO intersection,") of a set of linear half-spaces and linear hyperplanes.",
      
      PARA{}, "As examples for the positive hull consider the following cones:",
      
      EXAMPLE {
 	  " R = matrix{{1,2,3,1},{2,3,1,1},{3,1,2,1}}",
-	  " C = posHull R",
+	  " C = coneFromVData R",
 	  " rays C",
 	  " LS = matrix{{1},{1},{-2}}",
-	  " C = posHull(R,LS)",
+	  " C = coneFromVData(R,LS)",
 	  " rays C"
 	  },
      
@@ -692,10 +692,10 @@ document {
      a Fan is always considered as the collection of the Cone and all of its faces.",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{2,2},{1,-1}};",
-	  " C2 = posHull matrix {{2,-2},{1,1}};",
-	  " C3 = posHull matrix {{-2,-2},{1,-1}};",
-	  " C4 = posHull matrix {{-2,2},{-1,-1}};",
+	  " C1 = coneFromVData matrix {{2,2},{1,-1}};",
+	  " C2 = coneFromVData matrix {{2,-2},{1,1}};",
+	  " C3 = coneFromVData matrix {{-2,-2},{1,-1}};",
+	  " C4 = coneFromVData matrix {{-2,2},{-1,-1}};",
 	  " F = fan {C1,C2,C3,C4}"
 	  },
      
@@ -821,10 +821,10 @@ document {
      }
 
 document {
-     Key => {posHull, (posHull,Cone,Cone), (posHull,Matrix), (posHull,Matrix,Matrix), (posHull,Polyhedron), 
-	  (posHull,List)},
+     Key => {coneFromVData, (coneFromVData,Cone,Cone), (coneFromVData,Matrix), (coneFromVData,Matrix,Matrix), (coneFromVData,Polyhedron), 
+	  (coneFromVData,List)},
      Headline => "computes the positive hull of rays, cones, and the cone over a polyhedron",
-     Usage => " C = posHull M \nC = posHull(M,N) \nC = posHull(C1,C2) \nC = posHull P \nC = posHull L",
+     Usage => " C = coneFromVData M \nC = coneFromVData(M,N) \nC = coneFromVData(C1,C2) \nC = coneFromVData P \nC = coneFromVData L",
      Inputs => {
 	  "M" => Matrix => {"with entries in", TO ZZ," or ", TO QQ},
 	  "N" => Matrix => {"with entries in", TO ZZ," or ", TO QQ},
@@ -837,7 +837,7 @@ document {
 	  "C" => Cone
 	  },
      
-     PARA{}, TT "posHull", " computes the positive hull of the input. In the 
+     PARA{}, TT "coneFromVData", " computes the positive hull of the input. In the 
      first two cases it considers the columns of ", TT "M", " as a set of rays 
      and the columns of ", TT "N", " (if given) as generators of the lineality 
      space and computes the cone that is the positive hull of the rays plus 
@@ -859,7 +859,7 @@ document {
 	  {TO Polyhedron}
 	},
      
-     PARA{}, "Then ", TT "posHull", " computes the positive hull of all 
+     PARA{}, "Then ", TT "coneFromVData", " computes the positive hull of all 
      inserted objects, if they are in the same ambient space, i.e. all matrices 
      must have the same number of rows, which must equal the ambient dimension 
      of all cones and polyhedra.",
@@ -868,7 +868,7 @@ document {
      
      EXAMPLE {
 	  " R = matrix {{1,2},{2,1},{0,0}}",
-	  " C = posHull R"
+	  " C = coneFromVData R"
 	  },
      
      PARA{}, "We can construct a full dimensional cone out of this one by adding a lineality 
@@ -876,29 +876,29 @@ document {
      
      EXAMPLE {
 	  " LS = matrix {{0},{0},{1}}",
-	  " C1 = posHull (R,LS)"
+	  " C1 = coneFromVData (R,LS)"
 	  },
      
      PARA{}, "The resulting cone is not pointed anymore, because it contains the subspace spanned 
      by (0,0,1). To get a full dimensional pointed cone we have to add another ray to C. For 
-     this we can apply ",TT "posHull"," to a list containing ",TT "C"," and the new ray:",
+     this we can apply ",TT "coneFromVData"," to a list containing ",TT "C"," and the new ray:",
      
      EXAMPLE {
 	  " r = matrix {{0},{1},{2}}",
-	  " C2 = posHull {C,r}"
+	  " C2 = coneFromVData {C,r}"
 	  },
      
      PARA{}, "Another way would be, if we would have ",TT "r"," not as a ray but already as 
      a cone:",
      
      EXAMPLE {
-	  " r = posHull r"
+	  " r = coneFromVData r"
 	  },
      
      PARA{}, "In this case we can just take the positive hull of the two cones:",
      
      EXAMPLE {
-	  " C3 = posHull(C,r)",
+	  " C3 = coneFromVData(C,r)",
 	  " C3 == C2"
 	  }
      
@@ -929,7 +929,7 @@ document {
      PARA{}, "When inserting any of the combination of matrices into ", 
      TT "intersection", ", it considers the given matrices as defining 
      inequalities and equalities. Thus, it either computes the polyhedron ",
-     TT "P = {p | M*p <= v and N*p = w }",". Therefore, ", TT "M", " and ",
+     TT "P = {p | M*p <= v and N*p = w }"," or the cone ",TT "C = {p | M*p >= 0 and N*p=0}",". Therefore, ", TT "M", " and ",
      TT "N", " must have the same number of columns, which will be the 
      dimension of the ambient space, and ", TT "M", " and ", TT "v", " as 
      well as ", TT "N", " and ", TT "w", " must have the same number of 
@@ -1024,10 +1024,10 @@ document {
      function ",TO incompCones,".",
           
      EXAMPLE {
-	  " C = posHull matrix {{1,-1},{0,-1}}",
+	  " C = coneFromVData matrix {{1,-1},{0,-1}}",
 	  " F = fan C",
-	  " C1 = posHull matrix {{1,0},{0,1}};",
-	  " C2 = posHull matrix {{0,-1},{1,-1}};",
+	  " C1 = coneFromVData matrix {{1,0},{0,1}};",
+	  " C2 = coneFromVData matrix {{0,-1},{1,-1}};",
 	  " F = fan {C,C1,C2}"
 	  }
      
@@ -1103,9 +1103,9 @@ document {
      try to add an adjacent orthant.",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,0,0},{0,1,1},{0,0,1}};",
+	  " C = coneFromVData matrix {{1,0,0},{0,1,1},{0,0,1}};",
 	  " F = fan C",
-	  " C = posHull matrix {{-1,0,0},{0,1,0},{0,0,1}};",
+	  " C = coneFromVData matrix {{-1,0,0},{0,1,0},{0,0,1}};",
 	  " incompCones(C,F)"
 	  },
      
@@ -1113,8 +1113,8 @@ document {
      if we divide C into two parts, we get a fan.",
      
      EXAMPLE {
-	  " C1 = intersection {C, (matrix {{0,1,-1}}, matrix {{0}})};",
-	  " C2 = intersection {C, (matrix {{0,-1,1}}, matrix {{0}})};",
+	  " C1 = intersection {C, coneFromHData(matrix {{0,1,-1}})};",
+	  " C2 = intersection {C, coneFromHData(matrix {{0,-1,1}})};",
 	  " F = addCone({C1,C2},F)"
 	  }
      
@@ -1329,13 +1329,13 @@ document {
      
      PARA{}, " For a cone ", TT "C", " the output is the matrix", TT "M"," that is the 
      same matrix as before but ", TT "v", " is omitted since it is 0, 
-     so ", TT "C = {c in H | M*c =< 0}", " and ", TT "H", " is the intersection 
+     so ", TT "C = {c in H | M*c => 0}", " and ", TT "H", " is the intersection 
      of the defining linear hyperplanes.",
      
      EXAMPLE {
 	  " R = matrix {{1,1,2,2},{2,3,1,3},{3,2,3,1}};",
 	  " V = matrix {{1,-1},{0,0},{0,0}};",
-	  " C = posHull R",
+	  " C = coneFromVData R",
 	  " halfspaces C"
 	  },
      
@@ -1376,7 +1376,7 @@ document {
      EXAMPLE {
 	  " P = stdSimplex 2",
 	  " hyperplanes P",
-	  " C = posHull matrix {{1,2,4},{2,3,5},{3,4,6}}",
+	  " C = coneFromVData matrix {{1,2,4},{2,3,5},{3,4,6}}",
 	  " hyperplanes C"
 	  }
      
@@ -1426,7 +1426,7 @@ document {
      EXAMPLE {
 	  " P = convexHull(matrix {{1,-1,2,-2},{1,1,2,2}}, matrix {{0},{1}})",
 	  " rays P",
-	  " C = posHull P",
+	  " C = coneFromVData P",
 	  " rays C",
 	  " F = normalFan P",
 	  " rays F"
@@ -1482,9 +1482,9 @@ document {
      PARA{}, "For example, consider the following three cones",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,0},{0,1}};",
-	  " C2 = posHull matrix {{1,-1},{0,-1}};",
-	  " C3 = posHull matrix {{1,-1},{2,-1}};",
+	  " C1 = coneFromVData matrix {{1,0},{0,1}};",
+	  " C2 = coneFromVData matrix {{1,-1},{0,-1}};",
+	  " C3 = coneFromVData matrix {{1,-1},{2,-1}};",
 	  },
      
      PARA{}, "These might form a fan, but if we check if they are compatible, we see they 
@@ -1528,9 +1528,9 @@ document {
      PARA{}, "For example, consider the following three cones:",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,0},{0,1}};",
-	  " C2 = posHull matrix {{1,-1},{0,-1}};",
-	  " C3 = posHull matrix {{1,-1},{2,-1}};",
+	  " C1 = coneFromVData matrix {{1,0},{0,1}};",
+	  " C2 = coneFromVData matrix {{1,-1},{0,-1}};",
+	  " C3 = coneFromVData matrix {{1,-1},{2,-1}};",
 	  },
      
      PARA{}, "for each pair of two of them we can check if their intersection is a common face:",
@@ -1580,7 +1580,7 @@ document {
     PARA{}, "We can also check if the hypercube lies in the positive orthant.",
     
     EXAMPLE {
-	 " C = posHull matrix {{1,0,0},{0,1,0},{0,0,1}};",
+	 " C = coneFromVData matrix {{1,0,0},{0,1,0},{0,0,1}};",
 	 " contains(C,P)",
 	 " P = affineImage(P,matrix{{1},{1},{1}})",
 	 " contains(C,P)"
@@ -1630,9 +1630,9 @@ document {
      complex must contain non-compact polyhedra.",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,0},{0,1}};",
-	  " C2 = posHull matrix {{1,-1},{0,-2}};",
-	  " C3 = posHull matrix {{0,-2},{1,-1}};",
+	  " C1 = coneFromVData matrix {{1,0},{0,1}};",
+	  " C2 = coneFromVData matrix {{1,-1},{0,-2}};",
+	  " C3 = coneFromVData matrix {{0,-2},{1,-1}};",
 	  " F = fan {C1,C2,C3}",
 	  " isComplete F"
 	  },
@@ -1640,7 +1640,7 @@ document {
      PARA{}, "Hence the fan above is not complete, but we can add the missing cone:",
      
      EXAMPLE {
-	  " C4 = posHull matrix {{-1,-2},{-2,-1}};",
+	  " C4 = coneFromVData matrix {{-1,-2},{-2,-1}};",
 	  " F = addCone(C4,F)",
 	  " isComplete F"
 	  }
@@ -1761,7 +1761,7 @@ document {
      EXAMPLE {
 	  " C = intersection(matrix{{1,1,-1},{-1,-1,-1}})",
 	  " isPointed C",
-	  " C = intersection{C,(matrix{{1,-1,-1}},0)}",
+	  " C = intersection{C, coneFromHData(matrix{{1,-1,-1}})}",
 	  " isPointed C"
 	  }
      
@@ -1794,10 +1794,10 @@ document {
      PARA{}, "Note that the function first checks if the fan is complete.",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,0},{0,1}};",
-	  " C2 = posHull matrix {{1,-1},{0,-2}};",
-	  " C3 = posHull matrix {{0,-2},{1,-1}};",
-	  " C4 = posHull matrix {{-1,-2},{-2,-1}};",
+	  " C1 = coneFromVData matrix {{1,0},{0,1}};",
+	  " C2 = coneFromVData matrix {{1,-1},{0,-2}};",
+	  " C3 = coneFromVData matrix {{0,-2},{1,-1}};",
+	  " C4 = coneFromVData matrix {{-1,-2},{-2,-1}};",
 	  " F = fan{C1,C2,C3,C4}",
 	  " isPolytopal F"
 	  }
@@ -1822,8 +1822,8 @@ document {
      negative sum of the canonical basis, which is obviously not pure:",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,0,0},{0,1,0},{0,0,1}}",
-	  " v = posHull matrix {{-1},{-1},{-1}}",
+	  " C = coneFromVData matrix {{1,0,0},{0,1,0},{0,0,1}}",
+	  " v = coneFromVData matrix {{-1},{-1},{-1}}",
 	  " F = fan {C,v}",
 	  " isPure F",
 	  },
@@ -1832,8 +1832,8 @@ document {
      orthant and take the cone generated by this face and ",TT "v"," and add it to the cone:",
      
      EXAMPLE {
-	  " C1 = posHull (rays C)_((faces(1,C))#0)",
-     " C1 = posHull(C1, v)",
+	  " C1 = coneFromVData (rays C)_((faces(1,C))#0)",
+     " C1 = coneFromVData(C1, v)",
 	  " F = addCone(C1,F)",
 	  " isPure F"
 	  }
@@ -1878,7 +1878,7 @@ document {
 	  },
      
      PARA{},"A ",TO Polyhedron," of dimension ",TEX///$d$///," is simplicial if it is compact and 
-     has ",TEX///$d+1$///," vertices.",
+     every facet is (isomorphic to) a simplex.",
      
      EXAMPLE {
 	  " P = convexHull matrix {{3,0,0,0,1},{0,3,0,0,1},{0,0,3,0,1}}",
@@ -1887,13 +1887,12 @@ document {
 	  " isSimplicial P"
 	  },
      
-     PARA{},"A ",TO Fan," of dimension ",TEX///$d$///," is simplicial if it is pointed and 
-     has ",TEX///$d$///," rays.",
+     PARA{},"A pointed ",TO Cone," of dimension ",TEX///$d$///," is simplicial if it has ",TEX///$d$///," rays.",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,0,0,1},{0,1,0,1},{0,0,1,1}}",
+	  " C = coneFromVData matrix {{1,0,0,1},{0,1,0,1},{0,0,1,1}}",
 	  " isSimplicial C",
-	  " C = posHull matrix {{1,1,-1,-1},{1,-1,1,-1},{1,1,1,1}}",
+	  " C = coneFromVData matrix {{1,1,-1,-1},{1,-1,1,-1},{1,1,1,1}}",
 	  " isSimplicial C"
 	  },
      
@@ -1930,7 +1929,7 @@ document {
      lattice. For a ",TO Fan," it checks smoothness for every ",TO Cone,".",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,2,3},{3,1,2},{2,3,1}}",
+	  " C = coneFromVData matrix {{1,2,3},{3,1,2},{2,3,1}}",
 	  " isSmooth C",
 	  " F = hirzebruch 3",
 	  " isSmooth F"
@@ -1964,20 +1963,22 @@ document {
 
 
 document {
-     Key => {faces, (faces,ZZ,Polyhedron), (faces,ZZ,Cone)},
+     Key => {faces, (faces,ZZ,PolyhedralObject)},
      Headline => "computes all faces of a certain codimension of a Cone or Polyhedron",
-     Usage => " L = faces(k,C) \nL = faces(k,P)",
+     Usage => " L = faces(k,C) \nL = faces(k,P) \nL = faces(F)",
      Inputs => {
 	  "k" => ZZ,
-	  "P" => PolyhedralObject
+	  "PO" => PolyhedralObject
 	  },
      Outputs => {
-	  "L" => List => {"containing the indices of the vertices/rays used in the codim  ",TT "k", "faces of ", TT "P"}
+	  "L" => HashTable => {"containing the indices of the vertices/rays used in the codim  ",TT "k", "faces of ", TT "P"}
 	  },
      
      PARA{}, TT "faces"," computes the faces of codimension ",TT "k"," of the given ",TO Cone," 
      or ",TO Polyhedron,", where ",TT "k"," must be between 0 and the dimension of the second 
-     argument. The faces will be of the same class as the original convex object.",
+     argument. The faces will be of the same class as the original convex object. If the parameter",
+     TT "k","is omitted,", TT "faces"," will return a ",TT "HashTable"," containing the faces
+     with the codimensions as keys.",
      
      PARA{}, "For example, we can look at the edges of the cyclicPolytope with 5 vertices in 3 space",
      
@@ -1995,8 +1996,8 @@ document {
      }
 
 document {
-     Key => {fVector, (fVector, Cone), (fVector,Polyhedron)},
-     Headline => "computes the f-vector of a Cone or Polyhedron",
+     Key => {fVector, (fVector, PolyhedralObject)},
+     Headline => "computes the f-vector of a Cone, Polyhedron, Fan or PolyhedralComplex",
      Usage => " f = fVector C \nf = fVector P",
      Inputs => {
 	  "P" => PolyhedralObject
@@ -2039,7 +2040,7 @@ document {
      editors, Mathematical Software, ICMS 2002, pages 307317. World Scientific, 2002.",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,2},{2,1}}",
+	  " C = coneFromVData matrix {{1,2},{2,1}}",
 	  " hilbertBasis C"
 	  }
      
@@ -2066,11 +2067,11 @@ document {
      do not share a common face.",
      
      EXAMPLE {
-	  " C1 = posHull matrix{{1,0},{1,1}};",
-	  " C2 = posHull matrix{{1,0},{0,-1}};",
-	  " C3 = posHull matrix{{-1,0},{0,1}};",
-	  " C4 = posHull matrix{{1,1},{0,1}};",
-	  " C5 = posHull matrix {{1,2},{2,1}};",
+	  " C1 = coneFromVData matrix{{1,0},{1,1}};",
+	  " C2 = coneFromVData matrix{{1,0},{0,-1}};",
+	  " C3 = coneFromVData matrix{{-1,0},{0,1}};",
+	  " C4 = coneFromVData matrix{{1,1},{0,1}};",
+	  " C5 = coneFromVData matrix {{1,2},{2,1}};",
 	  " L = {C1,C2,C3,C4,C5};",
 	  " Lpairs = incompCones L",
 	  " Lpairs == {(C1,C4),(C1,C5)}",
@@ -2177,7 +2178,7 @@ document {
      
      EXAMPLE {
 	  " P = cyclicPolytope(3,4)",
-	  " C = posHull P",
+	  " C = coneFromVData P",
 	  " interiorVector C"
 	  }
      
@@ -2435,7 +2436,7 @@ document {
      normal fan of this polytope. Note that such a polytope is not unique.",
      
      EXAMPLE {
-	  " F = fan {posHull matrix {{1,0},{0,1}},posHull matrix {{0,-1},{1,1}},posHull matrix {{-1,-1},{0,1}},posHull matrix {{-1,1},{0,-1}},posHull matrix {{1,1},{0,-1}}}",
+	  " F = fan {coneFromVData matrix {{1,0},{0,1}},coneFromVData matrix {{0,-1},{1,1}},coneFromVData matrix {{-1,-1},{0,1}},coneFromVData matrix {{-1,1},{0,-1}},coneFromVData matrix {{1,1},{0,-1}}}",
 	  " P = polytope F"
 	  }
      
@@ -2556,7 +2557,7 @@ document {
      of its faces:",
      
      EXAMPLE {
-	  " C = posHull  matrix {{1,-1,0},{1,1,0},{1,1,1}}",
+	  " C = coneFromVData  matrix {{1,-1,0},{1,1,0},{1,1,1}}",
 	  " F = fan C"
 	  },
      
@@ -2758,7 +2759,7 @@ document {
      PARA{}, "For example, consider the following three dimensional cone.",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,2,3},{3,1,2},{2,3,1}}",
+	  " C = coneFromVData matrix {{1,2,3},{3,1,2},{2,3,1}}",
 	  },
      
      PARA{}, "This Cone can be mapped to the positive orthant:",
@@ -2837,7 +2838,7 @@ document {
      PARA{}, "For example, consider the following three dimensional cone:",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,2,3},{3,1,2},{2,3,1}}",
+	  " C = coneFromVData matrix {{1,2,3},{3,1,2},{2,3,1}}",
 	  },
      
      PARA{}, "We can look at its preimage under the following map:",
@@ -2960,7 +2961,7 @@ document {
      PARA{}, "Consider the positive orthant in ",TO QQ,"^3:",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,0,0},{0,1,0},{0,0,1}}"
+	  " C = coneFromVData matrix {{1,0,0},{0,1,0},{0,0,1}}"
 	  },
      
      PARA{}, "If we want to consider the positive orthant not as cone but as a polyhedron we 
@@ -3056,7 +3057,7 @@ document {
      by ",TT "{p in (",TO QQ,TT "^n)^* | p*c >= 0 for all c in C}",".",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,2},{2,1}}",
+	  " C = coneFromVData matrix {{1,2},{2,1}}",
 	  " Cv = dualCone C",
 	  " rays Cv"
 	  }
@@ -3101,7 +3102,7 @@ document {
      target space. The ",TT "imageFan"," is the common refinement of the images of all faces of ",TT "C",".",
      
      EXAMPLE {
-	  " C = posHull matrix {{2,1,-1,-3},{1,1,1,1},{0,1,-1,0}}",
+	  " C = coneFromVData matrix {{2,1,-1,-3},{1,1,1,1},{0,1,-1,0}}",
 	  " M = matrix {{1,0,0},{0,1,0}}",
 	  " F = imageFan(M,C)",
 	  " rays F"
@@ -3591,8 +3592,8 @@ document {
      if this is equal if it has the higher ordered rays and lineality space.",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,0},{0,1},{1,1}}",
-	  " C2 = posHull matrix {{1,0,1},{0,1,0},{1,1,0}}",
+	  " C1 = coneFromVData matrix {{1,0},{0,1},{1,1}}",
+	  " C2 = coneFromVData matrix {{1,0,1},{0,1,0},{1,1,0}}",
 	  " C1 ? C2"
 	  }
      }
@@ -3615,8 +3616,8 @@ document {
      PARA{}, "See also ",TO directProduct,".",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,2},{2,1}}",
-	  " C2 = posHull matrix {{1}}",
+	  " C1 = coneFromVData matrix {{1,2},{2,1}}",
+	  " C2 = coneFromVData matrix {{1}}",
 	  " C = C1 * C2",
 	  " rays C"
 	  }
@@ -3641,7 +3642,7 @@ document {
      PARA{}, "See also ",TO directProduct,".",
      
      EXAMPLE {
-	  " C = posHull matrix {{1,2},{2,1}}",
+	  " C = coneFromVData matrix {{1,2},{2,1}}",
 	  " P =convexHull matrix {{1},{-1}}",
 	  " Q = C * P",
 	  " (vertices Q,rays Q)"
@@ -3668,7 +3669,7 @@ document {
      
      EXAMPLE {
 	  " P =convexHull matrix {{1},{-1}}",
-	  " C = posHull matrix {{1,2},{2,1}}",
+	  " C = coneFromVData matrix {{1,2},{2,1}}",
 	  " Q = P * C",
 	  " (vertices Q,rays Q)"
 	  }
@@ -3770,8 +3771,8 @@ document {
      PARA{}, "See also ",TO minkowskiSum,".",
      
      EXAMPLE {
-	  " C1 = posHull matrix {{1,2,3},{2,3,1},{3,1,2}}",
-	  " C2 = posHull matrix {{1},{0},{0}}",
+	  " C1 = coneFromVData matrix {{1,2,3},{2,3,1},{3,1,2}}",
+	  " C2 = coneFromVData matrix {{1},{0},{0}}",
 	  " C = C1 + C2",
 	  " rays C"
 	  }
@@ -3797,7 +3798,7 @@ document {
      PARA{}, "See also ",TO minkowskiSum,".",
      
      EXAMPLE {
-	  " C = posHull matrix {{1},{2},{0}}",
+	  " C = coneFromVData matrix {{1},{2},{0}}",
 	  " P = hypercube 3",
 	  " Q = C + P",
 	  " (vertices Q,rays Q)"
@@ -3825,7 +3826,7 @@ document {
      
      EXAMPLE {
 	  " P = hypercube 2",
-	  " C = posHull matrix {{1},{2}}",
+	  " C = coneFromVData matrix {{1},{2}}",
 	  " Q = P + C",
 	  " (vertices Q,rays Q)"
 	  }
@@ -3905,7 +3906,7 @@ document {
      
      
      EXAMPLE {
-	  " C = posHull matrix {{2,3},{3,2}}",
+	  " C = coneFromVData matrix {{2,3},{3,2}}",
 	  " dim C"
 	  },
      

@@ -29,11 +29,17 @@ Fan == Fan := (F1, F2) -> (
 --  OUTPUT : The fan of all Cones in 'L' and all Cones in of the fans in 'L' and all their faces
 fan = method(TypicalValue => Fan)
 fan(Matrix, Matrix, List) := (irays, linealityGens, icones) -> (
-   rays := makeRaysPrimitive(irays);
+   if (numColumns irays != 0) 
+   and (numColumns linealityGens != 0) 
+   and (numRows irays != numRows linealityGens) then error("Rays and lineality must have same ambient dimension.");
+   irays = makeRaysPrimitive(irays);
    lineality := makeRaysPrimitive(linealityGens);
+   minRays := unique apply(select(numcols irays, i -> irays_{i} != 0), i -> irays_{i});
+   if not numcols irays == #minRays then error("Input rays are not minimal.");
+   if not checkConesForMaximality(icones) then error("Input cones are not maximal.");
    result := new HashTable from {
       ambientDimension => numRows irays,
-      computedRays => rays,
+      rays => irays,
       computedLinealityBasis => lineality,
       generatingObjects => icones
    };
@@ -60,10 +66,30 @@ fan HashTable := inputProperties -> (
    constructTypeFromHash(Fan, resultHash)
 )
 
+fanFromGfan = method()
+fanFromGfan List := gfanOutput -> (
+-- 0 rays -> Matrix
+-- 1 lineality -> Matrix
+-- 2 cones -> List<List>
+-- 3 dimension -> ZZ
+
+-- 4 pure -> bool
+-- 5 simplicial -> bool
+-- 6 fVector -> List
+   result := fan(gfanOutput#0, gfanOutput#1, gfanOutput#2);
+ --  setProperty(result, ambDim, gfanOutput#4);
+   setProperty(result, computedFVector, gfanOutput#6);
+   setProperty(result, pure, gfanOutput#4);
+   setProperty(result, simplicial, gfanOutput#5);
+   setProperty(result, computedDimension, gfanOutput#3);
+   return result;
+)
+
+
 
 sanitizeFanInput = method()
 sanitizeFanInput HashTable := given -> (
-   rayProperties := {inputRays, inputLinealityGenerators, computedRays, computedLinealityBasis};
+   rayProperties := {inputRays, inputLinealityGenerators, rays, computedLinealityBasis};
    remainingProperties := keys given;
    remainingProperties = select(remainingProperties, p -> all(rayProperties, rp -> rp=!=p));
    result := apply(remainingProperties, rp -> rp=>given#rp);
@@ -104,7 +130,7 @@ addCone(Fan, Cone) := (F, C) -> (
    mc = append(mc, newCone);
    result := new HashTable from {
       ambientDimension => ambDim F,
-      computedRays => joinedRays,
+      rays => joinedRays,
       computedLinealityBasis => linF,
       inputCones => mc
    };

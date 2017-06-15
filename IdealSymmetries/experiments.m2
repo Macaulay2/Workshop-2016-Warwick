@@ -19,8 +19,10 @@ symmetryIdeals = I -> (
     -- variables whose solutions are ideal-respecting
     -- variable swaps. Returns a tuple of this as an ideal
     -- in Z/2 and over the original coefficient ring.
-    n := numgens ring I;
-    myVars := c_(1,1)..c_(n,n);
+    curTime = currentTime();
+    R = ring I;
+    n := numgens R;
+    myVars := cc_(1,1)..cc_(n,n); --#################################
     justCs := coefficientRing R [myVars];
     csAsCoeffs := justCs[gens R];
     S := R ** justCs;
@@ -28,22 +30,30 @@ symmetryIdeals = I -> (
     combo := first entries transpose (m*(transpose matrix {(gens S)_{0..n-1}}));
     subList := for i in 0..n-1 list S_i => combo_i;
     polys := (I_*) / (a->substitute(substitute(a,S),subList));
-
+    return polys;
     diagProd := {product (for i in 1..n list sub(c_(i,i),S))};
     degreeLimiter := for x in gens justCs list sub(x^2-x,S);
     rowSums := flatten for row in entries m list {sum row - 1};
     pairwiseProds := flatten for row in entries m list
         flatten for i in 0..n-1 list for j in (i+1)..n-1 list row_i*row_j;
-    relationsOnC := degreeLimiter | rowSums | diagProd | pairwiseProds;
+    --relationsOnC := degreeLimiter | rowSums | diagProd | pairwiseProds;
 
-    newI := ideal relationsOnC + substitute(I,S);
-    --newI := ideal degreeLimiter + substitute(I,S);
-    modded := polys / (a-> a % newI);
+    print ("Time after computing ideal setup: "|toString(currentTime()-curTime));
+    --newI := ideal relationsOnC + substitute(I,S);
+    newI := ideal degreeLimiter + substitute(I,S);
+    --modded := polys / (a-> a % newI);
+    modded := for p in polys list (
+        print "hi";
+        p % newI
+    );
+    print ("Time after computing mods: "|toString(currentTime()-curTime));
     coeffIdeal := sum (modded / (a->sub(a,csAsCoeffs)) / content);
     coeffIdeal = sub(ideal relationsOnC,justCs) + coeffIdeal;
     coeffIdeal = ideal ((first entries gens coeffIdeal) / clearDenoms);
     Z2 := ZZ/2[myVars,MonomialOrder => Lex];
-    return (ideal first entries gens gb sub(coeffIdeal,Z2),coeffIdeal);
+    asdf := (ideal first entries gens gb sub(coeffIdeal,Z2),coeffIdeal);
+    print ("Time after computing Z2 gb: "|toString(currentTime()-curTime));
+    return asdf;
 )
 
 solveTriangular = I -> (
@@ -72,6 +82,29 @@ solveTriangular = I -> (
     return recurse(I,0);
 )
 
+
+idealSymmetry = I -> (
+    J := symmetryIdeals I;
+    switchOptionRing := opts -> (
+        return for opt in opts list (
+            sub(opt#0,ring J_1) => opt#1
+        );
+    );
+    testPoints := pts -> return select(pts,a -> sub(J_1,switchOptionRing a)==0);
+    pts := testPoints solveTriangular J_0;
+    pts = (for pt in pts list (
+        pt = new HashTable from pt;
+        apply(gens ring J_0,a->pt#a)
+    ));
+    n := numgens ring I;
+    transpositions := for pt in pts list (
+        m = matrix pack(n,pt);
+        flatten entries (m*transpose matrix {toList (1..n)})
+    );
+    return transpositions;
+)
+
+
 testIdeal = choice -> (
     if choice==1 then (
         R = QQ[vars {53..59}];
@@ -85,32 +118,23 @@ testIdeal = choice -> (
         R = QQ[x,y,z];
         I = ideal {x+y^2+z^3, z+x^2+y^3,y+z^2+x^3};
     );
-    return I;
+    return idealSymmetry I;
 )
 
-I = testIdeal 0;
-J = symmetryIdeals I;
-switchOptionRing = opts -> (
-    R = ring J_1;
-    return for opt in opts list (
-        sub(opt#0,R) => opt#1
-    );
+cyclicIdeal = n -> (
+    RX := QQ[vars(10..9+n)];
+    II := ideal (toList apply(1..n-1, d-> sum(0..n-1, 
+        i -> product(d, k -> RX_((i+k)%n))
+        )) | {product gens RX - 1});
+    return II;
+    return idealSymmetry II;
 )
-filterActualPoints = pts -> return select(pts,a -> sub(J_1,switchOptionRing a)==0);
-pts = solveTriangular J_0;
-pts = filterActualPoints pts;
-pts = (for pt in pts list (
-    pt = new HashTable from pt;
-    apply(myVars,a->pt#a)
-))
-n := numgens ring I;
-transpositions = for pt in pts list (
-    m = matrix pack(n,pt);
-    flatten entries (m*transpose matrix {toList (1..n)})
-)
-print transpositions;
---load "SymmetricGroupUtils.m2";
---transpositions / (a->convertToCycles({a},n))
+
+--print idealSymmetry cyclicIdeal 5
+
+--print testIdeal 3
+
+
 
 --compute a groebner basis, test permutations of variables
 factorialMethod = I -> (
@@ -145,4 +169,5 @@ factorialMethod = I -> (
     << perms#i << endl;
   );
 )
-elapsedTime factorialMethod testIdeal 0
+--elapsedTime factorialMethod cyclicIdeal 5
+--elapsedTime factorialMethod testIdeal 1

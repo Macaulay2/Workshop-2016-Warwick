@@ -1,3 +1,10 @@
+-- PURPOSE : Giving the generating Cones of the Fan
+--   INPUT : 'F'  a Fan
+--  OUTPUT : a List of Cones
+maxCones = method(TypicalValue => List)
+maxCones Fan := F -> maxObjects F
+
+
 --   INPUT : 'F'  a Fan
 --  OUTPUT : a Matrix, where the column vectors are a basis of the lineality space
 linSpace Fan := F -> linealitySpace F
@@ -5,9 +12,7 @@ linSpace Fan := F -> linealitySpace F
 
 --   INPUT : 'F',  a Fan
 --  OUTPUT : 'true' or 'false'
-isPointed Fan := F -> (
-     if not F.cache.?isPointed then F.cache.isPointed = isPointed((maxCones F)#0);
-     F.cache.isPointed)
+isPointed Fan := F -> all(getProperty(F, honestMaxObjects), c->isPointed c)
 
 
 --   INPUT : 'F'  a Fan
@@ -25,7 +30,7 @@ smoothSubfan Fan := F -> (
    cones := getProperty(F, smoothCones);
    result := new HashTable from {
       inputCones => cones,
-      computedRays => rays F,
+      rays => rays F,
       computedLinealityBasis => linealitySpace F
    };
    fan result
@@ -43,6 +48,7 @@ cones(ZZ,Fan) := (k,F) -> (
    faces := getProperty(F, computedFacesThroughRays);
    faces#(d-k)
 )
+
 
 -- PURPOSE : Computing the 'n'-skeleton of a fan
 --   INPUT : (n,F),  where 'n' is a positive integer and
@@ -78,3 +84,14 @@ objectsOfDim(ZZ, Fan) := (k,F) -> (
 	L := select(getProperty(F, honestMaxObjects), C -> dim C >= k);
 	-- Collecting the 'k'-dim faces of all generating cones of dimension greater than 'k'
 	unique flatten apply(L, C -> faces(dim(C)-k,C)))
+
+
+isWellDefined Fan := F -> getProperty(F, isWellDefined)
+
+
+facesAsCones(ZZ, Fan) := (d, F) -> (
+   raysF := rays F;
+   linF := linealitySpace F;
+   result := faces(d, F);
+   apply(result, f -> coneFromVData(raysF_f, linF))
+)
