@@ -1218,6 +1218,8 @@ gfanFanCommonRefinement = method( Options => {
 	}
 )
 
+--This has been broken by our changes to gfanInterface2 to make
+--the output be Fans in the new sense.
 gfanFanCommonRefinement (Fan, Fan) := opts -> (F,G) -> (
      fileF := "";
      fileG := "";
