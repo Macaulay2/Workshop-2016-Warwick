@@ -440,7 +440,6 @@ gfanParsePolyhedralFan String := o -> s -> (
 --			myBlocks := prepend(header, values rawBlocks);
 --			s = concatenate between("\n\n", apply(myBlocks, lines -> between("\n", lines)));
 --	);
-
 	P := new gfanParseHeader(header) from myhash;
    	if gfanCachePolyhedralOutput then (
 
@@ -1416,6 +1415,11 @@ gfanGroebnerCone Ideal := opts -> (I) -> (
 	gfanGroebnerCone(MPLConverter(I), opts)
 )
 
+--The bug in this one is that gfanParsePolyhedralFan assumes that it is trying
+--to create a fan, but this should be a cone (i.e, the gfan output doesn't have rays
+-- To continue to debug, make it print input
+-- and give that to gfan directly to help.
+-- Still a bug!
 gfanGroebnerCone MarkedPolynomialList := opts -> (L) -> (
 	(ringMap, newL) := gfanConvertToNewRing(L);
 	L = newL;
@@ -1424,7 +1428,7 @@ gfanGroebnerCone MarkedPolynomialList := opts -> (L) -> (
 			| "two MarkedPolynomialLists as arguments.");
 	input := gfanMPLToRingToString(L)
 		| gfanMPLToString(L);
-	gfanParsePolyhedralFan runGfanCommand("gfan _groebnercone", opts, input)
+        gfanParsePolyhedralFan runGfanCommand("gfan _groebnercone", opts, input)
 )
 
 gfanGroebnerCone Ideal := opts -> (I) -> (
@@ -1439,6 +1443,9 @@ gfanGroebnerCone List := opts -> (L) -> (
 -- gfan_homogeneityspace
 --------------------------------------------------------
 
+--The bug here is the same as for Groebner cone - the output
+-- should be a cone, not a fan (and it comes from gfan as a PolyhedralCone)
+--Still a bug!!!
 gfanHomogeneitySpace = method(Options=>{})
 
 gfanHomogeneitySpace (List) := opts -> (L) -> (
@@ -2786,7 +2793,7 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan gfan {x+y}
 			G = gfanToPolyhedralFan gfan {x+y^2}
-			gfanFanCommonRefinement(F,G)
+			gfanFanCommonRefinement(F_0,G_0)
 		Text
 
 			In the next example we take two half planes which overlap in the first
@@ -2828,7 +2835,7 @@ doc ///
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}};
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}};
 			Q = gfanFanCommonRefinement(F_0,G_0)
-			gfanFanLink(Q, {2,1}, "star" =>true)
+			gfanFanLink(Q_0, {2,1}, "star" =>true)
 
 		Text
 
