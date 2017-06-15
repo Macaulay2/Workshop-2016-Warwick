@@ -437,7 +437,7 @@ linealitySpace (TropicalCycle):= T->( linSpace fan T)
 maxCones (TropicalCycle):= T->( maxCones fan T)
 
 
-multiplicities = method(TypicalValue => TropicalCycle)
+multiplicities = method(TypicalValue => List)
 
 multiplicities (TropicalCycle) := T -> (T#"Multiplicities")
 
