@@ -25,7 +25,7 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-        PackageExports => {"gfanInterface2","EliminationMatrices"},
+        PackageExports => {"gfanInterface2","EliminationMatrices","Binomials"},
 	DebuggingMode => true
 )
 
@@ -143,42 +143,26 @@ computeCones=(R,M,L)->(
 --output:list of matrices
 -- note that ConesOfVariety is a local variable also in findMultiplicities
 findMultiplicity=(M,I)->(
---compute vector w in relative interior in order to get the initial ideal
+--compute vector w in relative interior in order to get the initial ideal in_w(I) with w in the maximal cone M
     n:=numRows M - 1;
+--if max convention applies then add an if and  this has to be turn into w:=flatten entries(sum(0..n, j->M^{j}));
     w:=flatten entries(-sum(0..n, j->M^{j}));
---weight the ring according to this w 
+--weight the ring according to this w , we are using leadTerm that is why we consider -sum of rays
     R:=newRing(ring I, MonomialOrder=>{Weights=>w},Global=>false);
     J:=sub(I,R);
     K:=ideal(leadTerm(1,J));
-    InitialIdeal:=sub(K,ring I);
---saturate the ideal with respect to the product of all the variables
-    listOfVariables:=gens (ring I);
-    j:=0;L:=1; while j<# listOfVariables do(
-	L=L* listOfVariables_j;
-	j=j+1
-	); 
-    Basis:= transpose((maxCol(transpose M))_0);
-    d:=dim (convexHull(Basis));
-    if d==0 
-    then 1
- --since the volume of a point is 0 and 0! is 1, then you have to divide
- --by the index but in this case is 1 
-    else 
-    (V:=d! * (volume(convexHull(Basis)));
-    IdealMinors:=minors(numRows Basis,Basis);
-    i:=0;
-    Minors:={};
-    while (i<numColumns gens IdealMinors) do ( 
-	Minors=append(Minors, (gens IdealMinors)_(0,i));i=i+1);
-    l:=gcd(Minors) ;
-    V=V/l;
-    m:=degree(saturate(InitialIdeal,L))/V;
+    InitialIdeal:= saturate(sub(K,ring I),ideal product gens ring I);
+--this is the the basis of the lattice associated to the toric ideal we are going to compute
+    Basis:= (maxCol( generators kernel M))_0;
+    --this is where we use  Binomials package
+    toricIdeal:=saturate(latticeBasisIdeal(ring InitialIdeal,Basis),ideal product gens ring I);
+    m:=degree(InitialIdeal)/degree (toricIdeal);
 --return multiplicity m as integer, since it lives currently in QQ
 --if m is an integer (as it should be), then the following command parses it to ZZ
 --otherwise, an errow will be returned "rational number is not an integer"
     lift(m,ZZ) 
     )    
-)
+
 --input Matrix whose rows are the generators of the cone and the ideal of the variety
 --output a list of one number that is the multiplicity
 --maths behind it look at exercise 34 chapter 3 Tropical book and [Stu96]
@@ -330,8 +314,8 @@ stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+    if (o.Strategy=="atint") then (
 -- does not work yet! Problems with intersection in atint (polymake)
-
 -- TODO: rewrite complety after Polyhedra is done and gfanInterface2 got adapted to Polyhedra
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
@@ -353,7 +337,7 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	run runstring;
 	result := get filename;
  	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
-	
+    );
 )    
 
 --parseFanFromGfanToPolyhedraFormat = method(TypicalValue => Fan)
