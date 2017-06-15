@@ -694,9 +694,7 @@ TEST ///
 F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
 assert((tropicalCycle(F,{1,1,1}))#"Fan"== F)
 assert((tropicalCycle(F,{1,1,1}))#"Multiplicities"== {1,1,1})
---case when it is not a tropical cycle
-F=fan(matrix{{1,0,-1},{0,1,-1}},{{0,1},{0,2},{1,2}})
---assert(tropicalCycle(F,{1,1,1})#"Fan"== F)
+
 ///
 
 -----------------------
@@ -787,12 +785,35 @@ assert((fVector T)==({1, 0}))
 
 
 
+--linealitySpace
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((linealitySpace T)==( matrix{{1},{1},{1}}))
+F:=fan(matrix{{1,0,-1},{0,1,-1}},map(ZZ^2,ZZ^0,0),{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((linealitySpace T)==(0))
+///
+
+--multiplicities
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((multiplicities T)==( {1,1,1}))
+F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T#"Multiplicities" ={1};
+T#"Fan" = F;
+assert((multiplicities T)==({1}))
+///
 
 
 --fan
---linealitySpace
 --cones
---multiplicities
 
 
 
@@ -822,8 +843,6 @@ TEST///
 QQ[x,y,z,w]
 F:=tropicalPrevariety({x+y+z+w,x^2+y*z})
 
-
-
 ///
 
 
@@ -851,19 +870,6 @@ F:=tropicalPrevariety({x+y+z+w,x^2+y*z})
     
 
 
------------------------
---getters
------------------------
---multiplicities
---rays
---cones
---dim
---ambDim
---fVector
---fan
---linealitySpace
---maxCones
---multiplicities
 
 
 -----------------------
