@@ -880,8 +880,17 @@ assert ((rays T)==(matrix {{2, -1, -1},{-1, 2, -1}, {-1, -1, 2}, {0, 0, 0}}))
 assert((linealitySpace T)==( matrix {{1, 0}, {1, 0}, {1, 0}, {0, 1}}))
 assert((multiplicities T)==( {2,2,2}))
 assert((maxCones T)==( {{0},{1},{2}}))
-
-
+I=ideal(x^2+x*z)
+T=tropicalVariety (I,Prime=>false)
+assert ((rays T)==(0 ))
+assert((linealitySpace T)==( matrix {{1, 0, 0}, {0, 1, 0}, {1, 0, 0}, {0, 0, 1}}))
+assert((maxCones T)==( {{}}))
+assert((multiplicities T)==( {1}))
+T=tropicalVariety (I,Prime=>false,ComputeMultiplicities=>false)
+assert ((rays T)==(0))
+assert((linealitySpace T)==(matrix {{1, 0, 0}, {0, 1, 0}, {1, 0, 0}, {0, 0, 1}}))
+assert((maxCones T)==( {{}}))
+assert((multiplicities T)==( {{}}))
 ///
 
 
