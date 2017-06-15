@@ -1,0 +1,40 @@
+This is the current status of the files
+
+---------------
+- Polyhedra
+---------------
+
+We need to get Lars to implement the change we made in ???add file name 
+
+
+---------------
+- gfanInterface2
+---------------
+
+There are three errors left.  Two of them have comments attached, and
+the work that is needed is to understand how to handle gfan output
+that is a PolyhedralCone.  The other I (DM) don't understand yet.
+
+There's also a lot of commented out stuff that we should probably delete
+(after checking tests) and also some other things that we should comment
+out (e.g, checking for keys in hash tables that no longer exist).
+
+---------------
+- Tropical 
+---------------
+
+Status of functions:
+
+
+
+
+Status of documentation:
+
+
+
+Status of tests:
+
+
+
+
+
