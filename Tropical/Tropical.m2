@@ -78,11 +78,11 @@ tropicalCycle (Fan, List) := (F,mult)->(
 
 --functions to switch to min-convention
 
-minmaxswitch = method ()
+minmaxSwitch = method ()
 
-minmaxswitch (Fan) := F -> fanFromGfan({- rays F, linSpace F, maxCones F ,dim F,isPure F,isSimplicial F,fVector F});
+minmaxSwitch (Fan) := F -> fanFromGfan({- rays F, linSpace F, maxCones F ,dim F,isPure F,isSimplicial F,fVector F});
 
-minmaxswitch (TropicalCycle) := T -> tropicalCycle(minmaxswitch fan T, multiplicities T);
+minmaxSwitch (TropicalCycle) := T -> tropicalCycle(minmaxSwitch fan T, multiplicities T);
 
 
 
@@ -123,7 +123,7 @@ tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => fa
     if (o.Strategy=="gfan") then (
     	F:= gfanTropicalIntersection(L, gfanopt); 
 --gives only the fan and not the fan plus multiplicities which are wrongly computed in gfan
-       F_0)
+	if (Tropical#Options#Configuration#"tropicalMax" == true) then return F_0 else return minmaxSwitch (F_0))
     else error "options not valid"
 )
 
@@ -217,7 +217,7 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 	       (if (opt.Prime== true)
 		then (
 		    F= gfanTropicalTraverse( gfanTropicalStartingCone I);
-	            tropicalCycle(F))
+	            if (Tropical#Options#Configuration#"tropicalMax" == true) then return tropicalCycle(F) else return minmaxSwitch tropicalCycle (F))
 		else
 		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
 		    (if opt.ComputeMultiplicities==false 
@@ -228,10 +228,10 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 			       mult=append(mult,{});
 			       i=i+1);
 			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities 
-			   tropicalCycle(F_0,mult)
+			   if (Tropical#Options#Configuration#"tropicalMax" == true) then return  tropicalCycle(F_0,mult) else return minmaxSwitch tropicalCycle(F_0,mult)
 	    	    	   )
 		     else (F= gfanTropicalBruteForce gfanBuchberger I;
-			 tropicalCycle(F_0,findMultiplicities(I,F_0))
+			 if (Tropical#Options#Configuration#"tropicalMax" == true) then return tropicalCycle(F_0,findMultiplicities(I,F_0)) else return minmaxSwitch tropicalCycle(F_0,findMultiplicities(I,F_0))
 			 )  )))
 
 
