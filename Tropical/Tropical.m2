@@ -206,8 +206,7 @@ tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	Prime => true
 	})
 tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
-    	if IsHomogIdeal==false then print "0"
---Once tropicalVariety(I) is finished, send there to homogenize
+    	if IsHomogIdeal==false then return tropicalVariety(I)
 	else
 		local F;
 		--If ideal is prime, use following algorithm for speed
@@ -266,32 +265,6 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	return(U);
 	)
 )
-
-{* Old tropicalVariety code
-    	--Then remove lineality space
-	--The following lines will need to be changed once the
-	--Polyhedra package has been updated (hopefully summer 2016)
-    	Trays:=entries transpose rays(T);
-	--Add a multiple of the all-ones vector to each ray to make the first
-	-- coordinate zero, drop the first coordinate, and divide by the 
-	-- gcd.
-	newTrays := apply(Trays, v->(
-	    newv := apply(#v-1,i->(v#(i+1)-v#0));
-	    gcdv := gcd(newv);
-	    newv = newv/gcdv;
-	    newv = apply(newv,i->(lift(i,ZZ)))
-       	    ));
-    	--The next line in particular should be replaced by a constructor.
-    	(fan(T))#cache#"Rays" = newTrays;
-	(fan(T))#cache#"computedDimension" = dim(T)-1;
-	(fan(T))#cache#"ambientDimension" = (fan(T))#cache#"ambientDimension"-1;
-	--For the next one, if we want to remember the lineality space
-	--we should instead quotient by the all ones vector
-	--remove(T,"LinealitySpace");
-	--remove(T,"OrthLinealitySpace");
-	--remove(T,"LinealityDim");
-	--return(T);
-*}
 
 dehomogenise=(M) -> (
 	vectorList:= entries transpose M;
