@@ -307,8 +307,8 @@ stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+    if (o.Strategy=="atint") then (
 -- does not work yet! Problems with intersection in atint (polymake)
-
 -- TODO: rewrite complety after Polyhedra is done and gfanInterface2 got adapted to Polyhedra
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
@@ -330,7 +330,7 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	run runstring;
 	result := get filename;
  	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
-	
+    );
 )    
 
 --parseFanFromGfanToPolyhedraFormat = method(TypicalValue => Fan)
