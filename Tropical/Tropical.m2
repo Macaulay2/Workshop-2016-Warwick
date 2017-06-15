@@ -506,7 +506,6 @@ doc ///
 			appear in the MaximalCones list.
 		Example
 			F = fan {posHull matrix {{1},{0},{0}}, posHull matrix {{0},{1},{0}}, posHull matrix {{0},{0},{1}}, posHull matrix {{-1},{-1},{-1}}} 
-			MaximalCones F
 			mult = {1,2,-3,1}
 			tropicalCycle(F, mult)
 ///
