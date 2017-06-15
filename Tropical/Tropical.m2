@@ -221,6 +221,7 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 		     then (F= gfanTropicalBruteForce gfanBuchberger I;
 			   mult := {};
 			   i:=0;
+			   
 			   while(i<#maxCones (F_0))do(
 			       mult=append(mult,{});
 			       i=i+1);
@@ -707,6 +708,97 @@ assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l]))==true)
 R:=QQ[x,y,z]
 assert( not isTropicalBasis({x+y+z,2*x+3*y-z}))
 ///
+
+
+-----------------------
+--getters
+-----------------------
+
+--rays
+
+
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((rays T)==( matrix{{0,0,0},{1,0,-1},{0,1,-1}}))
+F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T#"Multiplicities" ={1};
+T#"Fan" = F;
+assert((rays(T))==(matrix {{}, {}, {}}))
+///
+
+--maxCones
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((maxCones T)==( {{0,1},{0,2},{1,2}}))
+F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T#"Multiplicities" ={1};
+T#"Fan" = F;
+assert((maxCones(T))==({{}}))
+///
+
+
+
+--dim
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((dim T)==( 3))
+F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T#"Multiplicities" ={1};
+T#"Fan" = F;
+assert((dim T)==(1))
+///
+
+--ambDim
+
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((ambDim T)==( 3))
+F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T#"Multiplicities" ={1};
+T#"Fan" = F;
+assert((ambDim T)==(3))
+///
+
+
+--fVector
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((fVector T)==( {3, 3, 1, 0}))
+F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T#"Multiplicities" ={1};
+T#"Fan" = F;
+assert((fVector T)==({1, 0}))
+///
+
+
+
+
+
+--fan
+--linealitySpace
+--cones
+--multiplicities
+
+
+
+
+
+
    
 -----------------------
 --isBalanced
@@ -726,7 +818,13 @@ assert( not isTropicalBasis({x+y+z,2*x+3*y-z}))
 --tropicalPrevariety
 -----------------------
 
+TEST///
+QQ[x,y,z,w]
+F:=tropicalPrevariety({x+y+z+w,x^2+y*z})
 
+
+
+///
 
 
 
