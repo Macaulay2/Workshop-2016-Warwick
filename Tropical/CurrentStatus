@@ -4,7 +4,11 @@ This is the current status of the files
 - Polyhedra
 ---------------
 
-We need to get Lars to implement the change we made in ???add file name 
+We need to get Lars to implement the change we made in constructors.m2
+to the fanFromGfan command.
+
+Ideally we'd also get him to implement some version of "apply this
+linear transformation to a fan" (emailed about this on 15/6/17).
 
 
 ---------------
@@ -27,6 +31,8 @@ We're also waiting for Ben Madley's changes to this.
 
 Status of functions:
 
+- We'd still like to implement for someone to be able to choose their
+  favourite complementary subspace to the lineality space.
 
 
 
