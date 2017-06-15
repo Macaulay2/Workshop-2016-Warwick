@@ -19,6 +19,8 @@ There's also a lot of commented out stuff that we should probably delete
 (after checking tests) and also some other things that we should comment
 out (e.g, checking for keys in hash tables that no longer exist).
 
+We're also waiting for Ben Madley's changes to this.
+
 ---------------
 - Tropical 
 ---------------
