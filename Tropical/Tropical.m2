@@ -34,7 +34,7 @@ export {
   "tropicalCycle",
   "isBalanced",
   "tropicalPrevariety",
-  "computeMultiplicities",
+  “ComputeMultiplicities",
   "Prime",
   "stableIntersection",
   "tropicalVariety",
@@ -205,7 +205,7 @@ findMultiplicities=(I,T)->(
 --TODO: check multiplicity computation in the case that the variety has no rays but only lineality space
 --(see example for ideal K in tropicalVariety) 
 tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
-	computeMultiplicities => true,
+	ComputeMultiplicities => true,
 	Prime => true
 	})
 tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
@@ -220,7 +220,7 @@ tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
 	            tropicalCycle(F))
 		else
 		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
-		    (if opt.computeMultiplicities==false 
+		    (if opt.ComputeMultiplicities==false 
 		     then (F= gfanTropicalBruteForce gfanBuchberger I;
 			   mult := {};
 			   i:=0;
@@ -578,7 +578,7 @@ doc///
       tropicalVariety    
       (tropicalVariety, Ideal)
       (tropicalVariety, Ideal, Boolean)
-      [tropicalVariety, computeMultiplicities]
+      [tropicalVariety, ComputeMultiplicities]
       [tropicalVariety, Prime]
 
     Headline
@@ -586,14 +586,14 @@ doc///
     Usage
       tropicalVariety(I)
       tropicalVariety(I,IsHomogIdeal)
-      tropicalVariety(I,computeMultiplicities=>true)
+      tropicalVariety(I,ComputeMultiplicities=>true)
       tropicalVariety(I,Prime=>true)
     Inputs
       I:Ideal
         of polynomials
       IsHomogIdeal:Boolean
         a boolean that ensures whether the ideal is already homogeneous   
-      computeMultiplicities =>Boolean
+      ComputeMultiplicities =>Boolean
         a boolean that confirms whether the multiplicities will be computed
       Prime=>Boolean
         a boolean that ensures whether the ideal is already prime
@@ -604,7 +604,7 @@ doc///
          This method takes an ideal and computes the tropical variety associated to it. 
          By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
          In this case use optional inputs Prime=>false.
-         By default it computes multiplicities but setting computeMultiplicities=>false
+         By default it computes multiplicities but setting ComputeMultiplicities=>false
          turns this off.
 	 The ideal I is not assumed to be homogeneous but with tropicalVariety(I,true)
 	 the user can confirm it is homogeneous to the function does not check it.
@@ -614,10 +614,10 @@ doc///
        QQ[x,y,z]
        --I=ideal(x+y+1) 
        --tropicalVariety(I)
-       --tropicalVariety(I,computeMultiplicities=>false)  
+       --tropicalVariety(I,ComputeMultiplicities=>false)  
        J=ideal(x+y+z)
       -- tropicalVariety(J,true)
---       tropicalVariety(J,true,computeMultiplicities=>false)
+--       tropicalVariety(J,true,ComputeMultiplicities=>false)
        K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
        isPrime K
 --       tropicalVariety(K,true,Prime=>false)
@@ -694,14 +694,134 @@ doc///
 
 
 
+----- TESTS -----
+
+-----------------------
+--tropicalCycle
+-----------------------
 TEST ///
-    assert (1+1==2)
-    assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
-    assert(R:=QQ[x,y,z]; not isTropicalBasis({x+y+z,2*x+3*y-z}))
+
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+assert(tropicalCycle(F,{1,1,1})#"Fan"== F)
+assert(tropicalCycle(F,{1,1,1})#"Multiplicities"== {1,1,1})
+--case when it is not a tropical cycle
+F=fan(matrix{{1,0,-1},{0,1,-1}},{{0,1},{0,2},{1,2}})
+--assert(tropicalCycle(F,{1,1,1})#"Fan"== F)
+///
+
+-----------------------
+--isTropicalBasis
+-----------------------
+ 
+TEST ///
+assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l] ))==true)
+R:=QQ[x,y,z]
+assert( not isTropicalBasis({x+y+z,2*x+3*y-z}))
+///
+   
+-----------------------
+--isBalanced
+-----------------------
+
 --The following two tests are commented until their functions can work in a computer without polymake
     --assert(isBalanced tropicalVariety (ideal {6*x^2+3*x*y+8*y^2+x*z+6*y*z+3*z^2+2*x*t+5*z*t+3*t^2,5*x^2+x*y+8*y^2+x*z+4*y*z+9*z^2+5*x*t+8*y*t+z*t}, true)) 
+<<<<<<< Updated upstream
     --assert(R:=QQ[x,y,z,t]; I=ideal(x+y+z+t); J=ideal(4*x+y-2*z+5*t); 
 	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
     assert(R:=QQ[x,y,z]; rays(tropicalVariety(ideal(x+y+1)))==matrix{{-3,3,0},{-3,0,3},{-2,1,1}})
 ///    	    	
+=======
+
+
+-----------------------
+--tropicalPrevariety
+-----------------------
+
+
+
+
+
+-----------------------
+--stableIntersection
+-----------------------
+
+
+--The following two tests are commented until their functions can work in a computer without polymake
+R:=QQ[x,y,z,t];
+I=ideal(x+y+z+t); 
+J=ideal(4*x+y-2*z+5*t); 
+--assert(stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
+  
+
+-----------------------
+--tropicalVariety
+-----------------------
+
+
+
+
+
+    
+
+
+-----------------------
+--getters
+-----------------------
+--multiplicities
+--rays
+--cones
+--dim
+--ambDim
+--fVector
+--fan
+--linealitySpace
+--maxCones
+--multiplicities
+
+
+-----------------------
+--findMultiplicities
+--findMultiplicity
+--computeCones
+-----------------------
+
+
+
+
+
+-----------------------
+--isPure
+-----------------------
+
+
+
+
+-----------------------
+--isSimplicial
+-----------------------
+
+
+
+
+
+-----------------------
+--convertToPolymake
+-----------------------
+
+
+
+
+
+
+
+
+
+
+end
+
+    
+    
+    
+ 	    	
+>>>>>>> Stashed changes
        
