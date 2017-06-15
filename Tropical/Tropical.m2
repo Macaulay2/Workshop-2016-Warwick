@@ -161,8 +161,7 @@ computeCones=(R,M,L)->(
 findMultiplicity=(M,I)->(
 --compute vector w in relative interior in order to get the initial ideal in_w(I) with w in the maximal cone M
     n:=numRows M - 1;
---if max convention applies then add an if and  this has to be turn into w:=flatten entries(sum(0..n, j->M^{j}));
-    w:=flatten entries(-sum(0..n, j->M^{j}));
+    w:=flatten entries(sum(0..n, j->M^{j}));
 --weight the ring according to this w , we are using leadTerm that is why we consider -sum of rays
     R:=newRing(ring I, MonomialOrder=>{Weights=>w},Global=>false);
     J:=sub(I,R);
@@ -705,9 +704,9 @@ F=fan(matrix{{1,0,-1},{0,1,-1}},{{0,1},{0,2},{1,2}})
 -----------------------
  
 TEST ///
---assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l]))==true)
+assert(isTropicalBasis (flatten entries gens Grassmannian(1,4,QQ[a..l]))==true)
 R:=QQ[x,y,z]
---assert( not isTropicalBasis({x+y+z,2*x+3*y-z}))
+assert( not isTropicalBasis({x+y+z,2*x+3*y-z}))
 ///
    
 -----------------------
