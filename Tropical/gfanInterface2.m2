@@ -2803,7 +2803,7 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}}
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}}
-			gfanFanCommonRefinement(F,G)
+			gfanFanCommonRefinement(F_0,G_0)
 		Text
 
 			@STRONG "gfan Documentation"@
