@@ -879,8 +879,8 @@ toPolymakeFormat(String,Vector) := (propertyName,V) -> (
      else(
      	  S := propertyName|"\n";
      	  if length V > 0 then
-	        scan(V,l -> S = S|"\n"|replace(","," ",gfanToExternalString l));
-    	  S=S|"\n\n";		
+	        scan(V,l -> S = S|replace(","," ",gfanToExternalString l)|"\n");
+    	  S=S|"\n";		
      	  S
      	  )
      )
