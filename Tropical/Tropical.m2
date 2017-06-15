@@ -42,8 +42,7 @@ export {
   "multiplicities"
 }
 
---???check syntax - idea is that this is where we should define local symbols
---protect Maclagan
+
 
 
 
