@@ -77,7 +77,8 @@ export {
 --	"gfanVectorToString", -- to make gfan input
 --	"gfanVectorListToString", -- to make gfan input
 --	"gfanVectorListListToString"", -- to make gfan input
-	"gfanVersion"
+	"gfanVersion",
+	"toPolymakeFormat"
 }
 
 gfanPath = gfanInterface2#Options#Configuration#"path"
@@ -904,7 +905,7 @@ toPolymakeFormat(Fan) := (F) ->(
      L:=linealitySpace(F);
      str=concatenate(str,toPolymakeFormat("LINEALITY_DIM",rank L));
      str=concatenate(str,toPolymakeFormat("LINEALITY_SPACE",L));	 
-     conesF:=flatten apply(dim(F)+1,i->(cones(i,F)));	 
+     conesF:=flatten apply(dim(F)+1-rank L,i->(cones(i+rank L,F)));	 
      str=concatenate(str,toPolymakeFormat("CONES", conesF));
      str=concatenate(str,toPolymakeFormat("MAXIMAL_CONES", maxCones F));
      return(str);	     
@@ -1322,18 +1323,18 @@ gfanFanProduct (Fan, Fan) := opts -> (F,G) -> (
      fileFisTemp := true;
      fileGisTemp := true;
 
-     if F#?"GfanFileName" and fileExists F#"GfanFileName" then
-        (fileF = F#"GfanFileName"; fileFisTemp = false;)
-     else if F#?"GfanFileRawString" then
-     	fileF = gfanMakeTemporaryFile F#"GfanFileRawString"
-     else
+--     if F#?"GfanFileName" and fileExists F#"GfanFileName" then
+--        (fileF = F#"GfanFileName"; fileFisTemp = false;)
+--     else if F#?"GfanFileRawString" then
+--     	fileF = gfanMakeTemporaryFile F#"GfanFileRawString"
+--     else
      	fileF = gfanMakeTemporaryFile toPolymakeFormat F;
 
-     if G#?"GfanFileName" and fileExists G#"GfanFileName" then
-        (fileG = G#"GfanFileName"; fileGisTemp = false;)
-     else if G#?"GfanFileRawString" then
-     	fileG = gfanMakeTemporaryFile G#"GfanFileRawString"
-     else
+--     if G#?"GfanFileName" and fileExists G#"GfanFileName" then
+--        (fileG = G#"GfanFileName"; fileGisTemp = false;)
+--     else if G#?"GfanFileRawString" then
+--     	fileG = gfanMakeTemporaryFile G#"GfanFileRawString"
+--     else
      	fileG = gfanMakeTemporaryFile toPolymakeFormat G;
 
 	opts = opts ++ { "i1" => fileF , "i2" => fileG };
@@ -2826,7 +2827,7 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}};
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}};
-			Q = gfanFanCommonRefinement(F,G)
+			Q = gfanFanCommonRefinement(F_0,G_0)
 			gfanFanLink(Q, {2,1}, "star" =>true)
 
 		Text
@@ -2860,7 +2861,7 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}}
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}}
-			gfanFanProduct(F,G)
+			gfanFanProduct(F_0,G_0)
 
 		Text
 			@STRONG "gfan Documentation"@
