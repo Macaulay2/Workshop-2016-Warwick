@@ -89,8 +89,7 @@ isBalanced (TropicalCycle):= T->(
 	run runstring;
 	result := get filename;
 	if (result=="1") then return true;
-	if (result=="0") then return false;
-	error("Polymake Error: "|result);    
+	return false;
 )
 
 
