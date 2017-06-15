@@ -437,7 +437,7 @@ linealitySpace (TropicalCycle):= T->( linSpace fan T)
 maxCones (TropicalCycle):= T->( maxCones fan T)
 
 
-multiplicities = method(TypicalValue => List)
+multiplicities = method(TypicalValue => TropicalCycle)
 
 multiplicities (TropicalCycle) := T -> (T#"Multiplicities")
 
@@ -872,8 +872,6 @@ assert ((rays T)==(matrix {{2, -1, -1},{-1, 2, -1}, {-1, -1, 2}, {0, 0, 0}}))
 assert((linealitySpace T)==( matrix {{1, 0}, {1, 0}, {1, 0}, {0, 1}}))
 assert((multiplicities T)==( {2,2,2}))
 assert((maxCones T)==( {{0},{1},{2}}))
-
-
 ///
 
 
