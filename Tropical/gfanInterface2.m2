@@ -860,7 +860,7 @@ toPolymakeFormat(String, Matrix) := (propertyName, M) -> (
      else(
      	  S := propertyName|"\n";
      	  if numRows M > 0 then
-	     S = S|replace("\\|", "", toString net M);
+	     S = S|replace("\\|", "", toString net M)|"\n\n";
      	  S
      	  )
      )
@@ -879,21 +879,36 @@ toPolymakeFormat(String,Vector) := (propertyName,V) -> (
      	  S := propertyName|"\n";
      	  if length V > 0 then
 	        scan(V,l -> S = S|"\n"|replace(","," ",gfanToExternalString l));
+    	  S=S|"\n\n";		
      	  S
      	  )
      )
 toPolymakeFormat(String,ZZ) := (propertyName,x) -> (
      if x === null then ""
-     else propertyName|"\n"|x|"\n"
+     else propertyName|"\n"|x|"\n\n"
      )
 toPolymakeFormat(String,Boolean) := (propertyName,x) -> (
      if x === null then ""
      else propertyName|"\n"|(if x then "1" else "0")|"\n"
      )
-toPolymakeFormat(PolyhedralObject) := (P) -> (
-     goodkeys := select(keys P, k -> not match("Gfan", k));
-     concatenate apply(goodkeys, k-> toPolymakeFormat(PolyhedralNameToGfanName#k,P#k)|"\n\n")
-     )
+--toPolymakeFormat(PolyhedralObject) := (P) -> (
+--     goodkeys := select(keys P, k -> not match("Gfan", k));
+--     concatenate apply(goodkeys, k-> toPolymakeFormat(PolyhedralNameToGfanName#k,P#k)|"\n\n")
+--     )
+
+toPolymakeFormat(Fan) := (F) ->(
+     raysF:=rays(F);
+     str:=toPolymakeFormat("AMBIENT_DIM",ambDim(F));
+     str=concatenate(str,toPolymakeFormat("RAYS",raysF));
+     str=concatenate(str,toPolymakeFormat("N_RAYS",rank source raysF));
+     L:=linealitySpace(F);
+     str=concatenate(str,toPolymakeFormat("LINEALITY_DIM",rank L));
+     str=concatenate(str,toPolymakeFormat("LINEALITY_SPACE",L));	 
+     conesF:=flatten apply(dim(F)+1,i->(cones(i,F)));	 
+     str=concatenate(str,toPolymakeFormat("CONES", conesF));
+     str=concatenate(str,toPolymakeFormat("MAXIMAL_CONES", maxCones F));
+     return(str);	     
+)
 
 {*
 makeGfanFile = method(TypicalValue => String)
@@ -1231,11 +1246,11 @@ gfanFanCommonRefinement (Fan, Fan) := opts -> (F,G) -> (
      fileFisTemp := true;
      fileGisTemp := true;
 
-     if F#?"GfanFileName" and fileExists F#"GfanFileName" then
-        (fileF = F#"GfanFileName"; fileFisTemp = false;)
-     else if F#?"GfanFileRawString" then
-     	fileF = gfanMakeTemporaryFile F#"GfanFileRawString"
-     else
+--     if F#?"GfanFileName" and fileExists F#"GfanFileName" then
+--        (fileF = F#"GfanFileName"; fileFisTemp = false;)
+--     else if F#?"GfanFileRawString" then
+--     	fileF = gfanMakeTemporaryFile F#"GfanFileRawString"
+--     else
      	fileF = gfanMakeTemporaryFile toPolymakeFormat F;
 
      if G#?"GfanFileName" and fileExists G#"GfanFileName" then
