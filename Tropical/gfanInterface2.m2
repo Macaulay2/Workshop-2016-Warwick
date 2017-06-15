@@ -2071,7 +2071,17 @@ gfanTropicalIntersection (List) := opts -> (L) -> (
 	(ringMap, newL) := gfanConvertToNewRing(L);
 	L = newL;
 	input := gfanRingToString(ring first L) | gfanPolynomialListToString(L);
-	gfanParsePolyhedralFan runGfanCommand("gfan _tropicalintersection", opts, input)
+	s:=runGfanCommand("gfan _tropicalintersection", opts, input);
+	if ((opts#"t")==false) then (return gfanParsePolyhedralFan s)
+	else 
+	 if (toString substring(0,13, toString (s#0))=="The following") then false
+	    else (
+		if (toString substring(0,13, toString (s#0))=="_application ") then true
+--In case something has changed in 'gfan' or 'gfanInterface'
+	        else error "Algorithm fail"
+		)
+	    
+
 )
 
 --------------------------------------------------------
