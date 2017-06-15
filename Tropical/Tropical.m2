@@ -72,6 +72,24 @@ tropicalCycle (Fan, List) := (F,mult)->(
     return T
 )    
 
+
+
+
+
+--functions to switch to min-convention
+
+minmaxswitch = method ()
+
+minmaxswitch (Fan) := F -> fanFromGfan({- rays F, linSpace F, maxCones F ,dim F,isPure F,isSimplicial F,fVector F});
+
+minmaxswitch (TropicalCycle) := T -> tropicalCycle(minmaxswitch fan T, multiplicities T);
+
+
+
+
+
+
+
 isBalanced = method(TypicalValue => Boolean)
 
 isBalanced (TropicalCycle):= T->(
@@ -85,7 +103,6 @@ isBalanced (TropicalCycle):= T->(
 	if (result=="0") then return false;
 	error("Polymake Error: "|result);    
 )
-
 
 
 
