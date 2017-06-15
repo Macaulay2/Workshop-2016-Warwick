@@ -243,7 +243,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	--First homogenize
     	R:=ring I;
 --	KK:=coefficientRing R;
---    	AA:= symbol AA;
+    	AA:= symbol AA;
     	S:= first flattenRing( R[getSymbol "AA", Join=>false]);
 	J:=substitute(I,S);
 	J=homogenize(J,S_0);
@@ -251,8 +251,22 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	--Then compute tropical variety of homogenized ideal calling
         --the other function
 --I'm worried about the use S here - this might be broken.
-	use S;
+	--use S;
 	T:=tropicalVariety(J,true);
+	TProperties := {dehomogenise(rays T),
+			dehomogenise(linealitySpace T),
+			maxCones T,
+			dim(T)-1,
+			isPure T,
+			isSimplicial T,
+			fVector T};
+	UFan:=fanFromGfan(TProperties);
+	U:= tropicalCycle(UFan,multiplicities(T));
+	return(U);
+	)
+)
+
+{* Old tropicalVariety code
     	--Then remove lineality space
 	--The following lines will need to be changed once the
 	--Polyhedra package has been updated (hopefully summer 2016)
@@ -267,18 +281,27 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	    newv = apply(newv,i->(lift(i,ZZ)))
        	    ));
     	--The next line in particular should be replaced by a constructor.
-    	T#"Rays" = newTrays;
-	T#"Dim" = dim(T)-1;
-	T#"AmbientDim" = T#"AmbientDim"-1;
+    	(fan(T))#cache#"Rays" = newTrays;
+	(fan(T))#cache#"computedDimension" = dim(T)-1;
+	(fan(T))#cache#"ambientDimension" = (fan(T))#cache#"ambientDimension"-1;
 	--For the next one, if we want to remember the lineality space
 	--we should instead quotient by the all ones vector
-	remove(T,"LinealitySpace");
-	remove(T,"OrthLinealitySpace");
-	remove(T,"LinealityDim");
-	return(T);
-    )
-)
+	--remove(T,"LinealitySpace");
+	--remove(T,"OrthLinealitySpace");
+	--remove(T,"LinealityDim");
+	--return(T);
+*}
 
+dehomogenise=(M) -> (
+	vectorList:= entries transpose M;
+	dehomog:= apply(vectorList, L->(
+		newL := apply(#L-1,i->(L#(i+1)-L#0));
+		gcdL := gcd(newL);
+		newL = newL/gcdL;
+		newL = apply(newL,i->(lift(i,ZZ)))
+	));
+	transpose matrix dehomog
+)
 
 --Check if a list of polynomials is a tropical basis for the ideal they generate
 
@@ -678,5 +701,6 @@ TEST ///
     --assert(isBalanced tropicalVariety (ideal {6*x^2+3*x*y+8*y^2+x*z+6*y*z+3*z^2+2*x*t+5*z*t+3*t^2,5*x^2+x*y+8*y^2+x*z+4*y*z+9*z^2+5*x*t+8*y*t+z*t}, true)) 
     --assert(R:=QQ[x,y,z,t]; I=ideal(x+y+z+t); J=ideal(4*x+y-2*z+5*t); 
 	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
+    assert(R:=QQ[x,y,z]; rays(tropicalVariety(ideal(x+y+1)))==matrix{{-3,3,0},{-3,0,3},{-2,1,1}})
 ///    	    	
        
