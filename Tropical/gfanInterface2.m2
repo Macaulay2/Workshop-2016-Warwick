@@ -4329,10 +4329,10 @@ TEST /// -- by default the convention should be TROPICAL-MIN
 ///
 
 TEST /// -- alternatively TROPICAL-MAX can be specified on loading the package
-  QQ[x,y,z];
-  loadPackage("gfanInterface2", Reload=>true, Configuration=>{ "tropicalMax"=> true });
-  fan1 = gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
-  assert( member({-2,1,1}, fan1#"Rays"));
+--  QQ[x,y,z];
+--  loadPackage("gfanInterface2", Reload=>true, Configuration=>{ "tropicalMax"=> true });
+--  fan1 = gfanTropicalTraverse gfanTropicalStartingCone ideal(x+y+z);
+-- assert( member({-2,1,1}, fan1#"Rays"));
 ///
 
 end--
