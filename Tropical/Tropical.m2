@@ -237,8 +237,10 @@ tropicalVariety (Ideal) := o -> (I) ->(
 --I'm worried about the use S here - this might be broken.
 	--use S;
 	T:=tropicalVariety(J,true);
-	TProperties := {dehomogenise(rays T),
-			dehomogenise(linealitySpace T),
+	newRays:=dehomogenise(rays T);
+	newLinSpace:=gens gb dehomogenise(linealitySpace T);
+	TProperties := {newRays,
+			newLinSpace,
 			maxCones T,
 			dim(T)-1,
 			isPure T,
@@ -278,13 +280,17 @@ tropicalVariety (Ideal) := o -> (I) ->(
 
 dehomogenise=(M) -> (
 	vectorList:= entries transpose M;
-	dehomog:= apply(vectorList, L->(
+	dehomog:= new List;
+	for L in vectorList do (
 		newL := apply(#L-1,i->(L#(i+1)-L#0));
 		gcdL := gcd(newL);
+		if gcdL==0 then continue;
 		newL = newL/gcdL;
-		newL = apply(newL,i->(lift(i,ZZ)))
-	));
-	transpose matrix dehomog
+		newL = apply(newL,i->(lift(i,ZZ)));
+		dehomog = append(dehomog,newL);
+	);
+	if dehomog=={} then map(ZZ^(#entries(M)),ZZ^0,0)
+	else transpose matrix dehomog
 )
 
 --Check if a list of polynomials is a tropical basis for the ideal they generate
