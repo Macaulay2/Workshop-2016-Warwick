@@ -449,7 +449,6 @@ isSimplicial TropicalCycle:= Boolean => T->( isSimplicial(fan(T)))
 
 
 
-
 ------------------------------------------------------------------------------
 -- DOCUMENTATION
 ------------------------------------------------------------------------------
@@ -471,12 +470,15 @@ doc ///
     Headline
     	a Type for working with tropical cycles
     Description
-    	Text
-    	   This is the main type for tropical cycles.  A TropicalCycle
-    	   consists of a Fan with an extra HashKey Multiplicities,
-	   which is the list of multiplicities on the maximal cones,
-	   listed in the order that the maximal cones appear in the
-	   MaximalCones list.
+		Text
+			This is the main type for tropical cycles. A TropicalCycle
+			consists of a Fan with an extra HashKey Multiplicities,
+			which is the list of multiplicities on the maximal cones
+			listed in the order that the maximal cones appear in the
+			MaximalCones list. A TropicalCycle
+			is saved as a hash table which contains the Fan and the
+			Multiplicities.
+	   
 ///	   
 
 
@@ -486,26 +488,27 @@ doc ///
 
 doc ///
     Key
-	tropicalCycle
+		tropicalCycle
 	(tropicalCycle, Fan, List)
     Headline
-    	constructs a TropicalCycle from a Fan and a multiplicity function
+    	constructs a TropicalCycle from a Fan and a list with multiplicities
     Usage
     	tropicalCycle(F,mult)
     Inputs
-    	F:Fan 
+    	F:Fan
+		mult:List 
     Outputs
     	T:TropicalCycle
     Description
-	Text
-	    A TropicalCycle consists of a Fan with an extra HashKey
-	    Multiplicities, which is the list of multiplicities on the
-	    maximal cones, listed in the order that the maximal cones
-	    appear in the MaximalCones list.  This function takes a
-	    Fan (which does not have a list of multiplicties) and adds
-	    the Multiplicities key.
-      	Example
-	    1+1	    
+		Text
+			This function creates a tropical cycle from a fan and a list of multiplicities.
+			The multiplicities must be given in the same order as the maximal cones
+			appear in the MaximalCones list.
+		Example
+			F = fan {posHull matrix {{1},{0},{0}}, posHull matrix {{0},{1},{0}}, posHull matrix {{0},{0},{1}}, posHull matrix {{-1},{-1},{-1}}} 
+			MaximalCones F
+			mult = {1,2,-3,1}
+			tropicalCycle(F, mult)
 ///
 
 doc///
@@ -513,52 +516,51 @@ doc///
 	isBalanced
 	(isBalanced, TropicalCycle)
     Headline
-	whether a tropical cycle is balanced
+		check whether a tropical cycle is balanced
     Usage
     	isBalanced T
     Inputs
-	T:TropicalCycle
+		T:TropicalCycle
     Outputs
     	B:Boolean
     Description
-	Text
-	    A TropicalCycle is balanced if the underlying Fan,
-	    together with the multiplicity function makes the fan
-	    balanced.  See, for example, ???addTropicalBook Section
-	    3.4, for the mathematical definitions. 
-        Example
-	    1+1	    
+		Text
+			This function check if a tropical cycle is balanced.
+		Example
+			QQ[x,y,z]
+			V = tropicalVariety(ideal(x+y+z))
+			-- isBalanced V
 ///
 
 
 doc///
-  Key
-    tropicalPrevariety
-    (tropicalPrevariety, List)
-    [tropicalPrevariety, Strategy]
-  Headline
-    the intersection of the tropical hypersurfaces of polynomials in L
-  Usage
-    tropicalPrevariety(L)
-    tropicalPrevariety(L,Strategy=>S)
-  Inputs
-    L:List
-      of polynomials        
-    Strategy=>String
-      Strategy (currently only "gfan")
-  Outputs
-    F:Fan
-      the intersection of the tropical hypersurfaces of polynomials in L
-  Description
-    Text
-      This method intersects a list of tropical hypersurfaces. The input is a
-      list of polynomials whose tropicalizations give the hypersurfaces.
-    Example
-      QQ[x_1,x_2,x_3,x_4]
-      L={x_1+x_2+x_3+x_4,x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2,x_1*x_2*x_3*x_4-1}
-      tropicalPrevariety L
-      QQ[x,y]
-      tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
+	Key
+		tropicalPrevariety
+		(tropicalPrevariety, List)
+		[tropicalPrevariety, Strategy]
+	Headline
+		the intersection of the tropical hypersurfaces
+	Usage
+		tropicalPrevariety(L)
+		tropicalPrevariety(L,Strategy=>S)
+	Inputs
+		L:List
+		  of polynomials        
+		Strategy=>String
+		  Strategy (currently only "gfan")
+	Outputs
+		F:Fan
+		  the intersection of the tropical hypersurfaces of polynomials in L
+	Description
+		Text
+			This method intersects the tropical hypersurfaces
+			coming from the tropicalizations of polynomials in the list L. 
+		Example
+			QQ[x_1,x_2,x_3,x_4]
+			L={x_1+x_2+x_3+x_4,x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2,x_1*x_2*x_3*x_4-1}
+			tropicalPrevariety L
+			QQ[x,y]
+			tropicalPrevariety({x+y+1,x+y},Strategy => "gfan")
 ///
 
 
@@ -594,7 +596,7 @@ doc///
          This method takes an ideal and computes the tropical variety associated to it. 
          By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
          In this case use optional inputs Prime=>false.
-         By default it computes multiplicities but setting ComputeMultiplicities=>false
+         By default it computes multiplicities but setting computeMultiplicities=>false
          turns this off.
 	 The ideal I is not assumed to be homogeneous but with tropicalVariety(I,true)
 	 the user can confirm it is homogeneous to the function does not check it.
@@ -604,14 +606,13 @@ doc///
        QQ[x,y,z]
        --I=ideal(x+y+1) 
        --tropicalVariety(I)
-       --tropicalVariety(I,ComputeMultiplicities=>false)  
+       --tropicalVariety(I,computeMultiplicities=>false)  
        J=ideal(x+y+z)
       -- tropicalVariety(J,true)
---       tropicalVariety(J,true,ComputeMultiplicities=>false)
+--       tropicalVariety(J,true,computeMultiplicities=>false)
        K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
        isPrime K
 --       tropicalVariety(K,true,Prime=>false)
-
 ///
 
 
@@ -630,7 +631,7 @@ doc///
   	  another tropical cycle
     Outputs
         T:TropicalCycle
-	  a tropical cycle
+		  a tropical cycle
     Description 
     	Text
 	    This computes the stable intersection of two tropical
@@ -653,7 +654,7 @@ doc///
 	isTropicalBasis(L,Strategy=>S)
     Inputs
 	L:List
-	    of polynomials        
+	  of polynomials        
 	Strategy=>String
 	    Strategy (currently only "gfan")
     Outputs
@@ -671,15 +672,23 @@ doc///
 
 doc///
     Key
-	(rays, TropicalCycle)
-        (cones, ZZ, TropicalCycle)
-	(dim, TropicalCycle)
-	(ambDim, TropicalCycle)
-        (fVector, TropicalCycle)
-	(linealitySpace, TropicalCycle)
-        (maxCones, TropicalCycle)
 	multiplicities
 	(multiplicities, TropicalCycle)
+    Headline
+		returns the list of multiplicities on maximal cones in a tropical cycle
+    Usage
+    	multiplicities(T)
+    Inputs
+		T:TropicalCycle
+    Outputs
+    	L:List
+    Description
+		Text
+			This method returns the list of multiplicities on maximal cones in a tropical cycle. 
+		Example
+			QQ[x,y,z]
+			V = tropicalVariety(ideal(x+y+z));
+			multiplicities V	    
 ///
 
 
