@@ -837,7 +837,7 @@ assert((multiplicities T)==({1}))
 TEST///
 QQ[x,y,z,w]
 F:=tropicalPrevariety({x+y+z+w,x^2+y*z})
-
+assert(F#cache#rays == matrix {{1,1,-1},{5,-3,-1},{-3,5,-1},{-3,-3,3}})
 ///
 
 
