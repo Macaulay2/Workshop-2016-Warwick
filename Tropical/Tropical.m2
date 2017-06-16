@@ -39,7 +39,8 @@ export {
   "stableIntersection",
   "tropicalVariety",
   "isTropicalBasis",
-  "multiplicities"
+  "multiplicities",
+  "IsHomogIdeal"
 }
 
 
@@ -203,42 +204,22 @@ findMultiplicities=(I,T)->(
 --(see example for ideal K in tropicalVariety) 
 tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	ComputeMultiplicities => true,
-	Prime => true
+	Prime => true,
+	IsHomogIdeal=>false
 	})
-tropicalVariety (Ideal,Boolean) := opt -> (I,IsHomogIdeal)  -> (
-    	if IsHomogIdeal==false then return tropicalVariety(I)
-	else
-		local F;
-		--If ideal is prime, use following algorithm for speed
-	       (if (opt.Prime== true)
-		then (
-		    F= gfanTropicalTraverse( gfanTropicalStartingCone I);
-	            if (Tropical#Options#Configuration#"tropicalMax" == true) then return tropicalCycle(F) else return minmaxSwitch tropicalCycle (F))
-		else
-		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
-		    (if opt.ComputeMultiplicities==false 
-		     then (F= gfanTropicalBruteForce gfanBuchberger I;
-			   mult := {};
-			   i:=0;
-			   
-			   while(i<#maxCones (F_0))do(
-			       mult=append(mult,{});
-			       i=i+1);
-			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities 
-			   if (Tropical#Options#Configuration#"tropicalMax" == true) then return  tropicalCycle(F_0,mult) else return minmaxSwitch tropicalCycle(F_0,mult)
-	    	    	   )
-		     else (F= gfanTropicalBruteForce gfanBuchberger I;
-			 if (Tropical#Options#Configuration#"tropicalMax" == true) then return tropicalCycle(F_0,findMultiplicities(I,F_0)) else return minmaxSwitch tropicalCycle(F_0,findMultiplicities(I,F_0))
-			 )  )))
+
 
 
 --Main function to call for tropicalVariety.  Makes no assumption on ideal
 --WARNING:  There is a bug here in the way the new polynomial ring is dealt with.
 -- it seems to work if we've define the new ring globally, but not inside the package.
 tropicalVariety (Ideal) := o -> (I) ->(
-    if isHomogeneous(I) then return(tropicalVariety(I,true,o))
-    else (
-	--First homogenize
+    local F;
+    local T;
+    Homog:=isHomogeneous I;
+    if o.IsHomogIdeal==false  then 
+    (	 if Homog==false then(
+	 --First homogenize
     	R:=ring I;
 --	KK:=coefficientRing R;
     	AA:= symbol AA;
@@ -246,24 +227,51 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	J:=substitute(I,S);
 	J=homogenize(J,S_0);
 	J=saturate(J,S_0);
-	--Then compute tropical variety of homogenized ideal calling
-        --the other function
---I'm worried about the use S here - this might be broken.
-	--use S;
-	T:=tropicalVariety(J,true);
-	newRays:=dehomogenise(rays T);
+	--we transform I in J so that the procedure continues as in the homogeneous case
+	I=J;
+	)
+	);
+    
+    if (o.Prime== true)
+		then (
+		    F= gfanTropicalTraverse( gfanTropicalStartingCone I);
+		    T=tropicalCycle(F_0,F_1))
+		else
+		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
+		    (if o.ComputeMultiplicities==false 
+		     then (F= gfanTropicalBruteForce gfanBuchberger I;
+			   mult := {};
+			   i:=0;
+			   
+			   while(i<#maxCones (F_0))do(
+			       mult=append(mult,{});
+			       i=i+1);
+			   T=tropicalCycle(F_0,mult)
+			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities this is why we have to add the right number of empty multiplicities
+	    	    	   )
+		     else (F= gfanTropicalBruteForce gfanBuchberger I;
+			 T=tropicalCycle(F_0,findMultiplicities(I,F_0))
+			 )  );
+    if   o.IsHomogIdeal==false then 
+	( if Homog==false then(
+	    newRays:=dehomogenise(rays T);
 	newLinSpace:=gens gb dehomogenise(linealitySpace T);
 	TProperties := {newRays,
 			newLinSpace,
 			maxCones T,
 			dim(T)-1,
-			isPure T,
+			isPure F_0,
 			isSimplicial T,
 			fVector T};
 	UFan:=fanFromGfan(TProperties);
 	U:= tropicalCycle(UFan,multiplicities(T));
-	return(U);
+	-- we always want the output to be called T so we change U in T
+	T=U;
 	)
+	);
+	if (Tropical#Options#Configuration#"tropicalMax" == true) then return  T  else return minmaxSwitch T
+
+	
 )
 
 dehomogenise=(M) -> (
@@ -547,21 +555,21 @@ doc///
     Key
       tropicalVariety    
       (tropicalVariety, Ideal)
-      (tropicalVariety, Ideal, Boolean)
       [tropicalVariety, ComputeMultiplicities]
       [tropicalVariety, Prime]
+      [tropicalVariety, IsHomogIdeal]
 
     Headline
       the tropical variety associated to an ideal
     Usage
       tropicalVariety(I)
-      tropicalVariety(I,IsHomogIdeal)
       tropicalVariety(I,ComputeMultiplicities=>true)
       tropicalVariety(I,Prime=>true)
+      tropicalVariety(I,IsHomogIdeal=>false)
     Inputs
       I:Ideal
         of polynomials
-      IsHomogIdeal:Boolean
+      IsHomogIdeal=>Boolean
         a boolean that ensures whether the ideal is already homogeneous   
       ComputeMultiplicities =>Boolean
         a boolean that confirms whether the multiplicities will be computed
@@ -870,6 +878,7 @@ assert ((rays T)==(0))
 assert((linealitySpace T)==(matrix {{1, 0, 0}, {0, 1, 0}, {1, 0, 0}, {0, 0, 1}}))
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {{}}))
+I=ideal(x+y)
 ///
 
 
