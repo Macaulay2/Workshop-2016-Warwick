@@ -25,6 +25,8 @@ out (e.g, checking for keys in hash tables that no longer exist).
 
 We're also waiting for Ben Madley's changes to this.
 
+Problem when the output of gfan is empty.
+
 ---------------
 - Tropical 
 ---------------
