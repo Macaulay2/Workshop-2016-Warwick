@@ -42,7 +42,9 @@ Status of documentation:
 
 Status of tests:
 
+-needed tests for fan,cones,isBalanced(it needs polymake),stableIntersection(note that it needs the new gfan),findMultiplicities,
+findMultiplicity,computeCones,isPure,isSimplicial,convertToPolymake
 
-
+-more tests for tropicalVariety especially non homogeneous case
 
 
