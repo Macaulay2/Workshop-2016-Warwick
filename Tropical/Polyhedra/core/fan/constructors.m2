@@ -72,15 +72,15 @@ fanFromGfan List := gfanOutput -> (
 -- 1 lineality -> Matrix
 -- 2 cones -> List<List>
 -- 3 dimension -> ZZ
--- 4 amb dimension -> ZZ
--- 5 pure -> bool
--- 6 simplicial -> bool
--- 7 fVector -> List
+
+-- 4 pure -> bool
+-- 5 simplicial -> bool
+-- 6 fVector -> List
    result := fan(gfanOutput#0, gfanOutput#1, gfanOutput#2);
-   setProperty(result, ambDim, gfanOutput#4);
-   setProperty(result, computedFVector, gfanOutput#7);
-   setProperty(result, pure, gfanOutput#5);
-   setProperty(result, simplicial, gfanOutput#6);
+ --  setProperty(result, ambDim, gfanOutput#4);
+   setProperty(result, computedFVector, gfanOutput#6);
+   setProperty(result, pure, gfanOutput#4);
+   setProperty(result, simplicial, gfanOutput#5);
    setProperty(result, computedDimension, gfanOutput#3);
    return result;
 )
