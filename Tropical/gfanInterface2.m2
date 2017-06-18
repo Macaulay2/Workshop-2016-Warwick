@@ -46,6 +46,7 @@ export {
 	"gfanMarkPolynomialSet", -- done!
 	"gfanMinkowskiSum", -- v0.4 -- implemented, documented, but i don't understand/agree with the output
 	"gfanMinors", -- v0.4 done!
+	"gfanOverIntegers",
 	"gfanPolynomialSetUnion", -- done!
 	"gfanRender",
 	"gfanRenderStaircase",
@@ -1004,12 +1005,13 @@ runGfanCommandCaptureError = (cmd, opts, data) -> (
 -- This is a list of which arguments are used for which function.
 -- Currently this is not used.
 argFuncs = {
-	"d" => {gfanRenderStaircase, gfanTropicalStartingCone, gfanTropicalLinearSpace},
+	"d" => {gfanRenderStaircase, gfanTropicalStartingCone, gfanTropicalLinearSpace,
+		gfanOverIntegers},
 	"e" => {gfan},
 	"g" => {gfan,gfanBuchberger,gfanTropicalStartingCone},
 	"h" => {gfanToLatex,gfanTropicalBasis},
 	"i" => {gfanHomogenize},
-	"m" => {gfanLeadingTerms,gfanRenderStaircase},
+	"m" => {gfanLeadingTerms,gfanRenderStaircase, gfanOverIntegers},
 	"n" => {gfanTropicalLinearSpace},
 	"L" => {gfanRender},
 	"r" => {gfanBuchberger},
@@ -1021,6 +1023,9 @@ argFuncs = {
 	"disableSymmetryTest" => {gfan},
 	--missing help
 	"ideal" => {gfanInitialForms},
+	"initialIdeal" => {gfanOverIntegers},
+	"groebnerBasis" => {gfanOverIntegers},	
+	"groebnerFan" =>{gfanOverIntegers},
 	"noincidence" => {gfanTropicalTraverse},
 	"pair" => {gfanGroebnerCone, gfanInitialForms},
 	"polynomialset" => {gfanToLatex},
@@ -1059,6 +1064,9 @@ argStrs = hashTable {
 	"dressian" => "--dressian",
 	"help" => "--help",
 	"ideal" => "--ideal",
+	"initialIdeal" => "--initialIdeal",
+	"groebnerBasis" => "--groebnerBasis",	
+	"groebnerFan" => "--groebnerFan",
 	"kapranov" => "--kapranov",
 	"mark" => "--mark",
 	"names" => "--names",
@@ -1717,6 +1725,73 @@ gfanMinors (ZZ,ZZ,ZZ) := opts -> (r,d,n) -> (
 	)
 )
 
+--------------------------------------------------------
+-- gfan_overintegers
+--------------------------------------------------------
+
+gfanOverIntegers = method( Options => {
+	"groebnerFan" => false,
+	"initialIdeal" => false,
+	"groebnerBasis" => false
+	}
+)
+
+gfanOverIntegers Ideal := opts -> (I) -> (
+	if not opts#"groebnerFan" then error "Must specify groebnerFan or give weight vector.";
+	input := gfanRingToRationalString(ring I)
+		| gfanIdealToString(I);
+	resultString := first runGfanCommand("gfan _overintegers", opts, input);
+	return gfanParsePolyhedralFan resultString;
+)
+
+gfanOverIntegers (Ideal, List) := opts -> (I, w) -> (
+	if opts#"groebnerFan" then (
+		<< "Ignoring groebnerFan.";
+	);
+	if opts#"initialIdeal" and opts#"groebnerBasis" then error "Two procedures specified";
+	if not opts#"initialIdeal" and not opts#"groebnerBasis" then error "Must specify a procedure.";
+	input := gfanRingToRationalString(ring I)
+		| gfanIdealToString(I)
+		| gfanIntegerListToString(w);
+	resultString := first runGfanCommand("gfan _overintegers", opts, input);
+	if opts#"initialIdeal" then(
+		return gfanParseIdeal resultString;
+	)
+	else (
+		return gfanParseMPL resultString;
+	)
+)
+
+-- This function is used as gfan_overintegers requires the polynomial ring to be over
+-- a field, but it does not make sense for the rest of the program to have this.
+convertRingToRational = method()
+convertRingToRational Ring := ZRing -> (
+	if coefficientRing(ZRing) =!= ZZ then error "Must be a polynomial ring over integers";
+	return QQ(monoid[gens ZRing]);
+)
+
+-- Takes a ring and and returns a gfan string with rational coefficients.
+gfanRingToRationalString = method()
+gfanRingToRationalString Ring := ZRing -> (
+	out := "Q" | gfanToExternalString(new Array from gens ZRing) | newline;
+	return out;
+)
+
+-- Polyhedra wants fans to be constructed from the maximal cones.
+-- May be a way of doing this where we cut down on the the cones we are iterating over.
+maximalConesFromList = method()
+maximalConesFromList List := cones -> (
+	maximalCones := cones;
+	for index1 from 0 to  #cones-1 do (
+		for index2 from 0 to #cones-1 do(
+			if index1 === index2 then continue;			
+			if isSubset(cones#index2, cones#index1) then (
+				maximalCones = delete(cones#index2, maximalCones);
+			)
+		);
+	);
+	return maximalCones;
+)
 
 --------------------------------------------------------
 -- gfan_polynomialsetunion
@@ -2286,6 +2361,7 @@ gfanFunctions = hashTable {
 	gfanMarkPolynomialSet => "gfan _markpolynomialset",
 	gfanMinkowskiSum => "gfan _minkowskisum", -- v0.4
 	gfanMinors => "gfan _minors", -- v0.4
+	gfanOverIntegers => "gfan_overintegers",
 	gfanPolynomialSetUnion => "gfan _polynomialsetunion",
 	gfanRender => "gfan _render",
 	gfanRenderStaircase => "gfan _renderstaircase",
