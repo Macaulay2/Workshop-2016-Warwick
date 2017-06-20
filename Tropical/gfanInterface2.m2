@@ -2256,9 +2256,10 @@ gfanTropicalWeilDivisor (Fan, Fan) := opts -> (F,G) -> (
 --------------------------------------------------------
 
 gfanVersion  = () -> (
-     o := new OptionTable from {};
-     runGfanCommand("gfan _version", o, )
-          )
+  o := new OptionTable from {};
+  versionOutput := runGfanCommand("gfan _version", o, );
+  substring((separate ("\n", versionOutput#0))#1,4)
+)
 
 --------------------------------------------------------
 -- Documentation
