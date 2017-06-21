@@ -42,7 +42,10 @@ Status of functions:
 Status of documentation:
 
 - "Getting Started" page for first time users
+- More detailed version of the above with the expalnations of the options to castumize the package
 - Benefits over gfan
+- documentation of the methods that are not exported + options - what to do
+- add examples
 
 
 
