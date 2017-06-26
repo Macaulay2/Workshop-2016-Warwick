@@ -475,7 +475,7 @@ doc ///
 
 doc ///
     Key
-		tropicalCycle
+	tropicalCycle
 	(tropicalCycle, Fan, List)
     Headline
     	constructs a TropicalCycle from a Fan and a list with multiplicities
@@ -590,9 +590,9 @@ doc///
 	 
       Example
        QQ[x,y,z]
-       --I=ideal(x+y+1) 
-       --tropicalVariety(I)
-       --tropicalVariety(I,computeMultiplicities=>false)  
+       I=ideal(x+y+1) 
+       tropicalVariety(I,IsHomogIdeal=>false)
+       tropicalVariety(I,ComputeMultiplicities=>false)  
        J=ideal(x+y+z)
       -- tropicalVariety(J,true)
 --       tropicalVariety(J,true,computeMultiplicities=>false)
