@@ -27,9 +27,9 @@ We're also waiting for Ben Madley's changes to this.-SARA: pull-requested accept
 
 Problem when the output of gfan is empty.
 
-Output of gfanParseIdeal returns a a Macaulay2 list and not an ideal
+Output of gfanParseIdeal returns a a Macaulay2 list and not an ideal(Sara: I can take care of it)
 
-gfanParsePolyhedralFan returns a fan and an empty list of multiplicities rather than just a fan if the multiplicities do not exist.
+gfanParsePolyhedralFan returns a fan and an empty list of multiplicities rather than just a fan if the multiplicities do not exist.(Sara: I can take care of it)
 
 ---------------
 - Tropical 
