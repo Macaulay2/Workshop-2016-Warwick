@@ -23,9 +23,13 @@ There's also a lot of commented out stuff that we should probably delete
 (after checking tests) and also some other things that we should comment
 out (e.g, checking for keys in hash tables that no longer exist).
 
-We're also waiting for Ben Madley's changes to this.
+We're also waiting for Ben Madley's changes to this.-SARA: pull-requested accepted, gfanOverIntegers is now in gfanInterface2
 
 Problem when the output of gfan is empty.
+
+Output of gfanParseIdeal returns a a Macaulay2 list and not an ideal
+
+gfanParsePolyhedralFan returns a fan and an empty list of multiplicities rather than just a fan if the multiplicities do not exist.
 
 ---------------
 - Tropical 
