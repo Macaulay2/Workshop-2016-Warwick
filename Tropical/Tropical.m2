@@ -243,14 +243,14 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			   mult := {};
 			   i:=0;
 			   
-			   while(i<#maxCones (F_0))do(
+			   while(i<#maxCones (F))do(
 			       mult=append(mult,{});
 			       i=i+1);
-			   T=tropicalCycle(F_0,mult)
+			   T=tropicalCycle(F,mult)
 			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities this is why we have to add the right number of empty multiplicities
 	    	    	   )
 		     else (F= gfanTropicalBruteForce gfanBuchberger I;
-			 T=tropicalCycle(F_0,findMultiplicities(I,F_0))
+			 T=tropicalCycle(F,findMultiplicities(I,F))
 			 )  );
     if   o.IsHomogIdeal==false then 
 	( if Homog==false then(

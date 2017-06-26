@@ -468,7 +468,7 @@ gfanParsePolyhedralFan String := o -> s -> (
 	    S=fanFromGfan({myrays,mylinspace,P#"MaximalCones",P#"Dim",P#"Pure",P#"Simplicial",P#"FVector"});
 	    if  P#?"Multiplicities" then 
 	    (S,P#"Multiplicities" )
-	    else  (S,{})
+	    else  (S)
 	      
 )
 
