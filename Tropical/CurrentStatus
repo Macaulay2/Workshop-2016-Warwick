@@ -50,7 +50,7 @@ Status of documentation:
 - Benefits over gfan
 - documentation of the methods that are not exported + options - what to do
 - add examples
-
+- how much maths shall we include in it?
 
 
 Status of tests:
