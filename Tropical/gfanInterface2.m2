@@ -46,7 +46,11 @@ export {
 	"gfanMarkPolynomialSet", -- done!
 	"gfanMinkowskiSum", -- v0.4 -- implemented, documented, but i don't understand/agree with the output
 	"gfanMinors", -- v0.4 done!
+
 	"gfanOverIntegers",
+
+	"gfanMixedVolume", -- needs gfan 0.6 or higher
+
 	"gfanPolynomialSetUnion", -- done!
 	"gfanRender",
 	"gfanRenderStaircase",
@@ -1050,6 +1054,7 @@ argStrs = hashTable {
 	"i" => "-i",
 	"i1" => "-i1",
 	"i2" => "-i2",
+	"j" => "-j",
 	"L" => "-L",
 	"m" => "-m",
 	"n" => "-n",
@@ -1109,6 +1114,7 @@ cmdLineArgs = hashTable {
 	"gfan _fanlink" => {"i"},
 	"gfan _fanproduct" => {"i1", "i2"},
 	"gfan _minors" => {"r", "d", "n"},
+	"gfan _mixedvolume" => {"j"},
 	"gfan _tropicallinearspace" => {"n", "d"},
 	"gfan _tropicalhypersurfacereconstruction" => {"i"}
 }
@@ -1726,6 +1732,7 @@ gfanMinors (ZZ,ZZ,ZZ) := opts -> (r,d,n) -> (
 )
 
 --------------------------------------------------------
+
 -- gfan_overintegers
 --------------------------------------------------------
 
@@ -1792,6 +1799,32 @@ maximalConesFromList List := cones -> (
 	);
 	return maximalCones;
 )
+------------------------------
+-- gfan_mixedvolume
+--------------------------------------------------------
+
+gfanMixedVolume = method( Options => {
+	"j" => 1 --Number of threads used
+	}
+)
+
+gfanMixedVolume (List) := opts -> (L) -> (
+	if #L == 0 then
+		return;
+
+	-- The naming conventions of gfan are not standardized, so the best we can do
+	-- is make sure that the user is not using an earlier version of gfan.
+	-- However, maybe we don't want to do this at all?
+	if isSubset(set{gfanVersion()}, set{"0.5", "0.4plus", "0.4", "0.3", "0.2.2", "0.2", "0.1"}) then
+		error "Gfan version must be greater than or equal to 0.6";
+		
+	L = (gfanConvertToNewRing(L))#1;
+	input := gfanRingToString(ring L#0) | gfanPolynomialListToString(L);
+
+	(runGfanCommand("gfan _mixedvolume", opts, input))#0
+)
+
+
 
 --------------------------------------------------------
 -- gfan_polynomialsetunion
@@ -2331,9 +2364,10 @@ gfanTropicalWeilDivisor (Fan, Fan) := opts -> (F,G) -> (
 --------------------------------------------------------
 
 gfanVersion  = () -> (
-     o := new OptionTable from {};
-     runGfanCommand("gfan _version", o, )
-          )
+  o := new OptionTable from {};
+  versionOutput := runGfanCommand("gfan _version", o, );
+  substring((separate ("\n", versionOutput#0))#1,4)
+)
 
 --------------------------------------------------------
 -- Documentation
@@ -2362,6 +2396,8 @@ gfanFunctions = hashTable {
 	gfanMinkowskiSum => "gfan _minkowskisum", -- v0.4
 	gfanMinors => "gfan _minors", -- v0.4
 	gfanOverIntegers => "gfan_overintegers",
+	gfanMixedVolume => "gfan _mixedvolume", -- v0.6
+
 	gfanPolynomialSetUnion => "gfan _polynomialsetunion",
 	gfanRender => "gfan _render",
 	gfanRenderStaircase => "gfan _renderstaircase",
@@ -3400,7 +3436,7 @@ doc ///
 			number of columns
 	Outputs
 		L:List
-			a list of the {\tt r}x{\tt r} minorsof a {\tt d}x{\tt n} matrix of indeterminates
+			a list of the {\tt r}x{\tt r} minors of a {\tt d}x{\tt n} matrix of indeterminates
 	Description
 		Text
 			The method produces the {\tt r}x{\tt r} minors of a {\tt d}x{\tt n} matrix of indeterminates. Note that the variables in the output are indexed by strings.
@@ -3411,6 +3447,35 @@ doc ///
 
 			@STRONG "gfan Documentation"@
 			@gfanHelp "gfan _minors"@
+///
+
+doc ///
+	Key
+		gfanMixedVolume
+		(gfanMixedVolume, List)
+	Headline
+		mixed volume of a list of polynomials
+	Usage
+		n = gfanMixedVolume(L)
+	Inputs
+		L:List
+			of polynomials
+	Outputs
+		n:ZZ
+			the mixed volume for the Newton polytopes associated to the polynomials
+	Description
+		Text
+			The method outputs mixed volume for the Newton polytopes associated to the input polynomials.
+			The optional argument {\tt j} allows the user to set the number of threads to be used;
+			by default, one thread is used.
+
+		Example
+			QQ[x1,x2,x3]
+			gfanMixedVolume({x1+x2+x3,x1*x2+x2*x3+x3*x1,x1*x2*x3-1})
+		Text
+
+			@STRONG "gfan Documentation"@
+			@gfanHelp "gfan _mixedvolume"@
 ///
 
 doc ///
@@ -4351,7 +4416,12 @@ doc ///
 	-- M = gfanMinors(2,2,3)
 	-- assert(M == {-m_"01"*m_"10"+m_"00"*m_"11",-m_"02"*m_"10"+m_"00"*m_"12",-m_"02"*m_"11"+m_"01"*m_"12"})
 	-- ///
-	--
+	-- -- TEST gfanMixedVolume
+	-- TEST ///
+	-- QQ[x1,x2,x3,x4]
+	-- mv = gfanMixedVolume({x1+x2+x3+x4,x1*x2+x2*x3+x3*x4+x4*x1,x1*x2*x3+x2*x3*x4+x3*x4*x1+x4*x1*x2,x1*x2*x3*x4-1})
+	-- assert (mv == 16)
+	-- ///
 	-- -- TEST gfanPolynomialSetUnion
 	-- TEST ///
 	-- QQ[x,y,z];
