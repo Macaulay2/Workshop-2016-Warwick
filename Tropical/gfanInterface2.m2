@@ -1811,12 +1811,6 @@ gfanMixedVolume = method( Options => {
 gfanMixedVolume (List) := opts -> (L) -> (
 	if #L == 0 then
 		return;
-
-	-- The naming conventions of gfan are not standardized, so the best we can do
-	-- is make sure that the user is not using an earlier version of gfan.
-	-- However, maybe we don't want to do this at all?
-	if isSubset(set{gfanVersion()}, set{"0.5", "0.4plus", "0.4", "0.3", "0.2.2", "0.2", "0.1"}) then
-		error "Gfan version must be greater than or equal to 0.6";
 		
 	L = (gfanConvertToNewRing(L))#1;
 	input := gfanRingToString(ring L#0) | gfanPolynomialListToString(L);
