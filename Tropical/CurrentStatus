@@ -31,6 +31,7 @@ Output of gfanParseIdeal returns a a Macaulay2 list and not an ideal(Magda: I ca
 
 gfanParsePolyhedralFan returns a fan and an empty list of multiplicities rather than just a fan if the multiplicities do not exist.(Sara: Fixed it)
 
+check the multiplicities given by gfantropicalintersection (Sara)
 ---------------
 - Tropical 
 ---------------
