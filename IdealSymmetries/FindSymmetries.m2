@@ -148,8 +148,7 @@ findSymmetry List := polys-> (
         );
     );
     permutations = toList permutations;
-    print permutations;
-    return apply(permutations,a -> cycleToWordNotation(a,numberOfVariables));
+    return permutations;
 )
 
 parsePermutationStr = method()
