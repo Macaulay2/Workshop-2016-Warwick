@@ -511,7 +511,7 @@ doc///
     	B:Boolean
     Description
 		Text
-			This function check if a tropical cycle is balanced.
+			This function checks if a tropical cycle is balanced.
 		Example
 			QQ[x,y,z]
 			V = tropicalVariety(ideal(x+y+z))
@@ -676,6 +676,68 @@ doc///
 			V = tropicalVariety(ideal(x+y+z));
 			multiplicities V	    
 ///
+
+doc///
+    Key
+	ComputeMultiplicities
+    Headline
+		option to compute the multiplicities in case they ideal is not prime
+    Usage
+    	tropicalVariety(I,ComputeMultiplicities=>true)
+    Description
+		Text
+			This option allows to compute the multiplicities in case the ideal I is not prime. In fact the output of gfan 
+			does not include them and hence they are computed separately by this package. By default the ideal is assumed to be prime.
+		Example
+			QQ[x,y,z];
+			I=ideal(x^2-y^2);
+			isPrime I
+			T=tropicalVariety(I,Prime=>false,ComputeMultiplicities=>true);
+			multiplicities T
+///
+
+doc///
+    Key
+	Prime
+    Headline
+		option to declare if the input   ideal is prime
+    Usage
+    	tropicalVariety(I,Prime=>false)
+    
+    Description
+		Text
+			By default the ideal is assumed to be prime. If the ideal is not prime then the internal  procedure to compute the tropicalization is different.
+			It is used gfan_tropicalbrute force instead of gfan_tropicaltraverse. 
+		Example
+			QQ[x,y,z];
+			I=ideal(x^2+y^2-2*x*y);
+			isPrime I
+			T=tropicalVariety(I,Prime=>false)	    
+///
+
+
+doc///
+    Key
+	IsHomogIdeal
+    Headline
+		option to declare if the input  ideal is homogeneous
+    Usage
+    	tropicalVariety(I,IsHomogIdeal=>true)
+    
+    Description
+		Text
+			If the option is used than  homogeneity of the ideal  is not tested. By default the ideal is always assumed not homogeneous and a test is performed before
+			applying the function tropicalVariety.
+		Example
+		          QQ[x,y];
+			  I=ideal(x+y+1);
+			  T=tropicalVariety (I,IsHomogIdeal=>false)
+			
+				    
+///
+
+
+
 
 
 
