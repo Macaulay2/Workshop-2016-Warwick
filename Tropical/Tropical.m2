@@ -285,7 +285,7 @@ dehomogenise=(M) -> (
 		newL = apply(newL,i->(lift(i,ZZ)));
 		dehomog = append(dehomog,newL);
 	);
-	if dehomog=={} then map(ZZ^(#entries(M)),ZZ^0,0)
+	if dehomog=={} then map(ZZ^(#entries(M)-1),ZZ^0,0)
 	else transpose matrix dehomog
 )
 
@@ -738,7 +738,250 @@ doc///
 
 
 
+doc///
+    Key
+	(fan,TropicalCycle)
+    Headline
+	    outputs the fan assocated to the tropical cycle
+    Usage
+    	fan(T)
+    Inputs
+	T:TropicalCycle
+	         
+    Outputs
+	F:Fan
+	    the fan associated to the  tropical cycle T
+    
+    Description
+		Text
+		        This function outputs the fan associated to the tropical cycle T.	
+		Example
+			QQ[x,y,z]
+			T=tropicalVariety (ideal(x+3*y+3));
+			fan T
+			
+			    
+///
+doc///
+    Key
+	(maxCones,TropicalCycle)
+    Headline
+	computes the maximal cone of a tropical cycle	
+    Usage
+    	maxCones(T)
+    Inputs
+	T:TropicalCycle
+	         
+    Outputs
+        L:List
+	    
+    
+    Description
+		Text
+		        This function computes the maximal cones of the fan associated to the tropical cycle.
+			
+		Example
+			QQ[x,y,z,w]
+			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3);
+			T=tropicalVariety I;
+			maxCones T
+			    
+///
+doc///
+    Key
+	(isPure,TropicalCycle)
+    Headline
+	checks whether  a tropical cycle is pure
+    Usage
+    	isPure(T)
+    Inputs
+	T:TropicalCycle
+	         
+    Outputs
+	B:Boolean
+	    
+    
+    Description
+		Text
+		        This function checks whether the fan associated to the tropical cycle is pure, i.e. if the maximal cones have all the same dimension.	
+		Example
+		        F=fan ({posHull(matrix{{1,2,3},{0,2,0}}),posHull(matrix{{0},{1}})});
+			T=tropicalCycle (F,{1,2});
+			isPure T
+			    
+///
+doc///
+    Key
+	(isSimplicial,TropicalCycle)
+    Headline
+		checks whether a tropical cycle is simplicial
+    Usage
+    	isSimplicial(T)
+    Inputs
+	T:TropicalCycle
+	         
+    Outputs
+	B:Boolean
+	    
+    
+    Description
+		Text
+		       This function checks if the fan associated to the tropical cycle T is simplicial, i.e. if for each cone the rays generating  it are linearly independent.
+		Example
+		       F=fan ({posHull(matrix{{1,2,3},{0,2,0}}),posHull(matrix{{0},{1}})});
+		       T=tropicalCycle (F,{1,2});
+		       isSimplicial T
+		      
+			    
+///
+doc///
+    Key
+	(rays,TropicalCycle)
+    Headline
+	computes the rays of a tropical cycle	
+    Usage
+    	rays(T)
+    Inputs
+	T:TropicalCycle
+	         
+    Outputs
+	M:Matrix
+	    
+    
+    Description
+		Text
+		        This function computes the rays of the fan associated to the tropical cycle. These are the columns of
+		        the output matrix.	
+		Example
+		        QQ[x,y,z,w]
+			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3);
+			T=tropicalVariety I;
+			rays T
+			    
+///
+doc///
+    Key
+	(dim,TropicalCycle)
+    Headline
+		computes the dimension of a tropical cycle
+    Usage
+    	dim(T)
+    Inputs
+	T:TropicalCycle
+	         
+    Outputs
+	k:ZZ
+	    the dimension of the tropical cycle T
+    
+    Description
+		Text
+	                This function computes the dimension of the fan associated to the tropical cycle T.
+		Example
+			QQ[x,y,z,w]
+			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3);
+			T=tropicalVariety I;
+			dim T
+			    
+///
 
+doc///
+    Key
+	(fVector,TropicalCycle)
+    Headline
+		computes the fVector of  a  tropical cycle
+    Usage
+    	fVector(T)
+    Inputs
+	T:TropicalCycle
+	         
+    Outputs
+	L:List
+	    the fVector of the fan associated to the  tropical cycle T
+    
+    Description
+		Text
+		       This function computes the fVector of the fan associated to the tropical cycle T.	
+		Example
+			QQ[x,y,z]
+			T=tropicalVariety (ideal(x+3*y+3));
+			fVector T
+			    
+///
+
+doc///
+    Key
+	(ambDim,TropicalCycle)
+    Headline
+		computes the dimension of the ambient space of a tropical cycle
+    Usage
+    	ambDim(T)
+    Inputs
+	T:TropicalCycle
+	          
+    Outputs
+	n:ZZ
+	    the dimension of the tropicalCycle T
+    
+    Description
+		Text
+		        This function computes the dimension of the space where the tropical cycle is contained.	
+		Example
+			QQ[x,y,z]
+			T=tropicalVariety(ideal(x+y+z));
+			ambDim T
+			    
+///
+doc///
+    Key
+	(cones,ZZ,TropicalCycle)
+    Headline
+		computes the cones of a tropical cycle
+    Usage
+    	cones(k,T)
+    Inputs
+	k:ZZ
+	T:TropicalCycle
+	         
+    Outputs
+	L:List
+	    the cones of codimension k in T
+    
+    Description
+		Text
+		        This function computes the cone of codimension k of the fan associated to the tropical cycle T.	
+		Example
+			QQ[x,y,z,w,t]
+			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3,t-w+x);
+			T=tropicalVariety I;
+			cones(2,T)
+
+///
+
+doc///
+    Key
+	(linealitySpace,TropicalCycle)
+    Headline
+	computes the lineality space of a  tropical cycle
+    Usage
+    	linealitySpace(T)
+    Inputs
+	T:TropicalCycle
+	         
+    Outputs
+	M:Matrix
+	    
+    
+    Description
+		Text
+		        This function computes the lineality space of the fan associated to the tropical cycle T. The generators of the lineality space are the columns of the 
+		        output  matrix
+		Example
+		        QQ[x,y,z];
+			I=ideal(x-y);
+			T=tropicalVariety I;
+			L=linealitySpace T
+			    
+///
 
 
 ----- TESTS -----
