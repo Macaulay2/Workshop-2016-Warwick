@@ -1,4 +1,4 @@
-load "SymmetricGroupUtils.m2"
+load "./SymmetricGroupUtils.m2"
 
 createPartitionString = method()
 createPartitionString (BasicList) := partition -> (
