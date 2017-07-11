@@ -122,7 +122,7 @@ testIdeal = choice -> (
 )
 
 cyclicIdeal = n -> (
-    RX := QQ[vars(10..9+n)];
+    RX := CC[vars(10..9+n)];
     II := ideal (toList apply(1..n-1, d-> sum(0..n-1, 
         i -> product(d, k -> RX_((i+k)%n))
         )) | {product gens RX - 1});
