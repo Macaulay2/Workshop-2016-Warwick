@@ -24,7 +24,6 @@ newPackage(
 export {
 	"MarkedPolynomialList",
 	"markedPolynomialList",
-
 	"MPLConverter",
 	"polymakeFanToFan",
 	"polymakeConeToCone",
@@ -46,17 +45,15 @@ export {
 	"gfanMarkPolynomialSet", -- done!
 	"gfanMinkowskiSum", -- v0.4 -- implemented, documented, but i don't understand/agree with the output
 	"gfanMinors", -- v0.4 done!
-
 	"gfanOverIntegers",
-
 	"gfanMixedVolume", -- needs gfan 0.6 or higher
-
 	"gfanPolynomialSetUnion", -- done!
 	"gfanRender",
 	"gfanRenderStaircase",
 	"gfanResultantFan", -- needs gfan 0.6 or higher
 	"gfanSaturation", -- done!
 	"gfanSecondaryFan", -- v0.4 -- done! but could use better doc
+	"gfanStableIntersection",
 	"gfanStats", -- done!
 	"gfanSubstitute", -- done!
 	"gfanToLatex", -- done!
@@ -1111,6 +1108,7 @@ cmdLineArgs = hashTable {
 	"gfanRender" => { "shiftVariables" },
 	"gfanRenderStaircase" => { "d", "w" },
 	"gfan _fancommonrefinement" => {"i1", "i2"},
+	"gfan _fancommonrefinement --stable" => {"i1", "i2"},
 	"gfan _fanlink" => {"i"},
 	"gfan _fanproduct" => {"i1", "i2"},
 	"gfan _minors" => {"r", "d", "n"},
@@ -1287,6 +1285,36 @@ gfanFanCommonRefinement (Fan, Fan) := opts -> (F,G) -> (
 	 );
 	out
 )
+
+--Stable intersection is currently an option of gfan_fancommonrefinement
+--We're making it a separate function as that may change
+
+gfanStableIntersection = method( Options=> {
+	"i1" => null, -- these are set inside the method
+	"i2" => null, -- these are set inside the method
+	}
+)
+    
+gfanStableIntersection (Fan,List,Fan,List) := opts -> (F,m1,G,m2) -> (
+     fileF := "";
+     fileG := "";
+     fileFisTemp := true;
+     fileGisTemp := true;
+     fileF = gfanMakeTemporaryFile( (toPolymakeFormat(F))| toPolymakeFormat("MULTIPLICITIES",m1));
+     fileG = gfanMakeTemporaryFile( (toPolymakeFormat(G))| toPolymakeFormat("MULTIPLICITIES",m2));
+     opts = opts ++ { "i1" => fileF , "i2" => fileG };
+     out := gfanParsePolyhedralFan runGfanCommand("gfan _fancommonrefinement --stable", opts, "");
+     if gfanKeepFiles then (
+	  F#"GfanFileName" = fileF;
+	  G#"GfanFileName" = fileG;
+	   )
+     else (
+    	 if fileFisTemp then gfanRemoveTemporaryFile fileF;
+	 if fileGisTemp then gfanRemoveTemporaryFile fileG;
+	 );
+	out
+)    
+
 
 --------------------------------------------------------
 -- gfan_fanlink
@@ -2899,7 +2927,7 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan gfan {x+y}
 			G = gfanToPolyhedralFan gfan {x+y^2}
-			gfanFanCommonRefinement(F_0,G_0)
+			gfanFanCommonRefinement(F,G)
 		Text
 
 			In the next example we take two half planes which overlap in the first
@@ -2909,7 +2937,7 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}}
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}}
-			gfanFanCommonRefinement(F_0,G_0)
+			gfanFanCommonRefinement(F,G)
 		Text
 
 			@STRONG "gfan Documentation"@
@@ -2940,8 +2968,8 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}};
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}};
-			Q = gfanFanCommonRefinement(F_0,G_0)
-			gfanFanLink(Q_0, {2,1}, "star" =>true)
+			Q = gfanFanCommonRefinement(F,G)
+			gfanFanLink(Q, {2,1}, "star" =>true)
 
 		Text
 
@@ -2974,7 +3002,7 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}}
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}}
-			gfanFanProduct(F_0,G_0)
+			gfanFanProduct(F,G)
 
 		Text
 			@STRONG "gfan Documentation"@
