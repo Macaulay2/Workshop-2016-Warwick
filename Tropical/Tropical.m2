@@ -1113,8 +1113,32 @@ assert((multiplicities T)==({1}))
 
 
 --fan
---cones
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((fan T)==(F))
+F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T#"Multiplicities" ={1};
+T#"Fan" = F;
+assert((fan T)==(F))
+///
 
+--cones
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert((cones(1,T))==({{}}))
+assert((cones(2,T))==({{0},{1},{2}}))
+assert((cones(3,T))==({{0,1},{0,2},{1,2}}))
+F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T#"Multiplicities" ={1};
+T#"Fan" = F;
+assert((cones(1,T))==({{}}))
+///
 
 
 
@@ -1183,7 +1207,6 @@ assert ((rays T)==(0))
 assert((linealitySpace T)==(matrix {{1, 0, 0}, {0, 1, 0}, {1, 0, 0}, {0, 0, 1}}))
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {{}}))
-I=ideal(x+y)
 ///
 
 
@@ -1206,14 +1229,34 @@ I=ideal(x+y)
 -----------------------
 --isPure
 -----------------------
-
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert(isPure(T)==(true))
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0},{1,2}})
+T#"Multiplicities" ={1,1};
+T#"Fan" = F;
+assert(isPure(T)==(false))
+///
 
 
 
 -----------------------
 --isSimplicial
 -----------------------
-
+TEST///
+T:=new TropicalCycle
+F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T#"Multiplicities" ={1,1,1};
+T#"Fan" = F;
+assert(isSimplicial(T)==(true))
+F:=fan(matrix{{0,0,0,0},{1,0,-1,2},{0,1,-1,1}},matrix{{1},{1},{1}},{{0,1,2},{0,1,3},{0,2,3},{1,2,3}});
+T#"Multiplicities" ={1,1,1,1};
+T#"Fan" = F;
+assert(isSimplicial(T)==(false))
+///
 
 
 
