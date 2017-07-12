@@ -335,10 +335,10 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 --	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
     )
     else if (o.Strategy=="gfan") then (
-	F1 := fan(F);	
-	m1 := multiplicities(F);
-	F2 := fan(G);	
-	m2 := multiplicities(G);
+	F1 := F#"Fan";	
+	m1 := F#"Multiplicities";
+	F2 := G#"Fan";	
+	m2 := G#"Multiplicities";
 	gfanStableIntersection(F1,m1,F2,m2);
     ) 
     else (
