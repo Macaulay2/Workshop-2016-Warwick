@@ -330,7 +330,19 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
- 	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
+	(fan, mult) := gfanParsePolyhedralFan(result);
+	return tropicalCycle (fan,mult);
+--	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
+    )
+    else if (o.Strategy=="gfan") then (
+	F1 := fan(F);	
+	m1 := multiplicities(F);
+	F2 := fan(G);	
+	m2 := multiplicities(G);
+	gfanStableIntersection(F1,m1,F2,m2);
+    ) 
+    else (
+	return "Strategy unknown: Choose 'atint' or 'gfan'";
     );
 )    
 
