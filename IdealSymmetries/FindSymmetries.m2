@@ -1,4 +1,4 @@
-load "SymmetricGroupUtils.m2"
+load "./SymmetricGroupUtils.m2"
 
 createPartitionString = method()
 createPartitionString (BasicList) := partition -> (
@@ -14,7 +14,7 @@ createDreadnautString (BasicList, BasicList) := (polys, coefficients) -> (
     polynomials := new MutableList;
     variables := toList(1..n-1);
     newNodeIndex := n;
-    systemNode = newNodeIndex;
+    systemNode := newNodeIndex;
     newNodeIndex = newNodeIndex+1;
     termToNode := new MutableHashTable;
 
@@ -27,7 +27,7 @@ createDreadnautString (BasicList, BasicList) := (polys, coefficients) -> (
         systemAsLists = append(systemAsLists,{systemNode});
         newNodeIndex = newNodeIndex + 1;
         for j in 0..#(polys#i) - 1 do (
-            monomialNode = newNodeIndex;
+            monomialNode := newNodeIndex;
             if coeffToMonomialNode#?(coefficients#i#j) then (
                coeffToMonomialNode#(coefficients#i#j) = coeffToMonomialNode#(coefficients#i#j)|{monomialNode};
             ) else (
@@ -55,7 +55,7 @@ createDreadnautString (BasicList, BasicList) := (polys, coefficients) -> (
     exponentsToPartition := keys termToNode;
     exponentsToPartition = sort(exponentsToPartition);
     if #exponentsToPartition > 0 then (
-        minValue = exponentsToPartition#0#0;
+        minValue := exponentsToPartition#0#0;
     );
     for key in exponentsToPartition do (
         if key#0 != minValue then (
@@ -119,7 +119,7 @@ findSymmetry List := polys-> (
             coefficientList#i = append(coefficientList#i,term#1);
         );
     );
-    numberOfVariables = #(termList#0#0) ;
+    numberOfVariables := #(termList#0#0);
 
     polysAsLists := makeConstIntoVar(termList);
     dreadnautStrs := callDreadnaut(createDreadnautString(polysAsLists, coefficientList));
@@ -130,9 +130,9 @@ findSymmetry List := polys-> (
         if class regex("orbits", dreadnautStr) === class {} then break;
 
         if dreadnautStr#0 == "(" then (
-            newPermutationStr = dreadnautStr;
+            newPermutationStr := dreadnautStr;
             for j from i + 1 to #dreadnautStrs - 1 do (
-                testDreadnautStr = dreadnautStrs#j;
+                testDreadnautStr := dreadnautStrs#j;
                 if testDreadnautStr#0 != " " then (
                     i = j;
                     break;
@@ -141,14 +141,14 @@ findSymmetry List := polys-> (
                     newPermutationStr = newPermutationStr | substring(testDreadnautStr,3,#testDreadnautStr);
                 );
             );
-            possiblePermutation = parsePermutationStr(newPermutationStr, numberOfVariables);
+            possiblePermutation := parsePermutationStr(newPermutationStr, numberOfVariables);
             if #possiblePermutation != 0 then (
                 permutations = append(permutations, possiblePermutation);
             );
         );
     );
     permutations = toList permutations;
-    return permutations;
+    return apply(permutations,a -> cycleToWordNotation(a,numberOfVariables));
 )
 
 parsePermutationStr = method()
@@ -158,14 +158,14 @@ parsePermutationStr (String, ZZ) := (permutationStr, numberOfVariables) -> (
     permutationStr = substring(permutationStr,1,#permutationStr - 2);
     permutationStr = replace("[(]","", permutationStr);
     splitCycles := separate(")", permutationStr);
-    toReturn = new MutableList;
+    toReturn := new MutableList;
     for cycle in splitCycles do (
-        splitCycle = separate(" ", cycle);
-        intCycle = new MutableList;
+        splitCycle := separate(" ", cycle);
+        intCycle := new MutableList;
         for termStr in splitCycle do (
             intCycle = append(intCycle, value termStr);
         );
-        isCycleVarPermutation = true;
+        isCycleVarPermutation := true;
         for term in intCycle do (
             if term > numberOfVariables then (
                 isCycleVarPermutation = false;
