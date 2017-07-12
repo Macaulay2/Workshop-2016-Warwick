@@ -1,4 +1,4 @@
--- -*- coding: utf-8 -*-
+g-- -*- coding: utf-8 -*-
 
 newPackage(
 	"gfanInterface2",
@@ -901,7 +901,7 @@ toPolymakeFormat(String,Boolean) := (propertyName,x) -> (
 toPolymakeFormat(Fan) := (F) ->(
      raysF:=rays(F);
      str:=toPolymakeFormat("AMBIENT_DIM",ambDim(F));
-     str=concatenate(str,toPolymakeFormat("RAYS",raysF));
+     str=concatenate(str,toPolymakeFormat("RAYS",transpose raysF));
      str=concatenate(str,toPolymakeFormat("N_RAYS",rank source raysF));
      L:=linealitySpace(F);
      str=concatenate(str,toPolymakeFormat("LINEALITY_DIM",rank L));
