@@ -1,4 +1,4 @@
-g-- -*- coding: utf-8 -*-
+-- -*- coding: utf-8 -*-
 
 newPackage(
 	"gfanInterface2",
@@ -460,9 +460,17 @@ gfanParsePolyhedralFan String := o -> s -> (
 	S:={};
     	    myrays:={};
 	    mylinspace:={};
-	    if  P#"Rays"=={} then myrays=map(ZZ^(P#"AmbientDim"),ZZ^0,0) else  myrays=transpose matrix P#"Rays";
+	    mymaximalcones:={};
+            -- the other option for the two “if” below is there because the output of gfan 
+	    -- might not be a fan with rays,linspace and maximal cones but a cone defined 
+            -- by equations
+	    if    P#?"Rays"==false or P#"Rays"=={} then myrays=map(ZZ^(P#"AmbientDim"),ZZ^0,0) else  myrays=transpose matrix P#"Rays";
+	    if  P#?"MaximalCones"==false then mymaximalcones={{}} else  mymaximalcones= P#"MaximalCones";
 	    if P#"LinealitySpace"=={} then  mylinspace=map(ZZ^(P#"AmbientDim"),ZZ^0,0)  else mylinspace=transpose matrix P#"LinealitySpace";
-	    S=fanFromGfan({myrays,mylinspace,P#"MaximalCones",P#"Dim",P#"Pure",P#"Simplicial",P#"FVector"});
+	    if P#?"Rays"==false then S=fan(myrays,mylinspace,mymaximalcones)
+	    else 
+	    S=fanFromGfan({myrays,mylinspace,mymaximalcones,P#"Dim",P#"Pure",P#"Simplicial",P#"FVector"});
+	    
 	    if  P#?"Multiplicities" then 
 	    (S,P#"Multiplicities" )
 	    else  (S)
@@ -1341,7 +1349,7 @@ gfanFanLink (Fan, List) := opts -> (F,V) -> (
 
      opts = opts ++ { "i" => fileName };
      out := gfanParsePolyhedralFan runGfanCommand("gfan _fanlink", opts, input);
-
+     out=out_0;
      if gfanKeepFiles then F#"GfanFileName" = fileName
      else if fileIsTemp then gfanRemoveTemporaryFile fileName;
      out
@@ -1400,7 +1408,7 @@ gfanFanProduct (Fan, Fan) := opts -> (F,G) -> (
 gfanGroebnerCone = method( Options => {
 	"restrict" => false,
 	"pair" => false,
-	"asfan" => false,
+	"asfan" => true,
 	"xml" => false,
 	"vectorinput" => false
 	}
@@ -2969,7 +2977,8 @@ doc ///
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}};
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}};
 			Q = gfanFanCommonRefinement(F,G)
-			gfanFanLink(Q, {2,1}, "star" =>true)
+			--gfanFanLink(Q, {2,1}, "star" =>true)
+ 			gfanFanLink(Q, {1,1}, "star" =>true)
 
 		Text
 
