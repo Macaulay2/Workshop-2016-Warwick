@@ -34,7 +34,7 @@ gfanParsePolyhedralFan returns a fan and an empty list of multiplicities rather 
 
 check the multiplicities given by gfantropicalintersection (Sara) 
 
-Documentation to be checked, it does not work for me (Sara)
+Problem with empty polyhedral fan. Needs to be reconised.
 ---------------
 - Tropical 
 ---------------
