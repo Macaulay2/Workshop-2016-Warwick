@@ -309,8 +309,6 @@ TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
     if (o.Strategy=="atint") then (
--- does not work yet! Problems with intersection in atint (polymake)
--- TODO: rewrite complety after Polyhedra is done and gfanInterface2 got adapted to Polyhedra
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
 	openingStr := "\"_type SymmetricFan\\n\\nAMBIENT_DIM\\n\";";
@@ -339,7 +337,7 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	m1 := F#"Multiplicities";
 	F2 := G#"Fan";	
 	m2 := G#"Multiplicities";
-	gfanStableIntersection(F1,m1,F2,m2);
+	return gfanStableIntersection(F1,m1,F2,m2);
     ) 
     else (
 	return "Strategy unknown: Choose 'atint' or 'gfan'";
