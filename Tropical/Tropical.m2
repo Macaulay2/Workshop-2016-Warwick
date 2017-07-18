@@ -328,9 +328,22 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
-	(fan, mult) := gfanParsePolyhedralFan(result);
-	return tropicalCycle (fan,mult);
---	gfanParsePolyhedralFan (result, "TropicalMinConventionApplies"=>not Tropical#Options#Configuration#"tropicalMax")
+	(polyfan, mult) := gfanParsePolyhedralFan(result);
+--now we still need to transform things back to our format:
+--1) adjust the rays
+	R := rays polyfan;
+	row := (entries R)#0;
+	ind := -1;
+	scan(#row, i -> if ((row#i)==1) then ind = i);
+	R = submatrix'(R, {0} , {ind});
+--2)adjust the maximal cones
+	C := maxCones polyfan;
+	C = apply(C, c -> delete(ind, c));
+	C = apply(C, c -> apply(c, n -> if (n > ind) then (n-1) else (n) ));
+--3)adjust lineality space
+	L := linSpace polyfan;
+	L = L|(transpose matrix {apply(numgens target L, i -> 1)});
+	return tropicalCycle (fan(R,L,C),mult);
     )
     else if (o.Strategy=="gfan") then (
 	F1 := F#"Fan";	
