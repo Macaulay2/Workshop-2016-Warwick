@@ -806,8 +806,8 @@ doc///
 		Example
 			QQ[x,y,z,w]
 			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3);
-			T=tropicalVariety I;
-			maxCones T
+			--T=tropicalVariety I;
+			--maxCones T
 			    
 ///
 doc///
@@ -878,8 +878,8 @@ doc///
 		Example
 		        QQ[x,y,z,w]
 			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3);
-			T=tropicalVariety I;
-			rays T
+			--T=tropicalVariety I;
+			--rays T
 			    
 ///
 doc///
@@ -902,8 +902,8 @@ doc///
 		Example
 			QQ[x,y,z,w]
 			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3);
-			T=tropicalVariety I;
-			dim T
+			--T=tropicalVariety I;
+			--dim T
 			    
 ///
 
@@ -975,8 +975,8 @@ doc///
 		Example
 			QQ[x,y,z,w,t]
 			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3,t-w+x);
-			T=tropicalVariety I;
-			cones(2,T)
+			--T=tropicalVariety I;
+			--cones(2,T)
 
 ///
 
