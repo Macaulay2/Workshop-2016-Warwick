@@ -35,6 +35,8 @@ gfanParsePolyhedralFan returns a fan and an empty list of multiplicities rather 
 check the multiplicities given by gfantropicalintersection (Sara) 
 
 Problem with empty polyhedral fan. Needs to be reconised.
+
+Problem with fVector.
 ---------------
 - Tropical 
 ---------------
