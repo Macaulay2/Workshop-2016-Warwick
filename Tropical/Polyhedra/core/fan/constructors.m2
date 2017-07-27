@@ -29,9 +29,7 @@ Fan == Fan := (F1, F2) -> (
 --  OUTPUT : The fan of all Cones in 'L' and all Cones in of the fans in 'L' and all their faces
 fan = method(TypicalValue => Fan)
 fan(Matrix, Matrix, List) := (irays, linealityGens, icones) -> (
-   if (numColumns irays != 0) 
-   and (numColumns linealityGens != 0) 
-   and (numRows irays != numRows linealityGens) then error("Rays and lineality must have same ambient dimension.");
+   if numRows irays != numRows linealityGens then error("Rays and lineality must have same ambient dimension.");
    irays = makeRaysPrimitive(irays);
    lineality := makeRaysPrimitive(linealityGens);
    minRays := unique apply(select(numcols irays, i -> irays_{i} != 0), i -> irays_{i});
