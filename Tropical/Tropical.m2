@@ -1048,7 +1048,7 @@ T:=new TropicalCycle
 F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
 T#"Multiplicities" ={1,1,1};
 T#"Fan" = F;
-assert((rays T)==( matrix{{0,0,0},{1,0,-1},{0,1,-1}}))
+assert((rays T)==( matrix{{0,0,0},{1,-1,0},{0,-1,1}}))
 F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
 T#"Multiplicities" ={1};
 T#"Fan" = F;
@@ -1061,7 +1061,7 @@ T:=new TropicalCycle
 F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
 T#"Multiplicities" ={1,1,1};
 T#"Fan" = F;
-assert((maxCones T)==( {{0,1},{0,2},{1,2}}))
+assert(sort(maxCones T)==( sort({{0,1},{0,2},{1,2}})))
 F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
 T#"Multiplicities" ={1};
 T#"Fan" = F;
@@ -1194,7 +1194,7 @@ assert((cones(1,T))==({{}}))
 TEST///
 QQ[x,y,z,w]
 F:=tropicalPrevariety({x+y+z+w,x^2+y*z})
-assert(F#cache#rays == matrix {{1,1,-1},{5,-3,-1},{-3,5,-1},{-3,-3,3}})
+assert((rays F) == matrix {{1,1,-1},{5,-3,-1},{-3,5,-1},{-3,-3,3}})
 ///
 
 
@@ -1227,12 +1227,12 @@ assert((maxCones T)==( {{0},{1},{2}}))
 I=ideal(x^2+x*z)
 T=tropicalVariety (I,Prime=>false)
 assert ((rays T)==(0 ))
-assert((linealitySpace T)==( matrix {{1, 0, 0}, {0, 1, 0}, {1, 0, 0}, {0, 0, 1}}))
+assert((linealitySpace T)==( matrix {{0, 1, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}))
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {1}))
 T=tropicalVariety (I,Prime=>false,ComputeMultiplicities=>false)
 assert ((rays T)==(0))
-assert((linealitySpace T)==(matrix {{1, 0, 0}, {0, 1, 0}, {1, 0, 0}, {0, 0, 1}}))
+assert((linealitySpace T)==( matrix {{0, 1, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}))
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {{}}))
 ///
