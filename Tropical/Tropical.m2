@@ -308,6 +308,11 @@ stableIntersection = method(TypicalValue =>
 TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+--TODOS:
+--1) fVector acts weirdly
+--2) how to deal with min vs max?
+--3) how to add lineality space?
+--4) gfan strategy outputs only a fan, not a tropical cycle
     if (o.Strategy=="atint") then (
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
