@@ -260,7 +260,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			newLinSpace,
 			maxCones T,
 			dim(T)-1,
-			isPure F_0,
+			isPure fan T,
 			isSimplicial T,
 			fVector T};
 	UFan:=fanFromGfan(TProperties);
