@@ -18,7 +18,7 @@ linear transformation to a fan" (emailed about this on 15/6/17).
 There are three errors left.  Two of them have comments attached, and
 the work that is needed is to understand how to handle gfan output
 that is a PolyhedralCone.  The other I (DM) don't understand yet.
--one of the error (gfanGroebnercone) can be fixed if we set asfan=>true. In fact the problem is that gfanParsePolyhedralFan can only handle a gfan output that gives a fan or a cone not a cone written with in inequalities.
+-one of the error (gfanGroebnercone) can be fixed if we set asfan=>true. In fact the problem is that gfanParsePolyhedralFan can only handle a gfan output that gives a fan or a cone not a cone written with in inequalities.(FIXED in the way described)
 
 There's also a lot of commented out stuff that we should probably delete
 (after checking tests) and also some other things that we should comment
@@ -26,7 +26,7 @@ out (e.g, checking for keys in hash tables that no longer exist).
 
 We're also waiting for Ben Madley's changes to this.-SARA: pull-requested accepted, gfanOverIntegers is now in gfanInterface2
 
-Problem when the output of gfan is empty.
+
 
 Output of gfanParseIdeal returns a a Macaulay2 list and not an ideal(Magda: I can take care of it)
 
@@ -34,7 +34,7 @@ gfanParsePolyhedralFan returns a fan and an empty list of multiplicities rather 
 
 check the multiplicities given by gfantropicalintersection (Sara) 
 
-Problem with empty polyhedral fan. Needs to be reconised.
+Problem with empty polyhedral fan output of gfan. Needs to be reconised.
 
 ---------------
 - Tropical 
