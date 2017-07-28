@@ -309,10 +309,11 @@ TropicalCycle, Options => {Strategy=>"atint"})
 
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 --TODOS:
---1) fVector acts weirdly
+--0) export strategies
 --2) how to deal with min vs max?
 --3) how to add lineality space?
 --4) gfan strategy outputs only a fan, not a tropical cycle
+--5) test cases
     if (o.Strategy=="atint") then (
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
