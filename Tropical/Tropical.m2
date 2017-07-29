@@ -1105,11 +1105,11 @@ T:=new TropicalCycle
 F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
 T#"Multiplicities" ={1,1,1};
 T#"Fan" = F;
-assert((fVector T)==( {3, 3, 1, 0}))
+assert((fVector T)==( {1, 3, 3}))
 F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
 T#"Multiplicities" ={1};
 T#"Fan" = F;
-assert((fVector T)==({1, 0}))
+assert((fVector T)==({1}))
 ///
 
 
