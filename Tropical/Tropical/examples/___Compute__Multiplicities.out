@@ -1,0 +1,25 @@
+-- -*- M2-comint -*- {* hash: -1572576216 *}
+--loading configuration for package "FourTiTwo" from file /home/baer/.Macaulay2/init-FourTiTwo.m2
+--loading configuration for package "gfanInterface2" from file /home/baer/.Macaulay2/init-gfanInterface2.m2
+--loading configuration for package "Tropical" from file /home/baer/.Macaulay2/init-Tropical.m2
+-- polymake is installed
+
+i1 : QQ[x,y,z];
+
+i2 : I=ideal(x^2-y^2);
+
+o2 : Ideal of QQ[x, y, z]
+
+i3 : isPrime I
+
+o3 = false
+
+i4 : T=tropicalVariety(I,Prime=>false,ComputeMultiplicities=>true);
+
+i5 : multiplicities T
+
+o5 = {2}
+
+o5 : List
+
+i6 : 

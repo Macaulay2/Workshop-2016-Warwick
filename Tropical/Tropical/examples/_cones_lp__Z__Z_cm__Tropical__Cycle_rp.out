@@ -1,0 +1,17 @@
+-- -*- M2-comint -*- {* hash: -1189312993 *}
+--loading configuration for package "FourTiTwo" from file /home/baer/.Macaulay2/init-FourTiTwo.m2
+--loading configuration for package "gfanInterface2" from file /home/baer/.Macaulay2/init-gfanInterface2.m2
+--loading configuration for package "Tropical" from file /home/baer/.Macaulay2/init-Tropical.m2
+-- polymake is installed
+
+i1 : QQ[x,y,z,w,t]
+
+o1 = QQ[x, y, z, w, t]
+
+o1 : PolynomialRing
+
+i2 : I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3,t-w+x);
+
+o2 : Ideal of QQ[x, y, z, w, t]
+
+i3 : 
