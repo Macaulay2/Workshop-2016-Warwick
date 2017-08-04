@@ -40,6 +40,7 @@ Status of code:
 
 - We'd still like to implement for someone to be able to choose their
   favourite complementary subspace to the lineality space.
+- tropicalBasis now works but do we want to get the point outside the variety in case it is not a tropical basis?
 
 Status of documentation:
 

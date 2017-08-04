@@ -119,7 +119,7 @@ tropicalPrevariety = method(TypicalValue => Fan,  Options => {
 	})
 
  
-tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"t" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
+tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"tropicalbasistest" => false,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false};
 --using strategy gfan
     if (o.Strategy=="gfan") then (
     	F:= gfanTropicalIntersection(L, gfanopt); 
@@ -300,8 +300,10 @@ isTropicalBasis = method(TypicalValue => Boolean,  Options => {
 
 isTropicalBasis (List) := o -> L -> (
 	if (o.Strategy=="gfan") then (
-	    gfanopt:=(new OptionTable) ++ {"t" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false}; if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneous polynomials yet";
- 	    return gfanTropicalIntersection(L, gfanopt); 
+	    gfanopt:=(new OptionTable) ++ {"tropicalbasistest" => true,"tplane" => false,"symmetryPrinting" => false,"symmetryExploit" => false,"restrict" => false,"stable" => false}; 
+
+if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneous polynomials yet";
+ 	    return gfanTropicalIntersection(L, gfanopt) 
 	)
 	)
 
@@ -685,8 +687,8 @@ doc///
 	    This method checks if the intersection of the tropical hypersurfaces associated to the polynomials in the list equals the tropicalization of the variety corresponding to the ideal they generate.  
         Example
 	    QQ[x,y,z]
---	    isTropicalBasis({x+y+z,2*x+3*y-z})
---	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
+	    isTropicalBasis({x+y+z,2*x+3*y-z})
+	    isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
 ///
 
 

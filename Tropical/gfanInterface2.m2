@@ -78,7 +78,7 @@ export {
 --	"gfanPolynomialListToString",  -- to make gfan input
 --	"gfanVectorToString", -- to make gfan input
 --	"gfanVectorListToString", -- to make gfan input
---	"gfanVectorListListToString"", -- to make gfan input
+--	"gfanVectorListListToString", -- to make gfan input
 	"gfanVersion",
 	"toPolymakeFormat"
 }
@@ -835,14 +835,18 @@ containsList = (L) -> (
 
 gfanArgumentToString = method()
 gfanArgumentToString (String, String, Thing) := (cmd, key, value) -> (
+	
 	if value === null or value === false then
 		return "";
-
+	
 	cmdLineValue := false; -- whether a value is passed on the commandline
+
 	if cmdLineArgs#?cmd and member(key, cmdLineArgs#cmd) then
 		cmdLineValue = true;
 
 	" " | argStrs#key | (if cmdLineValue then " " | value else "")
+
+
 )
 
 ------------------------------------------------------------------
@@ -954,8 +958,11 @@ makePolymakeFormat(PolyhedralObject) := (P) ->(
 
 runGfanCommand = (cmd, opts, data) -> (
 	tmpFile := gfanMakeTemporaryFile data;
+	
 	args := concatenate apply(keys opts, key -> gfanArgumentToString(cmd, key, opts#key));
+	
 	ex := gfanPath | cmd | args | " < " | tmpFile | " > " | tmpFile | ".out" | " 2> " | tmpFile | ".err";
+
 	if gfanVerbose then << ex << endl;
 	returnvalue := run ex;
      	if(not returnvalue == 0) then
@@ -972,8 +979,11 @@ runGfanCommand = (cmd, opts, data) -> (
 	gfanRemoveTemporaryFile(tmpFile | ".out");
 	gfanRemoveTemporaryFile(tmpFile | ".err");
 	outputFileName := null;
+	
 	if gfanKeepFiles then outputFileName = tmpFile|".out";
+	
 	(out, "GfanFileName" => outputFileName)
+	
 )
 
 runGfanCommandCaptureBoth = (cmd, opts, data) -> (
@@ -1025,7 +1035,7 @@ argFuncs = {
 	"L" => {gfanRender},
 	"r" => {gfanBuchberger},
 	"s" => {gfanPolynomialSetUnion},
-	"t" => {gfanTropicalIntersection},
+	
 	"w" => {gfanBuchberger,gfanHomogenize,gfanRenderStaircase},
 	"W" => {gfanBuchberger},
 	"asfan" => {gfanGroebnerCone},
@@ -1047,6 +1057,9 @@ argFuncs = {
 	"stable" => {gfanTropicalStartingCone, gfanTropicalTraverse},
 	"symmetry" => {gfan,gfanTropicalTraverse,gfanToPolyhedralFan},
 	"tplane" => {gfanTropicalIntersection},
+	"symmetryExploit" => {gfanTropicalIntersection},
+
+	"tropicalbasistest" => {gfanTropicalIntersection},
 }
 
 -- Fix capitalization
@@ -1102,7 +1115,8 @@ argStrs = hashTable {
 	"trees" => "--trees",
 	"unimodular" => "--unimodular",
 	"vectorinput" => "--vectorinput",
-	"xml" => "--xml"
+	"xml" => "--xml",
+	"tropicalbasistest" => "--tropicalbasistest"
 };
 
 
@@ -2204,7 +2218,7 @@ gfanTropicalHyperSurfaceReconstruction Fan := opts -> (F) -> (
 --------------------------------------------------------
 
 gfanTropicalIntersection = method( Options => {
-	"t" => false,
+	"tropicalbasistest" => false,
 	"tplane" => false,
 	"symmetryPrinting" => false,
 	"symmetryExploit" => false,
@@ -2217,12 +2231,15 @@ gfanTropicalIntersection (List) := opts -> (L) -> (
 	(ringMap, newL) := gfanConvertToNewRing(L);
 	L = newL;
 	input := gfanRingToString(ring first L) | gfanPolynomialListToString(L);
+
 	s:=runGfanCommand("gfan _tropicalintersection", opts, input);
-	if ((opts#"t")==false) then (return gfanParsePolyhedralFan s)
+	tropicalBasisOutput:=s_0;--this is 0 if not tropical basis and 1 otherwise.
+	if ((opts#"tropicalbasistest")==false) then (return gfanParsePolyhedralFan s)
 	else 
-	 if (toString substring(0,13, toString (s#0))=="The following") then false
+	
+	 if ((tropicalBasisOutput_0)=="0") then false
 	    else (
-		if (toString substring(0,13, toString (s#0))=="_application ") then true
+		if (tropicalBasisOutput_0=="1") then true
 --In case something has changed in 'gfan' or 'gfanInterface'
 	        else error "Algorithm fail"
 		)
@@ -2453,7 +2470,7 @@ gfanFunctions = hashTable {
 }
 
 --gfanHelp = hashTable apply(keys gfanFunctions, fn ->
---	gfanFunctions#fn => apply( lines runGfanCommandCaptureError(gfanFunctions#fn, {"--help"}, {true}, "") , l->PARA {l})
+--	gfanFunctions#fn => apply( lines runGfanCommandCaptureError(gfanFunctions#fn, {"--help"}, {true}, ") , l->PARA {l})
 --)
 --WARNING - the word PARA was deleted from the next function (it used to read "l -> PARA {l})
 gfanHelp = (functionStr) ->
