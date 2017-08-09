@@ -498,7 +498,7 @@ doc ///
 			consists of a Fan with an extra HashKey Multiplicities,
 			which is the list of multiplicities on the maximal cones
 			listed in the order that the maximal cones appear in the
-			MaximalCones list. A TropicalCycle
+			MaxCones list. A TropicalCycle
 			is saved as a hash table which contains the Fan and the
 			Multiplicities.
 	   
