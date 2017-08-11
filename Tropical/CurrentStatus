@@ -1,78 +1,54 @@
-This is the current status of the files
-
----------------
 - Polyhedra
 ---------------
 
-We need to get Lars to implement the change we made in constructors.m2
-to the fanFromGfan command.
-
-Ideally we'd also get him to implement some version of "apply this
-linear transformation to a fan" (emailed about this on 15/6/17).
-
+- Get Lars to implement some version of "apply this linear transformation
+  to a fan" (emailed about this on 15/6/17).
 
 ---------------
 - gfanInterface2
 ---------------
 
-There are three errors left.  Two of them have comments attached, and
-the work that is needed is to understand how to handle gfan output
-that is a PolyhedralCone.  The other I (DM) don't understand yet.
--one of the error (gfanGroebnercone) can be fixed if we set
-asfan=>true. In fact the problem is that gfanParsePolyhedralFan can
-only handle a gfan output that gives a fan or a cone not a cone
-written with in inequalities.(FIXED in the way described)
+Status of code:
 
-There's also a lot of commented out stuff that we should probably delete
-(after checking tests) and also some other things that we should comment
-out (e.g, checking for keys in hash tables that no longer exist).
+- There's also a lot of commented out stuff that we should probably delete
+  (after checking tests) and also some other things that we should comment
+  out (e.g, checking for keys in hash tables that no longer exist).
 
-We're also waiting for Ben Madley's changes to this.-SARA: pull-requested accepted, gfanOverIntegers is now in gfanInterface2
+- Output of gfanParseIdeal returns a a Macaulay2 list and not an ideal
+  (Magda: I can take care of it)
 
+- check the multiplicities given by gfantropicalintersection (Sara) 
 
+- Problem with empty polyhedral fan output of gfan. Needs to be recognized.
 
-Output of gfanParseIdeal returns a a Macaulay2 list and not an
-ideal(Magda: I can take care of it)
+Status of documentation:
 
-gfanParsePolyhedralFan returns a fan and an empty list of
-multiplicities rather than just a fan if the multiplicities do not
-exist.(Sara: Fixed it)
+- Should be more documentation.
 
-check the multiplicities given by gfantropicalintersection (Sara) 
+Status of tests:
 
-Problem with empty polyhedral fan output of gfan. Needs to be reconised.
-
-Problem with fVector(look at Kathlen’s emails).
+- Tests currently run, but only because they are almost entirely commented out.
+  Fixing the tests will reveal underlying code issues. Everyone should work 
+  on this.
 
 ---------------
 - Tropical 
 ---------------
 
-Status of functions:
+Status of code:
 
 - We'd still like to implement for someone to be able to choose their
   favourite complementary subspace to the lineality space.
 
-- Still need to implement stable intersection for gfan (using the new gfan).
-
-
 Status of documentation:
 
-- "Getting Started" page for first time users
-- More detailed version of the above with the expalnations of the options to castumize the package
-- Benefits over gfan
-- documentation of the methods that are not exported + options - what to do
-- add examples
-- how much maths shall we include in it?
+- README.md page for first time users
 
+- Benefits over gfanInterface.m2
+
+- Documentation of the methods that are not exported + options - what to do
 
 Status of tests:
 
--needed tests for fan,cones,isBalanced(it needs
-polymake),stableIntersection(note that it needs the new
-gfan),findMultiplicities,
-findMultiplicity,computeCones,isPure,isSimplicial,convertToPolymake
-
--more tests for tropicalVariety especially non homogeneous case
-
+- Tests run, but there could be more.
 
