@@ -31,10 +31,10 @@ newPackage("Polyhedra",
       {
          Name => "Lars Kastner (Maintaining author)",
          HomePage => "http://page.mi.fu-berlin.de/lkastner/",
-         Email => "k.l@fu-berlin.de",
+         Email => "k.l@fu-berlin.de"
       }
      },
-    DebuggingMode => false,
+    DebuggingMode => true,
     PackageExports=>{"FourTiTwo"}
     )
 

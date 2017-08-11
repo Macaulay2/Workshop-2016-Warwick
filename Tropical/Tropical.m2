@@ -1,9 +1,6 @@
---TODO: min/max
---TODO: implement (unstable) intersection
---TODO: implement different strategies
---TODO: implement valuation fields
---TODO: check what happens for empty fan
---TODO: quotient out by (1,1,...,1)
+polymakeOkay := try replace( "polymake version ", "", first lines get "!polymake --version 2>&1") >= "3.0" else false;
+
+optArgs = new OptionTable from if (version#"VERSION" > "1.10") then {OptionalComponentsPresent => polymakeOkay} else {}
 newPackage(
     	"Tropical",
 	Version => "0.1",
@@ -26,7 +23,10 @@ newPackage(
 		"tropicalMax" => false
 	},
         PackageExports => {"gfanInterface2","EliminationMatrices","Binomials"},
-	DebuggingMode => true
+	DebuggingMode => true,
+	AuxiliaryFiles => true,
+	CacheExampleOutput => true,
+	optArgs
 )
 
 export {
@@ -45,7 +45,7 @@ export {
 
 
 
-
+if polymakeOkay then << "-- polymake is installed\n" else << "-- polymake not present\n"
 
 
 ------------------------------------------------------------------------------
@@ -310,10 +310,12 @@ TropicalCycle, Options => {Strategy=>"atint"})
 stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 --TODOS:
 --0) export strategies
+--1) what to do if polymake is not installed
 --2) how to deal with min vs max?
 --3) how to add lineality space?
 --4) gfan strategy outputs only a fan, not a tropical cycle
 --5) test cases
+--6) make tropical an immutable hash table
     if (o.Strategy=="atint") then (
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
@@ -348,7 +350,8 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	C = apply(C, c -> apply(c, n -> if (n > ind) then (n-1) else (n) ));
 --3)adjust lineality space
 	L := linSpace polyfan;
-	L = L|(transpose matrix {apply(numgens target L, i -> 1)});
+	L = submatrix'(L, {0} , );
+	L = L|(transpose matrix {apply(numgens target L , i -> 1)});
 	return tropicalCycle (fan(R,L,C),mult);
     )
     else if (o.Strategy=="gfan") then (
@@ -1105,11 +1108,11 @@ T:=new TropicalCycle
 F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
 T#"Multiplicities" ={1,1,1};
 T#"Fan" = F;
-assert((fVector T)==( {3, 3, 1, 0}))
+assert((fVector T)==( {1, 3, 3}))
 F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
 T#"Multiplicities" ={1};
 T#"Fan" = F;
-assert((fVector T)==({1, 0}))
+assert((fVector T)==({1}))
 ///
 
 
@@ -1177,6 +1180,8 @@ assert((cones(1,T))==({{}}))
 -----------------------
 --isBalanced
 -----------------------
+if polymakeOkay then (
+--if Tropical.Options.OptionalComponentsPresent then (
 --TEST///
 --The following two tests are commented until their functions can work in a computer without polymake
     --assert(isBalanced tropicalVariety (ideal {6*x^2+3*x*y+8*y^2+x*z+6*y*z+3*z^2+2*x*t+5*z*t+3*t^2,5*x^2+x*y+8*y^2+x*z+4*y*z+9*z^2+5*x*t+8*y*t+z*t}, true)) 
@@ -1185,7 +1190,7 @@ assert((cones(1,T))==({{}}))
 --	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
    -- assert(R:=QQ[x,y,z]; rays(tropicalVariety(ideal(x+y+1)))==matrix{{-3,3,0},{-3,0,3},{-2,1,1}})
 --///    	    	
-
+)
 
 
 -----------------------
@@ -1205,12 +1210,14 @@ assert((rays F) == matrix {{1,1,-1},{5,-3,-1},{-3,5,-1},{-3,-3,3}})
 -----------------------
 
 
+if polymakeOkay then (
+--if Tropical.Options.OptionalComponentsPresent then (
 --The following two tests are commented until their functions can work in a computer without polymake
 --R:=QQ[x,y,z,t];
 --I=ideal(x+y+z+t); 
 --J=ideal(4*x+y-2*z+5*t); 
 --assert(stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
-  
+)  
 
 -----------------------
 --tropicalVariety
