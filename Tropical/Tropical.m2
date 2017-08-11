@@ -264,7 +264,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			dim(T)-1,
 			isPure fan T,
 			isSimplicial T,
-			fVector T};
+			fVector fan T};
 	UFan:=fanFromGfan(TProperties);
 	U:= tropicalCycle(UFan,multiplicities(T));
 	-- we always want the output to be called T so we change U in T
@@ -448,7 +448,6 @@ dim TropicalCycle:= T->( dim fan T)
 ambDim TropicalCycle:= T->( ambDim fan T)
 
 
-fVector TropicalCycle:= T->( fVector fan T)
 
 
 fan TropicalCycle := T -> (T#"Fan")
@@ -920,29 +919,6 @@ doc///
 			    
 ///
 
-doc///
-    Key
-	(fVector,TropicalCycle)
-    Headline
-		computes the fVector of  a  tropical cycle
-    Usage
-    	fVector(T)
-    Inputs
-	T:TropicalCycle
-	         
-    Outputs
-	L:List
-	    the fVector of the fan associated to the  tropical cycle T
-    
-    Description
-		Text
-		       This function computes the fVector of the fan associated to the tropical cycle T.	
-		Example
-			QQ[x,y,z]
-			T=tropicalVariety (ideal(x+3*y+3));
-			fVector T
-			    
-///
 
 doc///
     Key
@@ -1103,20 +1079,6 @@ F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
 T#"Multiplicities" ={1};
 T#"Fan" = F;
 assert((ambDim T)==(3))
-///
-
-
---fVector
-TEST///
-T:=new TropicalCycle
-F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
-T#"Multiplicities" ={1,1,1};
-T#"Fan" = F;
-assert((fVector T)==( {1, 3, 3}))
-F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
-T#"Multiplicities" ={1};
-T#"Fan" = F;
-assert((fVector T)==({1}))
 ///
 
 
