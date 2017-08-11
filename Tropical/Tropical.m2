@@ -1,6 +1,7 @@
 polymakeOkay := try replace( "polymake version ", "", first lines get "!polymake --version 2>&1") >= "3.0" else false;
 
 optArgs = new OptionTable from if (version#"VERSION" > "1.10") then {OptionalComponentsPresent => polymakeOkay} else {}
+
 newPackage(
     	"Tropical",
 	Version => "0.1",
@@ -9,10 +10,11 @@ newPackage(
    		{Name => "Carlos Amendola", Email => "", HomePage=>""},
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
   		{Name => "Sara Lamboglia", Email => "", HomePage=>""},
-	    	{Name => "Diane Maclagan", Email => "", HomePage=>""},
+	    	{Name => "Diane Maclagan", Email => "D.Maclagan@warwick.ac.uk", HomePage=>"http://homepages.warwick.ac.uk/staff/D.Maclagan/"},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
    		{Name => "Jeff Sommars", Email => "", HomePage=>""},
     		{Name => "Paolo Tripoli", Email => "", HomePage=>""}
+   		{Name => "Magda Zajackowska", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
 	Configuration => {
