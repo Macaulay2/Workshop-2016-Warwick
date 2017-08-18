@@ -14,7 +14,7 @@ export {
    "polyhedron",
    "polyhedronFromHData",
    "polyhedronFromInequalities" => "polyhedronFromHData",
-
+   "dualFaceRepresentationMap",
    "facets",
    "Fan", 
    "PolyhedralComplex", 
@@ -32,6 +32,7 @@ export {
    "hyperplanes", 
    "linSpace", 
    "linealitySpace",
+   "linearTransform",
    "polyhedra", 
    "vertices",
    "areCompatible", 
