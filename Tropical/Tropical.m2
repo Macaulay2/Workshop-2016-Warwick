@@ -13,7 +13,7 @@ newPackage(
 	    	{Name => "Diane Maclagan", Email => "D.Maclagan@warwick.ac.uk", HomePage=>"http://homepages.warwick.ac.uk/staff/D.Maclagan/"},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
    		{Name => "Jeff Sommars", Email => "", HomePage=>""},
-    		{Name => "Paolo Tripoli", Email => "", HomePage=>""}
+    		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
    		{Name => "Magda Zajackowska", Email => "", HomePage=>""}
 		},
 	Headline => "Interface to Anders Jensen's Gfan software",
