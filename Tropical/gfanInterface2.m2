@@ -80,8 +80,7 @@ export {
 --	"gfanVectorListToString", -- to make gfan input
 --	"gfanVectorListListToString", -- to make gfan input
 	"gfanVersion",
-	"toPolymakeFormat",
-	"tropicalbasistest"
+	"toPolymakeFormat"
 }
 
 gfanPath = gfanInterface2#Options#Configuration#"path"
