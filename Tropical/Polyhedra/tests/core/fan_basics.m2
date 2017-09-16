@@ -55,4 +55,3 @@ assert(numRows linealitySpace FG == 2)
 assert(ambDim FG == 2)
 assert(F == FG)
 ///
-

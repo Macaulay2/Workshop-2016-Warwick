@@ -154,4 +154,3 @@ fan List := inputCones -> (
    );
    result
 )
-

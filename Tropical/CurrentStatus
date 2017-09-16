@@ -18,6 +18,8 @@ Status of code:
 - Output of gfanParseIdeal returns a a Macaulay2 list and not an ideal
   (Magda: I can take care of it)
 
+- order of rays and maxiaml cones changes after using polyhedra, this is a problem then with the multiplcities, do not understand why!
+
 - check the multiplicities given by gfantropicalintersection (Sara) 
 
 - Problem with empty polyhedral fan output of gfan. Needs to be recognized.
@@ -40,6 +42,7 @@ Status of code:
 
 - We'd still like to implement for someone to be able to choose their
   favourite complementary subspace to the lineality space.
+- tropicalBasis now works but do we want to get the point outside the variety in case it is not a tropical basis?
 
 Status of documentation:
 
