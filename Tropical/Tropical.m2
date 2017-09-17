@@ -16,7 +16,7 @@ newPackage(
     		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
    		{Name => "Magda Zajackowska", Email => "", HomePage=>""}
 		},
-	Headline => "Interface to Anders Jensen's Gfan software",
+	Headline => "A package for doing computations in tropical geometry",
 	Configuration => {
 		"path" => "",
 		"fig2devpath" => "",
@@ -484,6 +484,8 @@ doc ///
     Description
     	Text
 	    This is the main M2 package for all tropical computations.
+	    This uses Anders Jensen's package gfan, Michael Joswig's
+	    package Polymake, and also internal M2 computations.
 ///
 
 
@@ -606,35 +608,40 @@ doc///
       I:Ideal
         of polynomials
       IsHomogIdeal=>Boolean
-        a boolean that ensures whether the ideal is already homogeneous   
+        that ensures whether the ideal is already homogeneous   
       ComputeMultiplicities =>Boolean
-        a boolean that confirms whether the multiplicities will be computed
+        that confirms whether the multiplicities will be computed
       Prime=>Boolean
-        a boolean that ensures whether the ideal is already prime
+        that ensures whether the ideal is already prime
     Outputs
         F:TropicalCycle
     Description 
        Text
-         This method takes an ideal and computes the tropical variety associated to it. 
-         By default the ideal is assumed to be prime, however inputting a non prime ideal  will not give all tropical variety.
-         In this case use optional inputs Prime=>false.
-         By default it computes multiplicities but setting computeMultiplicities=>false
-         turns this off.
-	 The ideal I is not assumed to be homogeneous but with tropicalVariety(I,true)
-	 the user can confirm it is homogeneous to the function does not check it.
-	 
-	 
+         This method takes an ideal and computes the tropical variety
+         associated to it.  By default the ideal is assumed to be
+         prime.  If this is not the case the d default answer will not
+         necessarily give the correct answer.  In this case use the
+         optional argument Prime=>false.  By default the
+         tropicalVariety command computes multiplicities but setting
+         computeMultiplicities=>false turns this off.  This only saves
+         time if Prime is set to false.  The ideal I is not assumed to
+         be homogeneous.  The optional argument IsHomogIdeal=>true
+         allows the user to assert that the ideal is homogeneous.
       Example
-       QQ[x,y,z]
-       I=ideal(x+y+1) 
-       tropicalVariety(I,IsHomogIdeal=>false)
-       tropicalVariety(I,ComputeMultiplicities=>false)  
-       J=ideal(x+y+z)
-      -- tropicalVariety(J,true)
---       tropicalVariety(J,true,computeMultiplicities=>false)
-       K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
-       isPrime K
---       tropicalVariety(K,true,Prime=>false)
+       QQ[x,y,z];
+       I=ideal(x+y+1);
+       T=tropicalVariety(I)
+       rays(T)
+       maxCones(T)
+       QQ[x,y,z,w];
+       I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
+       T= tropicalVariety(I,Prime=>false);
+       rays(T)
+       maxCones(T)
+       multiplicities(T)
+--       J=ideal(x+y+z)
+--       K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+--       isPrime K
 ///
 
 
