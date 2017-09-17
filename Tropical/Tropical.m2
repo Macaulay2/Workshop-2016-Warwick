@@ -628,7 +628,7 @@ doc///
          be homogeneous.  The optional argument IsHomogIdeal=>true
          allows the user to assert that the ideal is homogeneous.
       Example
-       QQ[x,y,z];
+       QQ[x,y];
        I=ideal(x+y+1);
        T=tropicalVariety(I)
        rays(T)
