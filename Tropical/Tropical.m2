@@ -162,8 +162,8 @@ computeCones=(R,M,L)->(
 -- note that ConesOfVariety is a local variable also in findMultiplicities
 findMultiplicity=(M,I)->(
 --compute vector w in relative interior in order to get the initial ideal in_w(I) with w in the maximal cone M
-    n:=numRows M - 1;
-    w:=flatten entries(sum(0..n, j->M^{j}));
+--    n:=numRows M - 1;
+    w:=flatten entries(sum(numRows M, j->M^{j}));
 --weight the ring according to this w , we are using leadTerm that is why we consider -sum of rays
     R:=newRing(ring I, MonomialOrder=>{Weights=>w},Global=>false);
     J:=sub(I,R);
@@ -736,6 +736,8 @@ doc///
 			I=ideal(x^2-y^2);
 			isPrime I
 			T=tropicalVariety(I,Prime=>false,ComputeMultiplicities=>true);
+			rays T
+			maxCones T
 			multiplicities T
 ///
 
