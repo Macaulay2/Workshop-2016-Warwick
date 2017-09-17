@@ -65,3 +65,4 @@ Status of tests:
 1) (DM) Is there a reason to have the option IsHomogIdeal rather than
 IsHomogeneous?
 
+2) (DM) for multiplicities, we should say what order the result is returned in.
