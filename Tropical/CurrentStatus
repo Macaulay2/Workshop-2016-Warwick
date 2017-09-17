@@ -56,3 +56,12 @@ Status of tests:
 
 - Tests run, but there could be more.
 
+
+
+------------------------------------
+--Questions during reviewing
+------------------------------------
+
+1) (DM) Is there a reason to have the option IsHomogIdeal rather than
+IsHomogeneous?
+
