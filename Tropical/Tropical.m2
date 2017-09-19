@@ -14,7 +14,7 @@ newPackage(
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
    		{Name => "Jeff Sommars", Email => "", HomePage=>""},
     		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
-   		{Name => "Magda Zajackowska", Email => "", HomePage=>""}
+   		{Name => "Magda Zajaczkowska", Email => "", HomePage=>""}
 		},
 	Headline => "A package for doing computations in tropical geometry",
 	Configuration => {
