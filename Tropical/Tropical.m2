@@ -42,7 +42,7 @@ export {
   "tropicalVariety",
   "isTropicalBasis",
   "multiplicities",
-  "IsHomogIdeal"
+  "IsHomogeneous"
 }
 
 
@@ -125,11 +125,13 @@ tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"tropical
 
 --Computing a tropical variety
 
-
 computeCones=(R,M,L)->(
       ConesOfVariety:={};
       i:=0;
+
       ConeOfVariety:={};
+      
+      if M!={{}} then(
      --this i is going through the maximal cones
       while(i<#M) do(
 	  ConeOfVariety={};
@@ -140,49 +142,51 @@ computeCones=(R,M,L)->(
 	      ConeOfVariety=append(ConeOfVariety, R_(M_i_j));
 	  j=j+1);
       -- creates a matrix whose rows are the rays of the cone
-     ConeOfVariety= ConeOfVariety|L;
+     ConeOfVariety= L|matrix ConeOfVariety;
      -- each cone has to contain also the lineality space since we are not quotienting by it
-      ConeOfVariety = matrix ConeOfVariety ;
+     -- ConeOfVariety = matrix ConeOfVariety ;
       --add the cone to the list of cones
       	  ConesOfVariety=append(ConesOfVariety,ConeOfVariety);
 	  i=i+1;
 	);
+    )
+    else 
+    (ConesOfVariety={L};
+	) ;   
     ConesOfVariety
     )
 
---input:rays,maximal cones and 
---lineality space so you put maximalCones and rays so the 
---inputs are two lists
+--input:rays,maximal cones and lineality space 
 --output:list of matrices
 -- note that ConesOfVariety is a local variable also in findMultiplicities
 findMultiplicity=(M,I)->(
 --compute vector w in relative interior in order to get the initial ideal in_w(I) with w in the maximal cone M
---    n:=numRows M - 1;
-    w:=flatten entries(sum(numRows M, j->M^{j}));
---weight the ring according to this w , we are using leadTerm that is why we consider -sum of rays
+    w:=flatten entries(sum(numColumns M, j->M_{j}));
+--weight the ring according to this w , we are using leadTerm and max convention since the input fan has not been changed to min convention yet
     R:=newRing(ring I, MonomialOrder=>{Weights=>w},Global=>false);
     J:=sub(I,R);
     K:=ideal(leadTerm(1,J));
+--you saturate since you don't want the components outside the torus
     InitialIdeal:= saturate(sub(K,ring I),ideal product gens ring I);
 --this is the the basis of the lattice associated to the toric ideal we are going to compute
-    Basis:= (maxCol( generators kernel M))_0;
+    Basis:= (maxCol( generators kernel transpose M))_0;
     --this is where we use  Binomials package
     toricIdeal:=saturate(latticeBasisIdeal(ring InitialIdeal,Basis),ideal product gens ring I);
-    m:=degree(InitialIdeal)/degree (toricIdeal);
+    m:=(degree(InitialIdeal)/degree (toricIdeal));
 --return multiplicity m as integer, since it lives currently in QQ
 --if m is an integer (as it should be), then the following command parses it to ZZ
 --otherwise, an errow will be returned "rational number is not an integer"
     lift(m,ZZ) 
     )    
 
---input Matrix whose rows are the generators of the cone and the ideal of the variety
+--input Matrix whose columns are the generators of the cone and the ideal of the variety
 --output a list of one number that is the multiplicity
 --maths behind it look at exercise 34 chapter 3 Tropical book and [Stu96]
 --(Grobner basis and Convex Polytopes ) 
 findMultiplicities=(I,T)->(
 	ConesOfVariety:={};
 	M:={};
-	ConesOfVariety=computeCones(entries transpose rays T,maxCones T, entries transpose linSpace T);
+	ConesOfVariety=computeCones( rays T,maxCones T, linSpace T);
       --creates a list with matrices that correspond to the maximal cones
 	i:=0;
 	while(i<#ConesOfVariety)do(
@@ -197,12 +201,10 @@ findMultiplicities=(I,T)->(
 --output: list with the multiplicities to add to the tropicalCycle 
 
 
---TODO: check multiplicity computation in the case that the variety has no rays but only lineality space
---(see example for ideal K in tropicalVariety) 
 tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 	ComputeMultiplicities => true,
 	Prime => true,
-	IsHomogIdeal=>false
+	IsHomogeneous=>false
 	})
 
 
@@ -214,7 +216,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
     local F;
     local T;
     Homog:=isHomogeneous I;
-    if o.IsHomogIdeal==false  then 
+    if o.IsHomogeneous==false  then 
     (	 if Homog==false then(
 	 --First homogenize
     	R:=ring I;
@@ -224,6 +226,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	J:=substitute(I,S);
 	J=homogenize(J,S_0);
 	J=saturate(J,S_0);
+	print J;
 	--we transform I in J so that the procedure continues as in the homogeneous case
 	I=J;
 	)
@@ -247,9 +250,10 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities this is why we have to add the right number of empty multiplicities
 	    	    	   )
 		     else (F= gfanTropicalBruteForce gfanBuchberger I;
+		        
 			 T=tropicalCycle(F,findMultiplicities(I,F))
 			 )  );
-    if   o.IsHomogIdeal==false then 
+    if   o.IsHomogeneous==false then 
 	( if Homog==false then(
 	    newRays:=dehomogenise(rays T);
 	newLinSpace:=gens gb dehomogenise(linealitySpace T);
@@ -270,7 +274,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 
 	
 )
-
+--ausiliary function to quotient out the lineality space (1,1,...1) introduced by the homogenisation
 dehomogenise=(M) -> (
 	vectorList:= entries transpose M;
 	dehomog:= new List;
@@ -593,7 +597,7 @@ doc///
       (tropicalVariety, Ideal)
       [tropicalVariety, ComputeMultiplicities]
       [tropicalVariety, Prime]
-      [tropicalVariety, IsHomogIdeal]
+      [tropicalVariety, IsHomogeneous]
 
     Headline
       the tropical variety associated to an ideal
@@ -601,11 +605,11 @@ doc///
       tropicalVariety(I)
       tropicalVariety(I,ComputeMultiplicities=>true)
       tropicalVariety(I,Prime=>true)
-      tropicalVariety(I,IsHomogIdeal=>false)
+      tropicalVariety(I,IsHomogeneous=>false)
     Inputs
       I:Ideal
         of polynomials
-      IsHomogIdeal=>Boolean
+      IsHomogeneous=>Boolean
         that ensures whether the ideal is already homogeneous   
       ComputeMultiplicities =>Boolean
         that confirms whether the multiplicities will be computed
@@ -623,23 +627,24 @@ doc///
          tropicalVariety command computes multiplicities but setting
          computeMultiplicities=>false turns this off.  This only saves
          time if Prime is set to false.  The ideal I is not assumed to
-         be homogeneous.  The optional argument IsHomogIdeal=>true
+         be homogeneous.  The optional argument IsHomogeneous=>true
          allows the user to assert that the ideal is homogeneous.
       Example
        QQ[x,y];
        I=ideal(x+y+1);
        T=tropicalVariety(I)
+       5+5
        rays(T)
        maxCones(T)
+       linealitySpace T
        QQ[x,y,z,w];
        I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
        T= tropicalVariety(I,Prime=>false);
        rays(T)
        maxCones(T)
        multiplicities(T)
---       J=ideal(x+y+z)
---       K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
---       isPrime K
+       linealitySpace T
+
 ///
 
 
@@ -761,11 +766,11 @@ doc///
 
 doc///
     Key
-	IsHomogIdeal
+	IsHomogeneous
     Headline
 		option to declare if the input  ideal is homogeneous
     Usage
-    	tropicalVariety(I,IsHomogIdeal=>true)
+    	tropicalVariety(I,IsHomogeneous=>true)
     
     Description
 		Text
@@ -774,7 +779,7 @@ doc///
 		Example
 		          QQ[x,y];
 			  I=ideal(x+y+1);
-			  T=tropicalVariety (I,IsHomogIdeal=>false)
+			  T=tropicalVariety (I,IsHomogeneous=>false)
 			
 				    
 ///
@@ -898,8 +903,8 @@ doc///
 		Example
 		        QQ[x,y,z,w]
 			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3);
-			--T=tropicalVariety I;
-			--rays T
+			T=tropicalVariety I;
+			rays T
 			    
 ///
 doc///

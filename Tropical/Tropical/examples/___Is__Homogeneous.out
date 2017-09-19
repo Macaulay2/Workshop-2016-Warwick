@@ -1,21 +1,22 @@
--- -*- M2-comint -*- {* hash: 1397472778 *}
+-- -*- M2-comint -*- {* hash: 130646979 *}
 --loading configuration for package "FourTiTwo" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-FourTiTwo.m2
 --loading configuration for package "gfanInterface2" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-gfanInterface2.m2
 --loading configuration for package "Tropical" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-Tropical.m2
 -- polymake not present
 
-i1 : QQ[x,y,z]
+i1 : QQ[x,y];
 
-o1 = QQ[x, y, z]
+i2 : I=ideal(x+y+1);
 
-o1 : PolynomialRing
+o2 : Ideal of QQ[x, y]
 
-i2 : isTropicalBasis({x+y+z,2*x+3*y-z})
+i3 : T=tropicalVariety (I,IsHomogeneous=>false)
+ideal(AA + x + y)
+0
 
-o2 = false
+o3 = T
 
-i3 : isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
-
-o3 = true
+o3 : TropicalCycle
 
 i4 : 
+     

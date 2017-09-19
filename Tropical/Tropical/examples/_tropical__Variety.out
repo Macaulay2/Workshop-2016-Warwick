@@ -1,4 +1,4 @@
--- -*- M2-comint -*- {* hash: -995441178 *}
+-- -*- M2-comint -*- {* hash: 1959835755 *}
 --loading configuration for package "FourTiTwo" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-FourTiTwo.m2
 --loading configuration for package "gfanInterface2" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-gfanInterface2.m2
 --loading configuration for package "Tropical" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-Tropical.m2
@@ -17,50 +17,71 @@ o3 = T
 
 o3 : TropicalCycle
 
-i4 : rays(T)
+i4 : 5+5
 
-o4 = | 1 -1 0 |
+o4 = 10
+
+i5 : rays(T)
+
+o5 = | 1 -1 0 |
      | 0 -1 1 |
 
               2        3
-o4 : Matrix ZZ  <--- ZZ
+o5 : Matrix ZZ  <--- ZZ
 
-i5 : maxCones(T)
+i6 : maxCones(T)
 
-o5 = {{1}, {0}, {2}}
+o6 = {{1}, {0}, {2}}
 
-o5 : List
+o6 : List
 
-i6 : QQ[x,y,z,w];
+i7 : linealitySpace T
 
-i7 : I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
+o7 = 0
 
-o7 : Ideal of QQ[x, y, z, w]
+              2
+o7 : Matrix ZZ  <--- 0
 
-i8 : T= tropicalVariety(I,Prime=>false);
+i8 : QQ[x,y,z,w];
 
-i9 : rays(T)
+i9 : I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
 
-o9 = | 1  3  1  -1 1  -1 -1 -1 |
-     | 1  -1 1  3  -1 1  -1 -1 |
-     | 1  -1 -1 -1 1  1  3  -1 |
-     | -3 -1 -1 -1 -1 -1 -1 3  |
+o9 : Ideal of QQ[x, y, z, w]
 
-              4        8
-o9 : Matrix ZZ  <--- ZZ
+i10 : T= tropicalVariety(I,Prime=>false);
 
-i10 : maxCones(T)
+i11 : rays(T)
 
-o10 = {{0}, {1, 2}, {1, 4}, {1, 7}, {2, 3}, {4, 6}, {3, 5}, {3, 7}, {5, 6},
+o11 = | 1  3  1  -1 1  -1 -1 -1 |
+      | 1  -1 1  3  -1 1  -1 -1 |
+      | 1  -1 -1 -1 1  1  3  -1 |
+      | -3 -1 -1 -1 -1 -1 -1 3  |
+
+               4        8
+o11 : Matrix ZZ  <--- ZZ
+
+i12 : maxCones(T)
+
+o12 = {{0}, {1, 2}, {1, 4}, {1, 7}, {2, 3}, {4, 6}, {3, 5}, {3, 7}, {5, 6},
       -----------------------------------------------------------------------
       {6, 7}}
 
-o10 : List
+o12 : List
 
-i11 : multiplicities(T)
+i13 : multiplicities(T)
 
-o11 = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+o13 = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 
-o11 : List
+o13 : List
 
-i12 : 
+i14 : linealitySpace T
+
+o14 = | 1 |
+      | 1 |
+      | 1 |
+      | 1 |
+
+               4        1
+o14 : Matrix ZZ  <--- ZZ
+
+i15 : 

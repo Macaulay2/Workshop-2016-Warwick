@@ -957,6 +957,7 @@ makePolymakeFormat(PolyhedralObject) := (P) ->(
 --------------------------------------------------------
 
 runGfanCommand = (cmd, opts, data) -> (
+	
 	tmpFile := gfanMakeTemporaryFile data;
 	
 	args := concatenate apply(keys opts, key -> gfanArgumentToString(cmd, key, opts#key));
@@ -973,8 +974,9 @@ runGfanCommand = (cmd, opts, data) -> (
 	     << get(tmpFile);
 	     << "ERROR:\n";
 	     << get(tmpFile |".err");
+
 	     );
-	out := get(tmpFile | ".out");
+		out := get(tmpFile | ".out");
 	gfanRemoveTemporaryFile tmpFile;
 	gfanRemoveTemporaryFile(tmpFile | ".out");
 	gfanRemoveTemporaryFile(tmpFile | ".err");
