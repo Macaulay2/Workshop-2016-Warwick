@@ -63,6 +63,7 @@ Status of tests:
 ------------------------------------
 
 1) (DM) Is there a reason to have the option IsHomogIdeal rather than
-IsHomogeneous?
+IsHomogeneous? (S) I will change it
 
 2) (DM) for multiplicities, we should say what order the result is returned in.
+(S.) It is the same order of the maximal cones
