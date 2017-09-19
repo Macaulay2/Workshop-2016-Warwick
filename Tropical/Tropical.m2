@@ -234,11 +234,16 @@ tropicalVariety (Ideal) := o -> (I) ->(
     if (o.Prime== true)
 		then (
 		    F= gfanTropicalTraverse( gfanTropicalStartingCone I);
+		    --check if resultung fan is empty
+		    if (instance(F,String)) then return F; 
 		    T=tropicalCycle(F_0,F_1))
 		else
 		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
 		    (if o.ComputeMultiplicities==false 
-		     then (F= gfanTropicalBruteForce gfanBuchberger I;
+		     then (
+			   F= gfanTropicalBruteForce gfanBuchberger I;
+			   --check if resulting fan is empty
+			   if (instance(F,String)) then return F; 
 			   mult := {};
 			   i:=0;
 			   
@@ -248,8 +253,10 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			   T=tropicalCycle(F,mult)
 			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities this is why we have to add the right number of empty multiplicities
 	    	    	   )
-		     else (F= gfanTropicalBruteForce gfanBuchberger I;
-		        
+		     else (
+			 F= gfanTropicalBruteForce gfanBuchberger I;
+			 --check if resulting fan is empty
+			 if (instance(F,String)) then return F; 
 			 T=tropicalCycle(F,findMultiplicities(I,F))
 			 )  );
     if   o.IsHomogeneous==false or Homog==false then 
@@ -273,7 +280,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 
 	
 )
---ausiliary function to quotient out the lineality space (1,1,...1) introduced by the homogenisation
+--auxiliary function to quotient out the lineality space (1,1,...1) introduced by the homogenisation
 dehomogenise=(M) -> (
 	vectorList:= entries transpose M;
 	dehomog:= new List;

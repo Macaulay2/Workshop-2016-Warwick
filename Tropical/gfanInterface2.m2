@@ -2134,6 +2134,8 @@ gfanTropicalBruteForce List := opts -> (L) -> (
 	L = newL;
 	input := gfanMPLToRingToString(L) | gfanMPLToString(L);
 	output := runGfanCommand("gfan _tropicalbruteforce", opts, input);
+	--check if fan is empty
+	if (#select("empty",output#0)==1) then return "error: this fan is empty";
 --minmax switch disabled
 --	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true)
 	gfanParsePolyhedralFan output
@@ -2354,6 +2356,8 @@ gfanTropicalTraverse (List) := opts -> (L) -> (
 		| gfanVectorListToString(opts#"symmetry");
 
 	output := runGfanCommand("gfan _tropicaltraverse", opts, input);
+	--check if the returned fan is empty
+	if(length(output#0)==0) then return "error: this fan is empty";
 	
 --minmax switch disabled
 --	gfanParsePolyhedralFan append(output, "TropicalMinConventionApplies" => true )
