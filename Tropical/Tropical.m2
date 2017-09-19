@@ -1211,8 +1211,9 @@ if polymakeOkay then (
     --assert(R:=QQ[x,y,z,t]; I=ideal(x+y+z+t); J=ideal(4*x+y-2*z+5*t); 
 --	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
    -- assert(R:=QQ[x,y,z]; rays(tropicalVariety(ideal(x+y+1)))==matrix{{-3,3,0},{-3,0,3},{-2,1,1}})
---///    	    	
-)
+--///
+--)
+)  
 
 
 -----------------------
@@ -1239,6 +1240,7 @@ if polymakeOkay then (
 --I=ideal(x+y+z+t); 
 --J=ideal(4*x+y-2*z+5*t); 
 --assert(stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
+--)
 )  
 
 -----------------------
