@@ -63,6 +63,8 @@ Status of tests:
 ------------------------------------
 
 1) (DM) Is there a reason to have the option IsHomogIdeal rather than
-IsHomogeneous?
+IsHomogeneous? (S) Changed
 
 2) (DM) for multiplicities, we should say what order the result is returned in.
+(S.) It is the same order of the maximal cones
+3)(S.) What bug is in tropicalVariety in the definition of the new ring(non homogeneous case)?
