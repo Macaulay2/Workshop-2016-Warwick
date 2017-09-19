@@ -216,7 +216,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
     local F;
     local T;
     Homog:=isHomogeneous I;
-    if o.IsHomogeneous==false  then 
+    if o.IsHomogeneous==false or Homog==false then 
     (	 if Homog==false then(
 	 --First homogenize
     	R:=ring I;
@@ -226,7 +226,6 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	J:=substitute(I,S);
 	J=homogenize(J,S_0);
 	J=saturate(J,S_0);
-	print J;
 	--we transform I in J so that the procedure continues as in the homogeneous case
 	I=J;
 	)
@@ -253,7 +252,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 		        
 			 T=tropicalCycle(F,findMultiplicities(I,F))
 			 )  );
-    if   o.IsHomogeneous==false then 
+    if   o.IsHomogeneous==false or Homog==false then 
 	( if Homog==false then(
 	    newRays:=dehomogenise(rays T);
 	newLinSpace:=gens gb dehomogenise(linealitySpace T);
@@ -633,10 +632,10 @@ doc///
        QQ[x,y];
        I=ideal(x+y+1);
        T=tropicalVariety(I)
-       5+5
        rays(T)
        maxCones(T)
        linealitySpace T
+       fVector fan T
        QQ[x,y,z,w];
        I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
        T= tropicalVariety(I,Prime=>false);
@@ -1259,6 +1258,15 @@ assert ((rays T)==(0))
 assert((linealitySpace T)==( matrix {{0, 1, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}))
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {{}}))
+QQ[x,y,z]
+I=ideal(x*y-y+1)
+T=tropicalVariety(I,IsHomogeneous=>true)
+assert ((rays T)== (matrix {{-1, 0, 3}, {1, -3, 0}, {0, -1, 1}}))
+assert((linealitySpace T)==( matrix {{0}, {0}, {1}} ))
+assert((maxCones T)==( {{1}, {0}, {2}}))
+assert((multiplicities T)==( {1, 1, 1}))
+
+
 ///
 
 

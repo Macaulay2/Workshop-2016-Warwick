@@ -1,8 +1,8 @@
--- -*- M2-comint -*- {* hash: -1995809306 *}
---loading configuration for package "FourTiTwo" from file /home/baer/.Macaulay2/init-FourTiTwo.m2
---loading configuration for package "gfanInterface2" from file /home/baer/.Macaulay2/init-gfanInterface2.m2
---loading configuration for package "Tropical" from file /home/baer/.Macaulay2/init-Tropical.m2
--- polymake is installed
+-- -*- M2-comint -*- {* hash: 519585892 *}
+--loading configuration for package "FourTiTwo" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-FourTiTwo.m2
+--loading configuration for package "gfanInterface2" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-gfanInterface2.m2
+--loading configuration for package "Tropical" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-Tropical.m2
+-- polymake not present
 
 i1 : QQ[x,y,z]
 
@@ -16,4 +16,16 @@ o2 = V
 
 o2 : TropicalCycle
 
-i3 : 
+i3 : F = fan {posHull matrix {{1},{0},{0}}, posHull matrix {{0},{1},{0}}, posHull matrix {{0},{0},{1}}, posHull matrix {{-1},{-1},{-1}}}
+
+o3 = F
+
+o3 : Fan
+
+i4 : mult = {1,2,-3,1}
+
+o4 = {1, 2, -3, 1}
+
+o4 : List
+
+i5 : 

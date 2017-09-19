@@ -1,4 +1,4 @@
--- -*- M2-comint -*- {* hash: 1959835755 *}
+-- -*- M2-comint -*- {* hash: 1876139820 *}
 --loading configuration for package "FourTiTwo" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-FourTiTwo.m2
 --loading configuration for package "gfanInterface2" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-gfanInterface2.m2
 --loading configuration for package "Tropical" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-Tropical.m2
@@ -11,36 +11,37 @@ i2 : I=ideal(x+y+1);
 o2 : Ideal of QQ[x, y]
 
 i3 : T=tropicalVariety(I)
-ideal(AA + x + y)
 
 o3 = T
 
 o3 : TropicalCycle
 
-i4 : 5+5
+i4 : rays(T)
 
-o4 = 10
-
-i5 : rays(T)
-
-o5 = | 1 -1 0 |
+o4 = | 1 -1 0 |
      | 0 -1 1 |
 
               2        3
-o5 : Matrix ZZ  <--- ZZ
+o4 : Matrix ZZ  <--- ZZ
 
-i6 : maxCones(T)
+i5 : maxCones(T)
 
-o6 = {{1}, {0}, {2}}
+o5 = {{1}, {0}, {2}}
 
-o6 : List
+o5 : List
 
-i7 : linealitySpace T
+i6 : linealitySpace T
 
-o7 = 0
+o6 = 0
 
               2
-o7 : Matrix ZZ  <--- 0
+o6 : Matrix ZZ  <--- 0
+
+i7 : fVector fan T
+
+o7 = {1, 3}
+
+o7 : List
 
 i8 : QQ[x,y,z,w];
 
