@@ -535,7 +535,7 @@ doc///
 	isBalanced
 	(isBalanced, TropicalCycle)
     Headline
-		check whether a tropical cycle is balanced
+		checks whether a tropical cycle is balanced
     Usage
     	isBalanced T
     Inputs
@@ -549,6 +549,9 @@ doc///
 			QQ[x,y,z]
 			V = tropicalVariety(ideal(x+y+z))
 			-- isBalanced V
+			F = fan {posHull matrix {{1},{0},{0}}, posHull matrix {{0},{1},{0}}, posHull matrix {{0},{0},{1}}, posHull matrix {{-1},{-1},{-1}}} 
+			mult = {1,2,-3,1}
+			-- isBalanced (tropicalCycle(F, mult))
 ///
 
 
@@ -614,7 +617,7 @@ doc///
        Text
          This method takes an ideal and computes the tropical variety
          associated to it.  By default the ideal is assumed to be
-         prime.  If this is not the case the d default answer will not
+         prime.  If this is not the case the default answer will not
          necessarily give the correct answer.  In this case use the
          optional argument Prime=>false.  By default the
          tropicalVariety command computes multiplicities but setting
@@ -672,7 +675,7 @@ doc///
 	(isTropicalBasis, List)
 	[isTropicalBasis, Strategy]
     Headline
-	check if a list of polynomials is a tropical basis for the ideal they generate
+	checks if a list of polynomials is a tropical basis for the ideal they generate
     Usage
 	isTropicalBasis(L)
 	isTropicalBasis(L,Strategy=>S)
