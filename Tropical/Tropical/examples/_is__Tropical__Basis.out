@@ -1,8 +1,8 @@
--- -*- M2-comint -*- {* hash: 568655613 *}
---loading configuration for package "FourTiTwo" from file /home/baer/.Macaulay2/init-FourTiTwo.m2
---loading configuration for package "gfanInterface2" from file /home/baer/.Macaulay2/init-gfanInterface2.m2
---loading configuration for package "Tropical" from file /home/baer/.Macaulay2/init-Tropical.m2
--- polymake is installed
+-- -*- M2-comint -*- {* hash: 1397472778 *}
+--loading configuration for package "FourTiTwo" from file /Users/maclagan/Library/Application Support/Macaulay2/init-FourTiTwo.m2
+--loading configuration for package "gfanInterface2" from file /Users/maclagan/Library/Application Support/Macaulay2/init-gfanInterface2.m2
+--loading configuration for package "Tropical" from file /Users/maclagan/Library/Application Support/Macaulay2/init-Tropical.m2
+-- polymake not present
 
 i1 : QQ[x,y,z]
 
@@ -10,4 +10,12 @@ o1 = QQ[x, y, z]
 
 o1 : PolynomialRing
 
-i2 : 
+i2 : isTropicalBasis({x+y+z,2*x+3*y-z})
+
+o2 = false
+
+i3 : isTropicalBasis(flatten entries gens Grassmannian (1,4,QQ[a..l]))
+
+o3 = true
+
+i4 : 

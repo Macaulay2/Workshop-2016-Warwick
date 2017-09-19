@@ -1,48 +1,65 @@
--- -*- M2-comint -*- {* hash: 739348051 *}
---loading configuration for package "FourTiTwo" from file /home/baer/.Macaulay2/init-FourTiTwo.m2
---loading configuration for package "gfanInterface2" from file /home/baer/.Macaulay2/init-gfanInterface2.m2
---loading configuration for package "Tropical" from file /home/baer/.Macaulay2/init-Tropical.m2
--- polymake is installed
+-- -*- M2-comint -*- {* hash: -995441178 *}
+--loading configuration for package "FourTiTwo" from file /Users/maclagan/Library/Application Support/Macaulay2/init-FourTiTwo.m2
+--loading configuration for package "gfanInterface2" from file /Users/maclagan/Library/Application Support/Macaulay2/init-gfanInterface2.m2
+--loading configuration for package "Tropical" from file /Users/maclagan/Library/Application Support/Macaulay2/init-Tropical.m2
+-- polymake not present
 
-i1 : QQ[x,y,z]
+i1 : QQ[x,y];
 
-o1 = QQ[x, y, z]
+i2 : I=ideal(x+y+1);
 
-o1 : PolynomialRing
+o2 : Ideal of QQ[x, y]
 
-i2 : I=ideal(x+y+1)
+i3 : T=tropicalVariety(I)
 
-o2 = ideal(x + y + 1)
-
-o2 : Ideal of QQ[x, y, z]
-
-i3 : tropicalVariety(I,IsHomogIdeal=>false)
-
-o3 = TropicalCycle{...2...}
+o3 = T
 
 o3 : TropicalCycle
 
-i4 : tropicalVariety(I,ComputeMultiplicities=>false)
+i4 : rays(T)
 
-o4 = TropicalCycle{...2...}
+o4 = | 1 -1 0 |
+     | 0 -1 1 |
 
-o4 : TropicalCycle
+              2        3
+o4 : Matrix ZZ  <--- ZZ
 
-i5 : J=ideal(x+y+z)
+i5 : maxCones(T)
 
-o5 = ideal(x + y + z)
+o5 = {{1}, {0}, {2}}
 
-o5 : Ideal of QQ[x, y, z]
+o5 : List
 
-i6 : K=ideal(x^2+y^2+z*y,(z+y)*(z^2+x^2))
+i6 : QQ[x,y,z,w];
 
-             2    2         2     2       2    3
-o6 = ideal (x  + y  + y*z, x y + x z + y*z  + z )
+i7 : I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
 
-o6 : Ideal of QQ[x, y, z]
+o7 : Ideal of QQ[x, y, z, w]
 
-i7 : isPrime K
+i8 : T= tropicalVariety(I,Prime=>false);
 
-o7 = false
+i9 : rays(T)
 
-i8 : 
+o9 = | 1  3  1  -1 1  -1 -1 -1 |
+     | 1  -1 1  3  -1 1  -1 -1 |
+     | 1  -1 -1 -1 1  1  3  -1 |
+     | -3 -1 -1 -1 -1 -1 -1 3  |
+
+              4        8
+o9 : Matrix ZZ  <--- ZZ
+
+i10 : maxCones(T)
+
+o10 = {{0}, {1, 2}, {1, 4}, {1, 7}, {2, 3}, {4, 6}, {3, 5}, {3, 7}, {5, 6},
+      -----------------------------------------------------------------------
+      {6, 7}}
+
+o10 : List
+
+i11 : multiplicities(T)
+
+o11 = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+
+o11 : List
+
+i12 : 
