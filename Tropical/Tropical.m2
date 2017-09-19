@@ -813,6 +813,7 @@ doc///
 			QQ[x,y,z]
 			T=tropicalVariety (ideal(x+3*y+3));
 			fan T
+			peek o3#cache
 			
 			    
 ///
