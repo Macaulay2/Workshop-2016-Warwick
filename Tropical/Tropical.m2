@@ -76,8 +76,6 @@ tropicalCycle (Fan, List) := (F,mult)->(
 
 
 
-
-
 --functions to switch to min-convention
 
 minmaxSwitch = method ()
@@ -85,9 +83,6 @@ minmaxSwitch = method ()
 minmaxSwitch (Fan) := F -> fanFromGfan({- rays F, linSpace F, maxCones F ,dim F,isPure F,isSimplicial F,fVector F});
 
 minmaxSwitch (TropicalCycle) := T -> tropicalCycle(minmaxSwitch fan T, multiplicities T);
-
-
-
 
 
 
@@ -578,7 +573,7 @@ doc///
 	Description
 		Text
 			This method intersects the tropical hypersurfaces
-			coming from the tropicalizations of polynomials in the list L. 
+			coming from the tropicalizations of the polynomials in the list L.
 		Example
 			QQ[x_1,x_2,x_3,x_4]
 			L={x_1+x_2+x_3+x_4,x_1*x_2+x_2*x_3+x_3*x_4+x_4*x_1,x_1*x_2*x_3+x_2*x_3*x_4+x_3*x_4*x_1+x_4*x_1*x_2,x_1*x_2*x_3*x_4-1}
