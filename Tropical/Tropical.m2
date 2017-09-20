@@ -267,12 +267,11 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			dim(T)-1,
 			isPure fan T,
 			isSimplicial T,
-			fVector T};
+			drop(fVector T,1)};
 	UFan:=fanFromGfan(TProperties);
 	U:= tropicalCycle(UFan,multiplicities(T));
 	-- we always want the output to be called T so we change U in T
 	T=U;
-	
 	);
 	if (Tropical#Options#Configuration#"tropicalMax" == true) then return  T  else return minmaxSwitch T
 
