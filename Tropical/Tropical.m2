@@ -402,15 +402,23 @@ unembedFan = F -> (
 --inverse function to embedFan
 	--1) adjust rays
 	rs := entries transpose rays F;
-	rs = apply(rs, s -> apply(s, i -> i-sum(s)/(#s)));	
-	rs = apply(rs, s -> drop(s,-1));
-	rs = apply(rs, s -> apply(s, i -> i*(#s+1)));
-	rs = transpose matrix rs;
+	if (#rs != 0) then (
+		rs = apply(rs, s -> apply(s, i -> i-sum(s)/(#s)));	
+		rs = apply(rs, s -> drop(s,-1));
+		rs = apply(rs, s -> apply(s, i -> i*(#s+1)));
+		rs = transpose matrix rs;
+	) else (
+		rs = matrix apply(numgens(target rays F)-1, i -> {});
+	);
 	--2) adjust lineality space
 	ls := entries transpose linSpace F;
-	ls = apply(ls, s -> apply(s, i -> i-last(s)));
-	ls = apply(ls, s -> drop(s,-1));
-	ls = transpose matrix ls;
+	if (#ls != 0) then (
+		ls = apply(ls, s -> apply(s, i -> i-last(s)));
+		ls = apply(ls, s -> drop(s,-1));
+		ls = transpose matrix ls;
+	) else (
+		ls = matrix apply(numgens(target rays F)-1, i -> {});
+	);
 	return fan(rs,ls,maxCones F);
 )
 
