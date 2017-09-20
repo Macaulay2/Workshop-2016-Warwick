@@ -383,13 +383,18 @@ embedFan = F -> (
 	--1) adjust rays
 	rs := entries transpose rays F;
 	rs = apply(rs, s -> s|{-sum s});	
+	numberOfEntries := #first(rs);
 	rs = transpose matrix rs;
 	--2) adjust lineality space
  	ls := entries transpose linSpace F;	
-	ls = apply(ls, s -> s|{0});
-	ad := ambDim F;
---	ls = ls|{apply(ad+1, i -> 1)};
-	ls = transpose matrix ls;
+	if (#ls != 0) then(
+		ls = apply(ls, s -> s|{0});
+		ad := ambDim F;
+--		ls = ls|{apply(ad+1, i -> 1)};
+		ls = transpose matrix ls;
+	) else (
+		ls = matrix apply(numberOfEntries, i -> {});
+	);
 	return fan(rs,ls,maxCones F);
 )
 
@@ -456,7 +461,7 @@ convertToPolymake = (T) ->(
 		str = str|"],";
 	));
 --delete last comma
-	str = substring(0,#str-1,str);
+	if (#ls != 0) then str = substring(0,#str-1,str);
 	str = str|"],WEIGHTS=>[";
 --the multiplicities stay unchanged
 	mult := multiplicities(T);
