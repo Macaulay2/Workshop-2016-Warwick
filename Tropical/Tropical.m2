@@ -9,7 +9,7 @@ newPackage(
 	Authors => {
    		{Name => "Carlos Amendola", Email => "", HomePage=>""},
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
-  		{Name => "Sara Lamboglia", Email => "", HomePage=>""},
+  		{Name => "Sara Lamboglia", Email => "S.Lamboglia@warwick.ac.uk", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "D.Maclagan@warwick.ac.uk", HomePage=>"http://homepages.warwick.ac.uk/staff/D.Maclagan/"},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
    		{Name => "Jeff Sommars", Email => "", HomePage=>""},
@@ -214,9 +214,8 @@ tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 tropicalVariety (Ideal) := o -> (I) ->(
     local F;
     local T;
-    Homog:=isHomogeneous I;
-    if o.IsHomogeneous==false or Homog==false then 
-    (	 if Homog==false then(
+    if o.IsHomogeneous==false  then 
+    (	 
 	 --First homogenize
     	R:=ring I;
 --	KK:=coefficientRing R;
@@ -227,7 +226,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	J=saturate(J,S_0);
 	--we transform I in J so that the procedure continues as in the homogeneous case
 	I=J;
-	)
+	
 	);
     
     if (o.Prime== true)
@@ -258,8 +257,8 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			 if (instance(F,String)) then return F; 
 			 T=tropicalCycle(F,findMultiplicities(I,F))
 			 )  );
-    if   o.IsHomogeneous==false or Homog==false then 
-	( if Homog==false then(
+    if   o.IsHomogeneous==false  then 
+	( 
 	    newRays:=dehomogenise(rays T);
 	newLinSpace:=gens gb dehomogenise(linealitySpace T);
 	TProperties := {newRays,
@@ -273,7 +272,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	U:= tropicalCycle(UFan,multiplicities(T));
 	-- we always want the output to be called T so we change U in T
 	T=U;
-	)
+	
 	);
 	if (Tropical#Options#Configuration#"tropicalMax" == true) then return  T  else return minmaxSwitch T
 
@@ -281,6 +280,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 )
 --auxiliary function to quotient out the lineality space (1,1,...1) introduced by the homogenisation
 dehomogenise=(M) -> (
+  
 	vectorList:= entries transpose M;
 	dehomog:= new List;
 	for L in vectorList do (
@@ -683,11 +683,12 @@ doc///
       Example
        QQ[x,y];
        I=ideal(x+y+1);
-       T=tropicalVariety(I)
+       T=tropicalVariety(I);
        rays(T)
        maxCones(T)
        linealitySpace T
        fVector fan T
+       multiplicities(T)
        QQ[x,y,z,w];
        I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
        T= tropicalVariety(I,Prime=>false);
@@ -695,6 +696,13 @@ doc///
        maxCones(T)
        multiplicities(T)
        linealitySpace T
+       QQ[x,y,z,w];
+       I=intersect(ideal(x+y+z+1),ideal(x^2-y*z));
+       T= tropicalVariety(I,Prime=>false,ComputeMultiplicities=>false);
+       rays(T)
+       maxCones(T)
+       linealitySpace T
+       multiplicities(T)
 
 ///
 
@@ -1296,12 +1304,14 @@ if polymakeOkay then (
 
 TEST///
 QQ[x,y,z,w]
+--homogeneous
 I=ideal(x^2+y^2+z^2)
 T:=tropicalVariety(I)
 assert ((rays T)==(matrix {{2, -1, -1},{-1, 2, -1}, {-1, -1, 2}, {0, 0, 0}}))
 assert((linealitySpace T)==( matrix {{1, 0}, {1, 0}, {1, 0}, {0, 1}}))
 assert((multiplicities T)==( {2,2,2}))
 assert((maxCones T)==( {{0},{1},{2}}))
+--homogeneous and binomial
 I=ideal(x^2+x*z)
 T=tropicalVariety (I,Prime=>false)
 assert ((rays T)==(0 ))
@@ -1314,8 +1324,9 @@ assert((linealitySpace T)==( matrix {{0, 1, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {{}}))
 QQ[x,y,z]
+--non homogeneous
 I=ideal(x*y-y+1)
-T=tropicalVariety(I,IsHomogeneous=>true)
+T=tropicalVariety(I)
 assert ((rays T)== (matrix {{-1, 0, 3}, {1, -3, 0}, {0, -1, 1}}))
 assert((linealitySpace T)==( matrix {{0}, {0}, {1}} ))
 assert((maxCones T)==( {{1}, {0}, {2}}))
