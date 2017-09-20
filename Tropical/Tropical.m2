@@ -46,7 +46,6 @@ export {
 }
 
 
-
 if polymakeOkay then << "-- polymake is installed\n" else << "-- polymake not present\n"
 
 
@@ -314,18 +313,19 @@ if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneo
 
 
 stableIntersection = method(TypicalValue =>
-TropicalCycle, Options => {Strategy=>"atint"})
+TropicalCycle, Options => {Strategy=> if polymakeOkay then "atint" else "gfan"})
 
-stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+stableIntersection (TropicalCycle, TropicalCycle) := o -> (T1,T2) -> (
 --TODOS:
---0) export strategies
---1) what to do if polymake is not installed
---2) how to deal with min vs max?
---3) how to add lineality space?
 --4) gfan strategy outputs only a fan, not a tropical cycle
 --5) test cases
 --6) make tropical an immutable hash table
     if (o.Strategy=="atint") then (
+	--in polymake, the lineality span (1,...,1) is default.
+	--we embed the fans in a higher dimensional fan in case our lineality span does not contain (1,...,1)
+	C1 := tropicalCycle(embedFan fan T1, multiplicities T1);
+	C2 := tropicalCycle(embedFan fan T2, multiplicities T2);
+
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
 	openingStr := "\"_type SymmetricFan\\n\\nAMBIENT_DIM\\n\";";
@@ -341,7 +341,7 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	coneStr := "\"\\n\\nCONES\\n\";";
 	maxConeStr := "\"MAXIMAL_CONES\\n\";";
 	weightStr := "\"\\nMULTIPLICITIES\\n\";";
-	filename << "use application 'tropical';" << "my $c = "|convertToPolymake(F) << "my $d = "|convertToPolymake(G) << "my $i = intersect($c,$d);" << "use strict;" << "my $filename = '" << filename << "';" << "open(my $fh, '>', $filename);" << "print $fh " << openingStr << "print $fh $i->AMBIENT_DIM;" << "print $fh " << dimStr << "print $fh $i->DIM;" << "print $fh " << linDimStr << "print $fh $i->LINEALITY_DIM;" << "print $fh " << raysStr << "print $fh $i->RAYS;" << "print $fh " << nRaysStr << "print $fh $i->N_RAYS;" << "print $fh " << linSpaceStr << "print $fh $i->LINEALITY_SPACE;" << "print $fh " << orthLinStr << "print $fh $i->ORTH_LINEALITY_SPACE;" << "print $fh " << fStr << "print $fh $i->F_VECTOR;" << "print $fh " << simpStr << "print $fh $i->SIMPLICIAL;" << "print $fh " << pureStr << "print $fh $i->PURE;" << "print $fh " << coneStr << "my $cones = $i->CONES;" << "$cones =~ s/['\\>','\\<']//g;" << "print $fh $cones;" << "print $fh " << maxConeStr << "print $fh $i->MAXIMAL_CONES;" << "print $fh " << weightStr << "print $fh $i->WEIGHTS;" << "close $fh;" << close;
+	filename << "use application 'tropical';" << "my $c = "|convertToPolymake(C1) << "my $d = "|convertToPolymake(C2) << "my $i = intersect($c,$d);" << "use strict;" << "my $filename = '" << filename << "';" << "open(my $fh, '>', $filename);" << "print $fh " << openingStr << "print $fh $i->AMBIENT_DIM;" << "print $fh " << dimStr << "print $fh $i->DIM;" << "print $fh " << linDimStr << "print $fh $i->LINEALITY_DIM;" << "print $fh " << raysStr << "print $fh $i->RAYS;" << "print $fh " << nRaysStr << "print $fh $i->N_RAYS;" << "print $fh " << linSpaceStr << "print $fh $i->LINEALITY_SPACE;" << "print $fh " << orthLinStr << "print $fh $i->ORTH_LINEALITY_SPACE;" << "print $fh " << fStr << "print $fh $i->F_VECTOR;" << "print $fh " << simpStr << "print $fh $i->SIMPLICIAL;" << "print $fh " << pureStr << "print $fh $i->PURE;" << "print $fh " << coneStr << "my $cones = $i->CONES;" << "$cones =~ s/['\\>','\\<']//g;" << "print $fh $cones;" << "print $fh " << maxConeStr << "print $fh $i->MAXIMAL_CONES;" << "print $fh " << weightStr << "print $fh $i->WEIGHTS;" << "close $fh;" << close;
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
@@ -360,14 +360,16 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 --3)adjust lineality space
 	L := linSpace polyfan;
 	L = submatrix'(L, {0} , );
-	L = L|(transpose matrix {apply(numgens target L , i -> 1)});
-	return tropicalCycle (fan(R,L,C),mult);
+--	L = L|(transpose matrix {apply(numgens target L , i -> 1)});
+--4)inverse of our function embedFan
+	F := unembedFan fan(R,L,C);
+	return tropicalCycle (F,mult);
     )
     else if (o.Strategy=="gfan") then (
-	F1 := F#"Fan";	
-	m1 := F#"Multiplicities";
-	F2 := G#"Fan";	
-	m2 := G#"Multiplicities";
+	F1 := T1#"Fan";	
+	m1 := T1#"Multiplicities";
+	F2 := T2#"Fan";	
+	m2 := T2#"Multiplicities";
 	return gfanStableIntersection(F1,m1,F2,m2);
     ) 
     else (
@@ -375,17 +377,37 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
     );
 )    
 
---parseFanFromGfanToPolyhedraFormat = method(TypicalValue => Fan)
---parseFanFromGfanToPolyhedraFormat PolyhedralObject := P -> (
---	oldR := P#"Rays";
---	local newR;
---	if (#oldR > 0) then newR = transpose matrix oldR else newR = matrix{{}};
---	oldL := P#"LinealitySpace";
---	local newL;
---	if (#oldL > 0) then newL = transpose matrix oldL else newL = matrix{{}};
---	F := fan(newR,newL,P#"MaximalCones");
---	F
---)
+embedFan = F -> (
+--embeds a fan into a fan of one dimension higher
+--and DOES NOT add the lineality space (1,...,1)
+	--1) adjust rays
+	rs := entries transpose rays F;
+	rs = apply(rs, s -> s|{-sum s});	
+	rs = transpose matrix rs;
+	--2) adjust lineality space
+ 	ls := entries transpose linSpace F;	
+	ls = apply(ls, s -> s|{0});
+	ad := ambDim F;
+--	ls = ls|{apply(ad+1, i -> 1)};
+	ls = transpose matrix ls;
+	return fan(rs,ls,maxCones F);
+)
+
+unembedFan = F -> (
+--inverse function to embedFan
+	--1) adjust rays
+	rs := entries transpose rays F;
+	rs = apply(rs, s -> apply(s, i -> i-sum(s)/(#s)));	
+	rs = apply(rs, s -> drop(s,-1));
+	rs = apply(rs, s -> apply(s, i -> i*(#s+1)));
+	rs = transpose matrix rs;
+	--2) adjust lineality space
+	ls := entries transpose linSpace F;
+	ls = apply(ls, s -> apply(s, i -> i-last(s)));
+	ls = apply(ls, s -> drop(s,-1));
+	ls = transpose matrix ls;
+	return fan(rs,ls,maxCones F);
+)
 
 convertToPolymake = (T) ->(
 -- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
@@ -420,6 +442,17 @@ convertToPolymake = (T) ->(
 		cone = maxCs#i;
 		str = str|"[0";
 		scan (#cone,j -> str = str|","|(cone#j+1));
+		str = str|"],";
+	));
+--delete last comma
+	str = substring(0,#str-1,str);
+	str = str|"],LINEALITY_SPACE=>[";
+--add lineality space
+	ls := entries transpose linSpace F;
+	scan (#ls, i -> (
+		ray = ls#i;
+		str = str|"[0";
+		scan(#ray, j -> str = str|","|(ray#j));	
 		str = str|"],";
 	));
 --delete last comma
