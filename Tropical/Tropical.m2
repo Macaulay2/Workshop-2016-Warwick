@@ -14,7 +14,7 @@ newPackage(
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
    		{Name => "Jeff Sommars", Email => "", HomePage=>""},
     		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
-   		{Name => "Magda Zajackowska", Email => "", HomePage=>""}
+   		{Name => "Magda Zajaczkowska", Email => "", HomePage=>""}
 		},
 	Headline => "A package for doing computations in tropical geometry",
 	Configuration => {
@@ -846,6 +846,7 @@ doc///
 			QQ[x,y,z]
 			T=tropicalVariety (ideal(x+3*y+3));
 			fan T
+			peek o3#cache
 			
 			    
 ///
@@ -1244,8 +1245,9 @@ if polymakeOkay then (
     --assert(R:=QQ[x,y,z,t]; I=ideal(x+y+z+t); J=ideal(4*x+y-2*z+5*t); 
 --	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
    -- assert(R:=QQ[x,y,z]; rays(tropicalVariety(ideal(x+y+1)))==matrix{{-3,3,0},{-3,0,3},{-2,1,1}})
---///    	    	
-)
+--///
+--)
+)  
 
 
 -----------------------
@@ -1272,6 +1274,7 @@ if polymakeOkay then (
 --I=ideal(x+y+z+t); 
 --J=ideal(4*x+y-2*z+5*t); 
 --assert(stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
+--)
 )  
 
 -----------------------
