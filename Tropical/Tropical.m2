@@ -488,7 +488,6 @@ ambDim TropicalCycle:= T->( ambDim fan T)
 
 fVector TropicalCycle:= T->( fVector fan T)
 
-
 fan TropicalCycle := T -> (T#"Fan")
 
 

@@ -468,9 +468,12 @@ gfanParsePolyhedralFan String := o -> s -> (
 	    if  P#?"MaximalCones"==false then mymaximalcones={{}} else  mymaximalcones= P#"MaximalCones";
 	    if P#"LinealitySpace"=={} then  mylinspace=map(ZZ^(P#"AmbientDim"),ZZ^0,0)  else mylinspace=transpose matrix P#"LinealitySpace";
 	    if P#?"Rays"==false then S=fan(myrays,mylinspace,mymaximalcones)
-	    else 
-	    S=fanFromGfan({myrays,mylinspace,mymaximalcones,P#"Dim",P#"Pure",P#"Simplicial",P#"FVector"});
-	    
+	    else (
+		fVector := P#"FVector";
+		while (#fVector < P#"Dim"+1) do (fVector = {0}|fVector);
+		S=fanFromGfan({myrays,mylinspace,mymaximalcones,P#"Dim",P#"Pure",P#"Simplicial",fVector});
+	    );	    
+
 	    if  P#?"Multiplicities" then 
 	    (S,P#"Multiplicities" )
 	    else  (S)
