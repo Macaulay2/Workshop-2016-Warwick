@@ -670,11 +670,12 @@ doc///
       Example
        QQ[x,y];
        I=ideal(x+y+1);
-       T=tropicalVariety(I)
+       T=tropicalVariety(I);
        rays(T)
        maxCones(T)
        linealitySpace T
        fVector fan T
+       multiplicities(T)
        QQ[x,y,z,w];
        I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
        T= tropicalVariety(I,Prime=>false);
@@ -682,6 +683,13 @@ doc///
        maxCones(T)
        multiplicities(T)
        linealitySpace T
+       QQ[x,y,z,w];
+       I=intersect(ideal(x+y+z+1),ideal(x^2-y*z));
+       T= tropicalVariety(I,Prime=>false,ComputeMultiplicities=>false);
+       rays(T)
+       maxCones(T)
+       linealitySpace T
+       multiplicities(T)
 
 ///
 
@@ -1283,12 +1291,14 @@ if polymakeOkay then (
 
 TEST///
 QQ[x,y,z,w]
+--homogeneous
 I=ideal(x^2+y^2+z^2)
 T:=tropicalVariety(I)
 assert ((rays T)==(matrix {{2, -1, -1},{-1, 2, -1}, {-1, -1, 2}, {0, 0, 0}}))
 assert((linealitySpace T)==( matrix {{1, 0}, {1, 0}, {1, 0}, {0, 1}}))
 assert((multiplicities T)==( {2,2,2}))
 assert((maxCones T)==( {{0},{1},{2}}))
+--homogeneous and binomial
 I=ideal(x^2+x*z)
 T=tropicalVariety (I,Prime=>false)
 assert ((rays T)==(0 ))
@@ -1301,8 +1311,9 @@ assert((linealitySpace T)==( matrix {{0, 1, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {{}}))
 QQ[x,y,z]
+--non homogeneous
 I=ideal(x*y-y+1)
-T=tropicalVariety(I,IsHomogeneous=>true)
+T=tropicalVariety(I)
 assert ((rays T)== (matrix {{-1, 0, 3}, {1, -3, 0}, {0, -1, 1}}))
 assert((linealitySpace T)==( matrix {{0}, {0}, {1}} ))
 assert((maxCones T)==( {{1}, {0}, {2}}))
