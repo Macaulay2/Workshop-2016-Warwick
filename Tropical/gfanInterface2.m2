@@ -518,11 +518,9 @@ gfanParsePolyhedralFan String := o -> s -> (
 	   
 	    
       	 
-	    --re-writing the  multiplicities according to thw new order of maximal cones
-    	    Mult:=P#"Multiplicities";
-	   
+	    --re-writing the  multiplicities according to thw new order of maximal cones 
 	    if  P#?"Multiplicities" then 
-	    ( newMult:=multiplicitiesReorder({rays S,maxCones S,myrays,mymaximalcones,Mult});
+	    ( newMult:=multiplicitiesReorder({rays S,maxCones S,myrays,mymaximalcones,P#"Multiplicities"});
 		S,newMult
 		
 		 )
