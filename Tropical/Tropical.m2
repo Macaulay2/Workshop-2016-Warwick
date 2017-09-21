@@ -81,7 +81,9 @@ minmaxSwitch = method ()
 
 minmaxSwitch (Fan) := F -> fanFromGfan({- rays F, linSpace F, maxCones F ,dim F,isPure F,isSimplicial F,fVector F});
 
-minmaxSwitch (TropicalCycle) := T -> tropicalCycle(minmaxSwitch fan T, multiplicities T);
+minmaxSwitch (TropicalCycle) := T ->(
+    tropicalCycle( minmaxSwitch fan T, multiplicitiesReorder({rays (minmaxSwitch fan T),
+	    maxCones (minmaxSwitch fan T),-rays  T,maxCones  T,multiplicities T})))
 
 
 
@@ -269,7 +271,8 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			isSimplicial T,
 			drop(fVector T,1)};
 	UFan:=fanFromGfan(TProperties);
-	U:= tropicalCycle(UFan,multiplicities(T));
+
+	U:= tropicalCycle(UFan,multiplicitiesReorder({rays UFan,maxCones UFan,newRays,maxCones T,multiplicities(T)}));
 	-- we always want the output to be called T so we change U in T
 	T=U;
 	);
