@@ -387,7 +387,7 @@ embedFan = F -> (
 	--2) adjust lineality space
  	ls := entries transpose linSpace F;	
 	if (#ls != 0) then(
-		ls = apply(ls, s -> s|{0});
+		ls = apply(ls, s -> s|{-sum s});
 		ad := ambDim F;
 --		ls = ls|{apply(ad+1, i -> 1)};
 		ls = transpose matrix ls;
@@ -412,8 +412,10 @@ unembedFan = F -> (
 	--2) adjust lineality space
 	ls := entries transpose linSpace F;
 	if (#ls != 0) then (
-		ls = apply(ls, s -> apply(s, i -> i-last(s)));
+		ls = apply(ls, s -> apply(s, i -> i-sum(s)/(#s)));	
+--ls = apply(ls, s -> apply(s, i -> i-last(s)));
 		ls = apply(ls, s -> drop(s,-1));
+		ls = apply(ls, s -> apply(s, i -> i*(#s+1)));
 		ls = transpose matrix ls;
 	) else (
 		ls = matrix apply(numgens(target rays F)-1, i -> {});
