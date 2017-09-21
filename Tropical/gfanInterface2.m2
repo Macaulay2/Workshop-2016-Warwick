@@ -514,18 +514,12 @@ gfanParsePolyhedralFan String := o -> s -> (
 		S=fanFromGfan({myrays,mylinspace,mymaximalcones,P#"Dim",P#"Pure",P#"Simplicial",fVector});
 	    );	    
 
-	    newrays:=rays S;
-	   
-	    
-      	 
 	    --re-writing the  multiplicities according to thw new order of maximal cones 
-	    if  P#?"Multiplicities" then 
-	    ( newMult:=multiplicitiesReorder({rays S,maxCones S,myrays,mymaximalcones,P#"Multiplicities"});
+	    if  P#?"Multiplicities" then ( 
+		newMult:=multiplicitiesReorder({rays S,maxCones S,myrays,mymaximalcones,P#"Multiplicities"});
 		S,newMult
-		
 		 )
 	    else  (S)
-	      
 )
 
 gfanParseHeader = method(TypicalValue => Type)
