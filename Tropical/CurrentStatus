@@ -18,7 +18,7 @@ Status of code:
 - Output of gfanParseIdeal returns a a Macaulay2 list and not an ideal
   (Magda: I can take care of it)
 
-- order of rays and maxiaml cones changes after using polyhedra, this is a problem then with the multiplcities, do not understand why!
+- order of rays and maximal cones changes after using polyhedra, this is a problem then with the multiplicities, do not understand why!
 
 - check the multiplicities given by gfantropicalintersection (Sara) 
 
