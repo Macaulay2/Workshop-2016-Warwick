@@ -233,8 +233,11 @@ tropicalVariety (Ideal) := o -> (I) ->(
     
     if (o.Prime== true)
 		then (
-		    F= gfanTropicalTraverse( gfanTropicalStartingCone I);
-		    --check if resultung fan is empty
+		    cone := gfanTropicalStartingCone I;
+		    --check if resulting fan would be empty
+		    if instance(cone, String) then return cone;
+		    F= gfanTropicalTraverse cone;
+		    --check if resulting fan would be empty
 		    if (instance(F,String)) then return F; 
 		    T=tropicalCycle(F_0,F_1))
 		else
@@ -348,7 +351,9 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (T1,T2) -> (
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
-	(polyfan, mult) := gfanParsePolyhedralFan(result);
+	parsedResult := gfanParsePolyhedralFan(result);
+	if instance(parsedResult, String) then return parsedResult;
+	(polyfan, mult) := parsedResult;
 --now we still need to transform things back to our format:
 --1) adjust the rays
 	R := rays polyfan;
