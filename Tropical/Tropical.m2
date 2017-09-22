@@ -233,8 +233,11 @@ tropicalVariety (Ideal) := o -> (I) ->(
     
     if (o.Prime== true)
 		then (
-		    F= gfanTropicalTraverse( gfanTropicalStartingCone I);
-		    --check if resultung fan is empty
+		    cone := gfanTropicalStartingCone I;
+		    --check if resulting fan would be empty
+		    if instance(cone, String) then return cone;
+		    F= gfanTropicalTraverse cone;
+		    --check if resulting fan would be empty
 		    if (instance(F,String)) then return F; 
 		    T=tropicalCycle(F_0,F_1))
 		else
