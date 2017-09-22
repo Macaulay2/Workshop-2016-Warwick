@@ -510,6 +510,7 @@ gfanParsePolyhedralFan String := o -> s -> (
             -- the other option for the two “if” below is there because the output of gfan 
 	    -- might not be a fan with rays,linspace and maximal cones but a cone defined 
             -- by equations
+	    if (P#"AmbientDim" < 0) then return "error: this fan is empty"; 
 	    if    P#?"Rays"==false or P#"Rays"=={} then myrays=map(ZZ^(P#"AmbientDim"),ZZ^0,0) else  myrays=transpose matrix P#"Rays";
 	    if  P#?"MaximalCones"==false then mymaximalcones={{}} else  mymaximalcones= P#"MaximalCones";
 	   
@@ -568,6 +569,7 @@ gfanParseGfanType (String, List) := (T, L) -> (
 		1 === value first L
 	)
 	else if T == "vector" then (
+		if (#L == 0) then return L;
 		select(separateRegexp(" +", first L) / value, x -> x =!= null)
 	)
 	else if T == "columnVector" then (
@@ -1379,7 +1381,9 @@ gfanStableIntersection (Fan,List,Fan,List) := opts -> (F,m1,G,m2) -> (
      fileF = gfanMakeTemporaryFile( (toPolymakeFormat(F))| toPolymakeFormat("MULTIPLICITIES",m1));
      fileG = gfanMakeTemporaryFile( (toPolymakeFormat(G))| toPolymakeFormat("MULTIPLICITIES",m2));
      opts = opts ++ { "i1" => fileF , "i2" => fileG };
-     out := gfanParsePolyhedralFan runGfanCommand("gfan _fancommonrefinement --stable", opts, "");
+     out := runGfanCommand("gfan _fancommonrefinement --stable", opts, "");
+     if (#select("empty",out#0)==1) then return "error: this fan is empty";
+     out = gfanParsePolyhedralFan out;
      if gfanKeepFiles then (
 	  F#"GfanFileName" = fileF;
 	  G#"GfanFileName" = fileG;

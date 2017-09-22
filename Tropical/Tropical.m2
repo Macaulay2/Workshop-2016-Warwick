@@ -351,7 +351,9 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (T1,T2) -> (
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
-	(polyfan, mult) := gfanParsePolyhedralFan(result);
+	parsedResult := gfanParsePolyhedralFan(result);
+	if instance(parsedResult, String) then return parsedResult;
+	(polyfan, mult) := parsedResult;
 --now we still need to transform things back to our format:
 --1) adjust the rays
 	R := rays polyfan;
