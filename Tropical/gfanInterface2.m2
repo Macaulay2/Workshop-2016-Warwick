@@ -80,7 +80,8 @@ export {
 --	"gfanVectorListToString", -- to make gfan input
 --	"gfanVectorListListToString", -- to make gfan input
 	"gfanVersion",
-	"toPolymakeFormat"
+	"toPolymakeFormat",
+	"multiplicitiesReorder"
 }
 
 gfanPath = gfanInterface2#Options#Configuration#"path"
@@ -402,9 +403,54 @@ gfanParseBool String := (s) -> s == "true\n"
 gfanParseBoolInteger = method()
 gfanParseBoolInteger String := (s) -> s == "1\n"
 
+
+
+
+
+
 ------------------------------------------
 -- Gfan Parsing Polymake-style data
 ------------------------------------------
+
+
+--this function reorder the multiplicities according to the order polyhedra gave to the maximal cones. In fact we construct a fan with fanFromGfan which reorders
+--maximal cones and rays 
+multiplicitiesReorder= method()
+
+multiplicitiesReorder (List):=(L)->(
+    --L_0= matrix of rays of the fan after using fanFromGfan
+    --L_1=list of maximal cones after using fanFromGfan
+    --L_2=matrix of rays before before using fanFromGfan
+    --L_3=list of maximal cones before  using fanFromGfan
+    --L_4=list of multiplicities before using fanFromGfan
+     
+     Mnew:=L_1;
+        
+     myrays:=L_2;
+     
+     M:=L_3;
+     
+     Mult:=L_4;
+     
+     newrays:=L_0;
+     
+     newmcone:={};
+     newmcones:={};
+     newmult:={};
+     
+	    
+	    for i from 0 to  #M-1 do(newmcone={};for j from 0 to  #(M_i)-1 do (for k from 0 to  numColumns(newrays)-1 do
+		    (if (newrays_k)==myrays_((M_i)_j) then (newmcone=append(newmcone,k);)
+			 ;k=k+1) ;j=j+1);newmcones=append(newmcones,toList(set newmcone));i=i+1) ;
+	     
+    	    for i from 0 to #Mnew-1 do(for j from 0 to #newmcones-1 do(if ((Mnew)_i)==(newmcones_j)then ( newmult=append(newmult,Mult_j))
+			 ;j=j+1);i=i+1);
+		 
+		 newmult
+    
+    )
+
+
 
 --minmax switch is now disabled
 --gfanParsePolyhedralFan = method(TypicalValue => PolyhedralObject, Options => {"GfanFileName" => null, "TropicalMinConventionApplies" => false })
@@ -466,15 +512,21 @@ gfanParsePolyhedralFan String := o -> s -> (
             -- by equations
 	    if    P#?"Rays"==false or P#"Rays"=={} then myrays=map(ZZ^(P#"AmbientDim"),ZZ^0,0) else  myrays=transpose matrix P#"Rays";
 	    if  P#?"MaximalCones"==false then mymaximalcones={{}} else  mymaximalcones= P#"MaximalCones";
+	   
 	    if P#"LinealitySpace"=={} then  mylinspace=map(ZZ^(P#"AmbientDim"),ZZ^0,0)  else mylinspace=transpose matrix P#"LinealitySpace";
 	    if P#?"Rays"==false then S=fan(myrays,mylinspace,mymaximalcones)
-	    else 
-	    S=fanFromGfan({myrays,mylinspace,mymaximalcones,P#"Dim",P#"Pure",P#"Simplicial",P#"FVector"});
-	    
-	    if  P#?"Multiplicities" then 
-	    (S,P#"Multiplicities" )
+	    else (
+		fVector := P#"FVector";
+		while (#fVector < P#"Dim"+1) do (fVector = {0}|fVector);
+		S=fanFromGfan({myrays,mylinspace,mymaximalcones,P#"Dim",P#"Pure",P#"Simplicial",fVector});
+	    );	    
+
+	    --re-writing the  multiplicities according to thw new order of maximal cones 
+	    if  P#?"Multiplicities" then ( 
+		newMult:=multiplicitiesReorder({rays S,maxCones S,myrays,mymaximalcones,P#"Multiplicities"});
+		S,newMult
+		 )
 	    else  (S)
-	      
 )
 
 gfanParseHeader = method(TypicalValue => Type)
@@ -2697,7 +2749,7 @@ doc ///
 		MarkedPolynomialList
 ///
     
--- --{*
+-- --
 -- doc ///
 -- 	Key
 -- 		polymakeConeToCone
@@ -2966,9 +3018,9 @@ doc ///
 
 		Example
 			QQ[x,y];
-			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}}
-			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}}
-			gfanFanCommonRefinement(F,G)
+			--F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}}
+			--G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}}
+			--gfanFanCommonRefinement(F,G)
 		Text
 
 			@STRONG "gfan Documentation"@
@@ -2999,9 +3051,9 @@ doc ///
 			QQ[x,y];
 			F = gfanToPolyhedralFan {markedPolynomialList{{x}, {x+y}}};
 			G = gfanToPolyhedralFan {markedPolynomialList{{y^2}, {x+y^2}}};
-			Q = gfanFanCommonRefinement(F,G)
+			--Q = gfanFanCommonRefinement(F,G)
 			--gfanFanLink(Q, {2,1}, "star" =>true)
- 			gfanFanLink(Q, {1,1}, "star" =>true)
+ 			--gfanFanLink(Q, {1,1}, "star" =>true)
 
 		Text
 

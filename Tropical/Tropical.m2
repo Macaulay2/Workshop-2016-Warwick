@@ -9,7 +9,7 @@ newPackage(
 	Authors => {
    		{Name => "Carlos Amendola", Email => "", HomePage=>""},
 	    	{Name => "Kathlen Kohn", Email => "", HomePage=>""},
-  		{Name => "Sara Lamboglia", Email => "", HomePage=>""},
+  		{Name => "Sara Lamboglia", Email => "S.Lamboglia@warwick.ac.uk", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "D.Maclagan@warwick.ac.uk", HomePage=>"http://homepages.warwick.ac.uk/staff/D.Maclagan/"},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
    		{Name => "Jeff Sommars", Email => "", HomePage=>""},
@@ -44,7 +44,6 @@ export {
   "multiplicities",
   "IsHomogeneous"
 }
-
 
 
 if polymakeOkay then << "-- polymake is installed\n" else << "-- polymake not present\n"
@@ -82,7 +81,9 @@ minmaxSwitch = method ()
 
 minmaxSwitch (Fan) := F -> fanFromGfan({- rays F, linSpace F, maxCones F ,dim F,isPure F,isSimplicial F,fVector F});
 
-minmaxSwitch (TropicalCycle) := T -> tropicalCycle(minmaxSwitch fan T, multiplicities T);
+minmaxSwitch (TropicalCycle) := T ->(
+    tropicalCycle( minmaxSwitch fan T, multiplicitiesReorder({rays (minmaxSwitch fan T),
+	    maxCones (minmaxSwitch fan T),-rays  T,maxCones  T,multiplicities T})))
 
 
 
@@ -215,9 +216,8 @@ tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 tropicalVariety (Ideal) := o -> (I) ->(
     local F;
     local T;
-    Homog:=isHomogeneous I;
-    if o.IsHomogeneous==false or Homog==false then 
-    (	 if Homog==false then(
+    if o.IsHomogeneous==false  then 
+    (	 
 	 --First homogenize
     	R:=ring I;
 --	KK:=coefficientRing R;
@@ -228,7 +228,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	J=saturate(J,S_0);
 	--we transform I in J so that the procedure continues as in the homogeneous case
 	I=J;
-	)
+	
 	);
     
     if (o.Prime== true)
@@ -259,22 +259,23 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			 if (instance(F,String)) then return F; 
 			 T=tropicalCycle(F,findMultiplicities(I,F))
 			 )  );
-    if   o.IsHomogeneous==false or Homog==false then 
-	( if Homog==false then(
+    if   o.IsHomogeneous==false  then 
+	( 
 	    newRays:=dehomogenise(rays T);
-	newLinSpace:=gens gb dehomogenise(linealitySpace T);
+
+	     newLinSpace:=gens gb dehomogenise(linealitySpace T);
 	TProperties := {newRays,
 			newLinSpace,
 			maxCones T,
 			dim(T)-1,
 			isPure fan T,
 			isSimplicial T,
-			fVector T};
+			drop(fVector T,1)};
 	UFan:=fanFromGfan(TProperties);
-	U:= tropicalCycle(UFan,multiplicities(T));
+
+	U:= tropicalCycle(UFan,multiplicitiesReorder({rays UFan,maxCones UFan,newRays,maxCones T,multiplicities(T)}));
 	-- we always want the output to be called T so we change U in T
 	T=U;
-	)
 	);
 	if (Tropical#Options#Configuration#"tropicalMax" == true) then return  T  else return minmaxSwitch T
 
@@ -282,6 +283,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 )
 --auxiliary function to quotient out the lineality space (1,1,...1) introduced by the homogenisation
 dehomogenise=(M) -> (
+  
 	vectorList:= entries transpose M;
 	dehomog:= new List;
 	for L in vectorList do (
@@ -314,18 +316,19 @@ if not all(L, a-> isHomogeneous a) then error "Not implemented for non homogeneo
 
 
 stableIntersection = method(TypicalValue =>
-TropicalCycle, Options => {Strategy=>"atint"})
+TropicalCycle, Options => {Strategy=> if polymakeOkay then "atint" else "gfan"})
 
-stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
+stableIntersection (TropicalCycle, TropicalCycle) := o -> (T1,T2) -> (
 --TODOS:
---0) export strategies
---1) what to do if polymake is not installed
---2) how to deal with min vs max?
---3) how to add lineality space?
 --4) gfan strategy outputs only a fan, not a tropical cycle
 --5) test cases
 --6) make tropical an immutable hash table
     if (o.Strategy=="atint") then (
+	--in polymake, the lineality span (1,...,1) is default.
+	--we embed the fans in a higher dimensional fan in case our lineality span does not contain (1,...,1)
+	C1 := tropicalCycle(embedFan fan T1, multiplicities T1);
+	C2 := tropicalCycle(embedFan fan T2, multiplicities T2);
+
 	filename := temporaryFileName();
 	--ugly declaration of helping strings
 	openingStr := "\"_type SymmetricFan\\n\\nAMBIENT_DIM\\n\";";
@@ -341,7 +344,7 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 	coneStr := "\"\\n\\nCONES\\n\";";
 	maxConeStr := "\"MAXIMAL_CONES\\n\";";
 	weightStr := "\"\\nMULTIPLICITIES\\n\";";
-	filename << "use application 'tropical';" << "my $c = "|convertToPolymake(F) << "my $d = "|convertToPolymake(G) << "my $i = intersect($c,$d);" << "use strict;" << "my $filename = '" << filename << "';" << "open(my $fh, '>', $filename);" << "print $fh " << openingStr << "print $fh $i->AMBIENT_DIM;" << "print $fh " << dimStr << "print $fh $i->DIM;" << "print $fh " << linDimStr << "print $fh $i->LINEALITY_DIM;" << "print $fh " << raysStr << "print $fh $i->RAYS;" << "print $fh " << nRaysStr << "print $fh $i->N_RAYS;" << "print $fh " << linSpaceStr << "print $fh $i->LINEALITY_SPACE;" << "print $fh " << orthLinStr << "print $fh $i->ORTH_LINEALITY_SPACE;" << "print $fh " << fStr << "print $fh $i->F_VECTOR;" << "print $fh " << simpStr << "print $fh $i->SIMPLICIAL;" << "print $fh " << pureStr << "print $fh $i->PURE;" << "print $fh " << coneStr << "my $cones = $i->CONES;" << "$cones =~ s/['\\>','\\<']//g;" << "print $fh $cones;" << "print $fh " << maxConeStr << "print $fh $i->MAXIMAL_CONES;" << "print $fh " << weightStr << "print $fh $i->WEIGHTS;" << "close $fh;" << close;
+	filename << "use application 'tropical';" << "my $c = "|convertToPolymake(C1) << "my $d = "|convertToPolymake(C2) << "my $i = intersect($c,$d);" << "use strict;" << "my $filename = '" << filename << "';" << "open(my $fh, '>', $filename);" << "print $fh " << openingStr << "print $fh $i->AMBIENT_DIM;" << "print $fh " << dimStr << "print $fh $i->DIM;" << "print $fh " << linDimStr << "print $fh $i->LINEALITY_DIM;" << "print $fh " << raysStr << "print $fh $i->RAYS;" << "print $fh " << nRaysStr << "print $fh $i->N_RAYS;" << "print $fh " << linSpaceStr << "print $fh $i->LINEALITY_SPACE;" << "print $fh " << orthLinStr << "print $fh $i->ORTH_LINEALITY_SPACE;" << "print $fh " << fStr << "print $fh $i->F_VECTOR;" << "print $fh " << simpStr << "print $fh $i->SIMPLICIAL;" << "print $fh " << pureStr << "print $fh $i->PURE;" << "print $fh " << coneStr << "my $cones = $i->CONES;" << "$cones =~ s/['\\>','\\<']//g;" << "print $fh $cones;" << "print $fh " << maxConeStr << "print $fh $i->MAXIMAL_CONES;" << "print $fh " << weightStr << "print $fh $i->WEIGHTS;" << "close $fh;" << close;
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
@@ -360,14 +363,16 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
 --3)adjust lineality space
 	L := linSpace polyfan;
 	L = submatrix'(L, {0} , );
-	L = L|(transpose matrix {apply(numgens target L , i -> 1)});
-	return tropicalCycle (fan(R,L,C),mult);
+--	L = L|(transpose matrix {apply(numgens target L , i -> 1)});
+--4)inverse of our function embedFan
+	F := unembedFan fan(R,L,C);
+	return tropicalCycle (F,mult);
     )
     else if (o.Strategy=="gfan") then (
-	F1 := F#"Fan";	
-	m1 := F#"Multiplicities";
-	F2 := G#"Fan";	
-	m2 := G#"Multiplicities";
+	F1 := T1#"Fan";	
+	m1 := T1#"Multiplicities";
+	F2 := T2#"Fan";	
+	m2 := T2#"Multiplicities";
 	return gfanStableIntersection(F1,m1,F2,m2);
     ) 
     else (
@@ -375,17 +380,52 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (F,G) -> (
     );
 )    
 
---parseFanFromGfanToPolyhedraFormat = method(TypicalValue => Fan)
---parseFanFromGfanToPolyhedraFormat PolyhedralObject := P -> (
---	oldR := P#"Rays";
---	local newR;
---	if (#oldR > 0) then newR = transpose matrix oldR else newR = matrix{{}};
---	oldL := P#"LinealitySpace";
---	local newL;
---	if (#oldL > 0) then newL = transpose matrix oldL else newL = matrix{{}};
---	F := fan(newR,newL,P#"MaximalCones");
---	F
---)
+embedFan = F -> (
+--embeds a fan into a fan of one dimension higher
+--and DOES NOT add the lineality space (1,...,1)
+	--1) adjust rays
+	rs := entries transpose rays F;
+	rs = apply(rs, s -> s|{-sum s});	
+	numberOfEntries := #first(rs);
+	rs = transpose matrix rs;
+	--2) adjust lineality space
+ 	ls := entries transpose linSpace F;	
+	if (#ls != 0) then(
+		ls = apply(ls, s -> s|{-sum s});
+		ad := ambDim F;
+--		ls = ls|{apply(ad+1, i -> 1)};
+		ls = transpose matrix ls;
+	) else (
+		ls = matrix apply(numberOfEntries, i -> {});
+	);
+	return fan(rs,ls,maxCones F);
+)
+
+unembedFan = F -> (
+--inverse function to embedFan
+	--1) adjust rays
+	rs := entries transpose rays F;
+	if (#rs != 0) then (
+		rs = apply(rs, s -> apply(s, i -> i-sum(s)/(#s)));	
+		rs = apply(rs, s -> drop(s,-1));
+		rs = apply(rs, s -> apply(s, i -> i*(#s+1)));
+		rs = transpose matrix rs;
+	) else (
+		rs = matrix apply(numgens(target rays F)-1, i -> {});
+	);
+	--2) adjust lineality space
+	ls := entries transpose linSpace F;
+	if (#ls != 0) then (
+		ls = apply(ls, s -> apply(s, i -> i-sum(s)/(#s)));	
+--ls = apply(ls, s -> apply(s, i -> i-last(s)));
+		ls = apply(ls, s -> drop(s,-1));
+		ls = apply(ls, s -> apply(s, i -> i*(#s+1)));
+		ls = transpose matrix ls;
+	) else (
+		ls = matrix apply(numgens(target rays F)-1, i -> {});
+	);
+	return fan(rs,ls,maxCones F);
+)
 
 convertToPolymake = (T) ->(
 -- converts a tropical cycle into a string, which is a constructor of a tropical cycle in polymake
@@ -424,6 +464,17 @@ convertToPolymake = (T) ->(
 	));
 --delete last comma
 	str = substring(0,#str-1,str);
+	str = str|"],LINEALITY_SPACE=>[";
+--add lineality space
+	ls := entries transpose linSpace F;
+	scan (#ls, i -> (
+		ray = ls#i;
+		str = str|"[0";
+		scan(#ray, j -> str = str|","|(ray#j));	
+		str = str|"],";
+	));
+--delete last comma
+	if (#ls != 0) then str = substring(0,#str-1,str);
 	str = str|"],WEIGHTS=>[";
 --the multiplicities stay unchanged
 	mult := multiplicities(T);
@@ -454,7 +505,6 @@ ambDim TropicalCycle:= T->( ambDim fan T)
 
 
 fVector TropicalCycle:= T->( fVector fan T)
-
 
 fan TropicalCycle := T -> (T#"Fan")
 
@@ -638,11 +688,12 @@ doc///
       Example
        QQ[x,y];
        I=ideal(x+y+1);
-       T=tropicalVariety(I)
+       T=tropicalVariety(I);
        rays(T)
        maxCones(T)
        linealitySpace T
        fVector fan T
+       multiplicities(T)
        QQ[x,y,z,w];
        I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
        T= tropicalVariety(I,Prime=>false);
@@ -650,6 +701,13 @@ doc///
        maxCones(T)
        multiplicities(T)
        linealitySpace T
+       QQ[x,y,z,w];
+       I=intersect(ideal(x+y+z+1),ideal(x^2-y*z));
+       T= tropicalVariety(I,Prime=>false,ComputeMultiplicities=>false);
+       rays(T)
+       maxCones(T)
+       linealitySpace T
+       multiplicities(T)
 
 ///
 
@@ -813,6 +871,7 @@ doc///
 			QQ[x,y,z]
 			T=tropicalVariety (ideal(x+3*y+3));
 			fan T
+			peek o3#cache
 			
 			    
 ///
@@ -1211,8 +1270,9 @@ if polymakeOkay then (
     --assert(R:=QQ[x,y,z,t]; I=ideal(x+y+z+t); J=ideal(4*x+y-2*z+5*t); 
 --	     stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
    -- assert(R:=QQ[x,y,z]; rays(tropicalVariety(ideal(x+y+1)))==matrix{{-3,3,0},{-3,0,3},{-2,1,1}})
---///    	    	
-)
+--///
+--)
+)  
 
 
 -----------------------
@@ -1239,6 +1299,7 @@ if polymakeOkay then (
 --I=ideal(x+y+z+t); 
 --J=ideal(4*x+y-2*z+5*t); 
 --assert(stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
+--)
 )  
 
 -----------------------
@@ -1248,12 +1309,14 @@ if polymakeOkay then (
 
 TEST///
 QQ[x,y,z,w]
+--homogeneous
 I=ideal(x^2+y^2+z^2)
 T:=tropicalVariety(I)
 assert ((rays T)==(matrix {{2, -1, -1},{-1, 2, -1}, {-1, -1, 2}, {0, 0, 0}}))
 assert((linealitySpace T)==( matrix {{1, 0}, {1, 0}, {1, 0}, {0, 1}}))
 assert((multiplicities T)==( {2,2,2}))
 assert((maxCones T)==( {{0},{1},{2}}))
+--homogeneous and binomial
 I=ideal(x^2+x*z)
 T=tropicalVariety (I,Prime=>false)
 assert ((rays T)==(0 ))
@@ -1266,8 +1329,9 @@ assert((linealitySpace T)==( matrix {{0, 1, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {{}}))
 QQ[x,y,z]
+--non homogeneous
 I=ideal(x*y-y+1)
-T=tropicalVariety(I,IsHomogeneous=>true)
+T=tropicalVariety(I)
 assert ((rays T)== (matrix {{-1, 0, 3}, {1, -3, 0}, {0, -1, 1}}))
 assert((linealitySpace T)==( matrix {{0}, {0}, {1}} ))
 assert((maxCones T)==( {{1}, {0}, {2}}))
