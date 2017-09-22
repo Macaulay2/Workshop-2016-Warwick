@@ -1,3 +1,4 @@
+-- -*- M2-comint -*- {* hash: 1876139820 *}
 --loading configuration for package "FourTiTwo" from file /Users/maclagan/Library/Application Support/Macaulay2/init-FourTiTwo.m2
 --loading configuration for package "gfanInterface2" from file /Users/maclagan/Library/Application Support/Macaulay2/init-gfanInterface2.m2
 --loading configuration for package "Tropical" from file /Users/maclagan/Library/Application Support/Macaulay2/init-Tropical.m2
@@ -29,41 +30,6 @@ o5 = {{1}, {0}, {2}}
 
 o5 : List
 
-<<<<<<< HEAD
-i6 : QQ[x,y,z,w];
-
-i7 : I=intersect(ideal(x+y+z+w),ideal(x-y,y-z));
-
-o7 : Ideal of QQ[x, y, z, w]
-
-i8 : T= tropicalVariety(I,Prime=>false);
-
-i9 : rays(T)
-
-o9 = | 1  3  1  -1 1  -1 -1 -1 |
-     | 1  -1 1  3  -1 1  -1 -1 |
-     | 1  -1 -1 -1 1  1  3  -1 |
-     | -3 -1 -1 -1 -1 -1 -1 3  |
-
-              4        8
-o9 : Matrix ZZ  <--- ZZ
-
-i10 : maxCones(T)
-
-o10 = {{0}, {1, 2}, {1, 4}, {1, 7}, {2, 3}, {4, 6}, {3, 5}, {3, 7}, {5, 6},
-      -----------------------------------------------------------------------
-      {6, 7}}
-
-o10 : List
-
-i11 : multiplicities(T)
-
-o11 = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-
-o11 : List
-
-i12 : 
-=======
 i6 : linealitySpace T
 
 o6 = 0
@@ -120,4 +86,3 @@ o14 = | 1 |
 o14 : Matrix ZZ  <--- ZZ
 
 i15 : 
->>>>>>> 0693917550d8a38b59d389b1b0ecae3c1c3cb913
