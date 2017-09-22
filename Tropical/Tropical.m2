@@ -262,7 +262,8 @@ tropicalVariety (Ideal) := o -> (I) ->(
     if   o.IsHomogeneous==false  then 
 	( 
 	    newRays:=dehomogenise(rays T);
-	newLinSpace:=gens gb dehomogenise(linealitySpace T);
+
+	     newLinSpace:=gens gb dehomogenise(linealitySpace T);
 	TProperties := {newRays,
 			newLinSpace,
 			maxCones T,
