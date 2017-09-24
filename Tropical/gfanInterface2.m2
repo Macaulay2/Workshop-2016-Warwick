@@ -413,8 +413,9 @@ gfanParseBoolInteger String := (s) -> s == "1\n"
 ------------------------------------------
 
 
---this function reorder the multiplicities according to the order polyhedra gave to the maximal cones. In fact we construct a fan with fanFromGfan which reorders
---maximal cones and rays 
+--this function reorder the multiplicities according to the order
+--polyhedra gave to the maximal cones. In fact we construct a fan with
+--fanFromGfan which reorders maximal cones and rays
 multiplicitiesReorder= method()
 
 multiplicitiesReorder (List):=(L)->(
@@ -423,32 +424,21 @@ multiplicitiesReorder (List):=(L)->(
     --L_2=matrix of rays before before using fanFromGfan
     --L_3=list of maximal cones before  using fanFromGfan
     --L_4=list of multiplicities before using fanFromGfan
-     
      Mnew:=L_1;
-        
      myrays:=L_2;
-     
      M:=L_3;
-     
      Mult:=L_4;
-     
      newrays:=L_0;
-     
      newmcone:={};
      newmcones:={};
      newmult:={};
-     
-	    
-	    for i from 0 to  #M-1 do(newmcone={};for j from 0 to  #(M_i)-1 do (for k from 0 to  numColumns(newrays)-1 do
-		    (if (newrays_k)==myrays_((M_i)_j) then (newmcone=append(newmcone,k);)
-			 ;k=k+1) ;j=j+1);newmcones=append(newmcones,toList(set newmcone));i=i+1) ;
-	     
-    	    for i from 0 to #Mnew-1 do(for j from 0 to #newmcones-1 do(if ((Mnew)_i)==(newmcones_j)then ( newmult=append(newmult,Mult_j))
-			 ;j=j+1);i=i+1);
-		 
-		 newmult
-    
-    )
+     for i from 0 to  #M-1 do(newmcone={};for j from 0 to  #(M_i)-1 do (for k from 0 to  numColumns(newrays)-1 do
+	    (if (newrays_k)==myrays_((M_i)_j) then (newmcone=append(newmcone,k);)
+		 ;k=k+1) ;j=j+1);newmcones=append(newmcones,toList(set newmcone));i=i+1) ;
+  	    for i from 0 to #Mnew-1 do(for j from 0 to #newmcones-1 do(if ((Mnew)_i)==(newmcones_j)then ( newmult=append(newmult,Mult_j))
+		 ;j=j+1);i=i+1);
+ 	 newmult
+)
 
 
 

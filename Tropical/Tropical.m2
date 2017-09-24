@@ -42,7 +42,8 @@ export {
   "tropicalVariety",
   "isTropicalBasis",
   "multiplicities",
-  "IsHomogeneous"
+  "IsHomogeneous",
+"findMultiplicities"
 }
 
 
@@ -125,13 +126,16 @@ tropicalPrevariety (List) := o -> L -> (gfanopt:=(new OptionTable) ++ {"tropical
 )
 
 --Computing a tropical variety
-
+--The input is a matrix R, consisting of the rays of the variety,
+--a list of lists M, being the list of maximal cones, and a matrix L giving generators 
+--for the lineality space.  R has the first lattice point on rays as columns, while L has generators 
+--for the lineality space as columns.
+--output:list of matrices whose rows span the span of each cone.
+-- note that ConesOfVariety is a local variable also in findMultiplicities
 computeCones=(R,M,L)->(
       ConesOfVariety:={};
       i:=0;
-
       ConeOfVariety:={};
-      
       if M!={{}} then(
      --this i is going through the maximal cones
       while(i<#M) do(
@@ -157,9 +161,7 @@ computeCones=(R,M,L)->(
     ConesOfVariety
     )
 
---input:rays,maximal cones and lineality space 
---output:list of matrices
--- note that ConesOfVariety is a local variable also in findMultiplicities
+
 findMultiplicity=(M,I)->(
 --compute vector w in relative interior in order to get the initial ideal in_w(I) with w in the maximal cone M
     w:=flatten entries(sum(numColumns M, j->M_{j}));
@@ -184,22 +186,25 @@ findMultiplicity=(M,I)->(
 --output a list of one number that is the multiplicity
 --maths behind it look at exercise 34 chapter 3 Tropical book and [Stu96]
 --(Grobner basis and Convex Polytopes ) 
+
+--DM: this comment was below - is this a bad git merge???
+--input: the ideal of the variety and the fan computed by gfanbruteforce
+--output: list with the multiplicities to add to the tropicalCycle 
+
 findMultiplicities=(I,T)->(
-	ConesOfVariety:={};
-	M:={};
-	ConesOfVariety=computeCones( rays T,maxCones T, linSpace T);
+--	ConesOfVariety:={};   --DM: I don't understand why this was here, since computeCones overrides it.
+--	M:={};
+	ConesOfVariety:=computeCones( rays T,maxCones T, linSpace T);
       --creates a list with matrices that correspond to the maximal cones
-	i:=0;
-	while(i<#ConesOfVariety)do(
+--	i:=0;
+	M:= apply(ConesOfVariety, linearSpan->(
        --for each cone computes the multiplicity and adds this to a list of multiplicities
-	    M=append(M,findMultiplicity(ConesOfVariety_i,I));
-	    i=i+1;
+	    findMultiplicity(linearSpan,I))
 	    );
+--DM: - person who wrote this please fix this comment!  (maybe it's also moved with a bad merge??)
 	--call the function tropicalCycle to create a new tropical variety with multiplicities
 	M
 )
---input: the ideal of the variety and the tropical variety computed by gfanbruteforce
---output: list with the multiplicities to add to the tropicalCycle 
 
 
 tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
@@ -228,7 +233,6 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	J=saturate(J,S_0);
 	--we transform I in J so that the procedure continues as in the homogeneous case
 	I=J;
-	
 	);
     
     if (o.Prime== true)
@@ -240,7 +244,7 @@ tropicalVariety (Ideal) := o -> (I) ->(
 		    --check if resulting fan would be empty
 		    if (instance(F,String)) then return F; 
 		    T=tropicalCycle(F_0,F_1))
-		else
+     		else
 		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
 		    (if o.ComputeMultiplicities==false 
 		     then (
@@ -249,7 +253,6 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			   if (instance(F,String)) then return F; 
 			   mult := {};
 			   i:=0;
-			   
 			   while(i<#maxCones (F))do(
 			       mult=append(mult,{});
 			       i=i+1);
@@ -261,13 +264,12 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			 --check if resulting fan is empty
 			 if (instance(F,String)) then return F; 
 			 T=tropicalCycle(F,findMultiplicities(I,F))
-			 )  );
+			 );  );
     if   o.IsHomogeneous==false  then 
 	( 
 	    newRays:=dehomogenise(rays T);
-
-	     newLinSpace:=gens gb dehomogenise(linealitySpace T);
-	TProperties := {newRays,
+     	    newLinSpace:=gens gb dehomogenise(linealitySpace T);
+	    TProperties := {newRays,
 			newLinSpace,
 			maxCones T,
 			dim(T)-1,
@@ -275,18 +277,17 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			isSimplicial T,
 			drop(fVector T,1)};
 	UFan:=fanFromGfan(TProperties);
-
 	U:= tropicalCycle(UFan,multiplicitiesReorder({rays UFan,maxCones UFan,newRays,maxCones T,multiplicities(T)}));
-	-- we always want the output to be called T so we change U in T
+	-- we always want the output to be called T so we change U to T
 	T=U;
 	);
 	if (Tropical#Options#Configuration#"tropicalMax" == true) then return  T  else return minmaxSwitch T
-
-	
 )
+
+
 --auxiliary function to quotient out the lineality space (1,1,...1) introduced by the homogenisation
+--DM: ???say what the input is???
 dehomogenise=(M) -> (
-  
 	vectorList:= entries transpose M;
 	dehomog:= new List;
 	for L in vectorList do (
