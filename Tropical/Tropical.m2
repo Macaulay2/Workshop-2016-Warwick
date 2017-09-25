@@ -42,9 +42,7 @@ export {
   "tropicalVariety",
   "isTropicalBasis",
   "multiplicities",
-  "IsHomogeneous",
-"findMultiplicities"
-}
+  "IsHomogeneous"}
 
 
 if polymakeOkay then << "-- polymake is installed\n" else << "-- polymake not present\n"
@@ -192,11 +190,8 @@ findMultiplicity=(M,I)->(
 --output: list with the multiplicities to add to the tropicalCycle 
 
 findMultiplicities=(I,T)->(
---	ConesOfVariety:={};   --DM: I don't understand why this was here, since computeCones overrides it.
---	M:={};
 	ConesOfVariety:=computeCones( rays T,maxCones T, linSpace T);
       --creates a list with matrices that correspond to the maximal cones
---	i:=0;
 	M:= apply(ConesOfVariety, linearSpan->(
        --for each cone computes the multiplicity and adds this to a list of multiplicities
 	    findMultiplicity(linearSpan,I))
@@ -286,7 +281,8 @@ tropicalVariety (Ideal) := o -> (I) ->(
 
 
 --auxiliary function to quotient out the lineality space (1,1,...1) introduced by the homogenisation
---DM: ???say what the input is???
+--input= matrix whose columns are either the rays or the generators of the lineality space of a fan
+--output= matrix whose columns are either the rays or the generators of the linelity space of the fan quotiented by (1,...,1)
 dehomogenise=(M) -> (
 	vectorList:= entries transpose M;
 	dehomog:= new List;
