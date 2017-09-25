@@ -185,7 +185,9 @@ findMultiplicity=(M,I)->(
 --maths behind it look at exercise 34 chapter 3 Tropical book and [Stu96]
 --(Grobner basis and Convex Polytopes ) 
 
---DM: this comment was below - is this a bad git merge???
+
+
+
 --input: the ideal of the variety and the fan computed by gfanbruteforce
 --output: list with the multiplicities to add to the tropicalCycle 
 
@@ -196,8 +198,6 @@ findMultiplicities=(I,T)->(
        --for each cone computes the multiplicity and adds this to a list of multiplicities
 	    findMultiplicity(linearSpan,I))
 	    );
---DM: - person who wrote this please fix this comment!  (maybe it's also moved with a bad merge??)
-	--call the function tropicalCycle to create a new tropical variety with multiplicities
 	M
 )
 
@@ -258,7 +258,8 @@ tropicalVariety (Ideal) := o -> (I) ->(
 			 F= gfanTropicalBruteForce gfanBuchberger I;
 			 --check if resulting fan is empty
 			 if (instance(F,String)) then return F;
-			
+				--call the function tropicalCycle to create a new tropical variety with multiplicities
+
 			 T=tropicalCycle(F,findMultiplicities(I,F))
 			 );  );
     if   o.IsHomogeneous==false  then 
