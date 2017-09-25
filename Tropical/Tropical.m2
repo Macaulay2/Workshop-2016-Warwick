@@ -257,7 +257,8 @@ tropicalVariety (Ideal) := o -> (I) ->(
 		     else (
 			 F= gfanTropicalBruteForce gfanBuchberger I;
 			 --check if resulting fan is empty
-			 if (instance(F,String)) then return F; 
+			 if (instance(F,String)) then return F;
+			
 			 T=tropicalCycle(F,findMultiplicities(I,F))
 			 );  );
     if   o.IsHomogeneous==false  then 

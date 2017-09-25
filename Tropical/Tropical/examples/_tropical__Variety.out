@@ -1,7 +1,7 @@
---loading configuration for package "FourTiTwo" from file /Users/maclagan/Library/Application Support/Macaulay2/init-FourTiTwo.m2
---loading configuration for package "gfanInterface2" from file /Users/maclagan/Library/Application Support/Macaulay2/init-gfanInterface2.m2
---loading configuration for package "Tropical" from file /Users/maclagan/Library/Application Support/Macaulay2/init-Tropical.m2
-
+-- -*- M2-comint -*- {* hash: -487926035 *}
+--loading configuration for package "FourTiTwo" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-FourTiTwo.m2
+--loading configuration for package "gfanInterface2" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-gfanInterface2.m2
+--loading configuration for package "Tropical" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-Tropical.m2
 -- polymake not present
 
 i1 : QQ[x,y];
