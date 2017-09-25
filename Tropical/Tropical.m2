@@ -220,7 +220,6 @@ tropicalVariety (Ideal) := o -> (I) ->(
     (	 
 	 --First homogenize
     	R:=ring I;
---	KK:=coefficientRing R;
     	AA:= symbol AA;
     	S:= first flattenRing( R[getSymbol "AA", Join=>false]);
 	J:=substitute(I,S);
@@ -228,40 +227,37 @@ tropicalVariety (Ideal) := o -> (I) ->(
 	J=saturate(J,S_0);
 	--we transform I in J so that the procedure continues as in the homogeneous case
 	I=J;
-	);
-    
-    if (o.Prime== true)
-		then (
-		    cone := gfanTropicalStartingCone I;
-		    --check if resulting fan would be empty
-		    if instance(cone, String) then return cone;
-		    F= gfanTropicalTraverse cone;
-		    --check if resulting fan would be empty
-		    if (instance(F,String)) then return F; 
-		    T=tropicalCycle(F_0,F_1))
-     		else
-		--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
-		    (if o.ComputeMultiplicities==false 
-		     then (
-			   F= gfanTropicalBruteForce gfanBuchberger I;
-			   --check if resulting fan is empty
-			   if (instance(F,String)) then return F; 
-			   mult := {};
-			   i:=0;
-			   while(i<#maxCones (F))do(
-			       mult=append(mult,{});
-			       i=i+1);
-			   T=tropicalCycle(F,mult)
-			   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities this is why we have to add the right number of empty multiplicities
-	    	    	   )
-		     else (
-			 F= gfanTropicalBruteForce gfanBuchberger I;
-			 --check if resulting fan is empty
-			 if (instance(F,String)) then return F;
-				--call the function tropicalCycle to create a new tropical variety with multiplicities
-
-			 T=tropicalCycle(F,findMultiplicities(I,F))
-			 );  );
+    );
+    if (o.Prime== true) then (
+	    cone := gfanTropicalStartingCone I;
+	    --check if resulting fan would be empty
+	    if instance(cone, String) then return cone;
+	    F= gfanTropicalTraverse cone;
+	    --check if resulting fan would be empty
+	    if (instance(F,String)) then return F; 
+	    T=tropicalCycle(F_0,F_1))
+    else
+	--If ideal not prime, use gfanTropicalBruteForce to ensure disconnected parts are not missed at expense of multiplicities
+	    (if o.ComputeMultiplicities==false 
+	     then (
+		   F= gfanTropicalBruteForce gfanBuchberger I;
+		   --check if resulting fan is empty
+		   if (instance(F,String)) then return F; 
+		   mult := {};
+		   i:=0;
+		   while(i<#maxCones (F))do(
+		       mult=append(mult,{});
+		       i=i+1);
+		   T=tropicalCycle(F,mult)
+		   --note that the output of gfanTropicalBruteForce is a fan and an empty list of multiplicities this is why we have to add the right number of empty multiplicities
+    	    	   )
+	     else (
+		 F= gfanTropicalBruteForce gfanBuchberger I;
+		 --check if resulting fan is empty
+		 if (instance(F,String)) then return F;
+			--call the function tropicalCycle to create a new tropical variety with multiplicities
+		 T=tropicalCycle(F,findMultiplicities(I,F))
+	 );  );
     if   o.IsHomogeneous==false  then 
 	( 
 	    newRays:=dehomogenise(rays T);
