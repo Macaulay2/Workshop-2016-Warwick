@@ -742,7 +742,16 @@ doc///
 	    which only computes the fan of the stable intersection
 	    without multiplicities.
 	Example
-    	    1+1
+	    QQ[x,y,z];
+	    I = ideal(x^2+y^2+z^2-1);
+	    T1 = tropicalVariety(I);
+	    J = ideal(x*y+y*z+x*z+1);
+	    T2 = tropicalVariety(J);
+	    V = tropicalVariety(I+J);
+	    W1 =  stableIntersection(T1,T2,Strategy=>"atint");
+	    W2 =  stableIntersection(T1,T2,Strategy=>"gfan");
+	    V#"Fan" == W1#"Fan"
+	    V#"Fan" == W2
 ///
 
 
