@@ -722,15 +722,19 @@ doc///
     Key
 	stableIntersection
 	(stableIntersection,TropicalCycle,TropicalCycle)
+	[stableIntersection, Strategy]
     Headline
     	computes the stable intersection of two tropical varieties
     Usage
 	stableIntersection(F,G)
+	stableIntersection(L,Strategy=>S)
     Inputs
 	F:TropicalCycle
 	  a tropical cycle
   	G:TropicalCycle
   	  another tropical cycle
+	Strategy=>String
+	  Strategy ("atint" (polymake) or "gfan")
     Outputs
         T:TropicalCycle
 		  a tropical cycle
@@ -739,6 +743,10 @@ doc///
 	    This computes the stable intersection of two tropical
 	    cycles.  For details on the definition of stable
 	    intersection, see, for example, Section 3.6 of TROPICALBOOK.
+	    If a recent enough version of polymake is installed,
+	    the Strategy "atint" is default. Otherwise "gfan" will be used,
+	    which only computes the fan of the stable intersection
+	    without multiplicities.
 	Example
     	    1+1
 ///
