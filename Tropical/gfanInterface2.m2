@@ -434,8 +434,8 @@ multiplicitiesReorder (List):=(L)->(
      newmult:={};
      for i from 0 to  #M-1 do(newmcone={};for j from 0 to  #(M_i)-1 do (for k from 0 to  numColumns(newrays)-1 do
 	    (if (newrays_k)==myrays_((M_i)_j) then (newmcone=append(newmcone,k);)
-		 ;k=k+1) ;j=j+1);newmcones=append(newmcones,toList(set newmcone));i=i+1) ;
-  	    for i from 0 to #Mnew-1 do(for j from 0 to #newmcones-1 do(if ((Mnew)_i)==(newmcones_j)then ( newmult=append(newmult,Mult_j))
+		 ;k=k+1) ;j=j+1);newmcones=append(newmcones, newmcone);i=i+1) ;
+  	    for i from 0 to #Mnew-1 do(for j from 0 to #newmcones-1 do(if set ((Mnew)_i)=== set(newmcones_j)then ( newmult=append(newmult,Mult_j))
 		 ;j=j+1);i=i+1);
  	 newmult
 )
