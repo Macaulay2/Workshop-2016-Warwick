@@ -1012,12 +1012,12 @@ runGfanCommand = (cmd, opts, data) -> (
 	returnvalue := run ex;
      	if(not returnvalue == 0) then
 	(
-	     << "GFAN returned an error message.\n";
-	     << "COMMAND:" << ex << endl;
-	     << "INPUT:\n";
-	     << get(tmpFile);
-	     << "ERROR:\n";
-	     << get(tmpFile |".err");
+--	     << "GFAN returned an error message.\n";
+--	     << "COMMAND:" << ex << endl;
+--	     << "INPUT:\n";
+--	     << get(tmpFile);
+--	     << "ERROR:\n";
+--	     << get(tmpFile |".err");
 
 	     );
 		out := get(tmpFile | ".out");
