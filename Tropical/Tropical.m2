@@ -1309,16 +1309,41 @@ assert((rays F) == matrix {{1,1,-1},{5,-3,-1},{-3,5,-1},{-3,-3,3}})
 --stableIntersection
 -----------------------
 
+TEST///
 
 if polymakeOkay then (
---if Tropical.Options.OptionalComponentsPresent then (
---The following two tests are commented until their functions can work in a computer without polymake
---R:=QQ[x,y,z,t];
---I=ideal(x+y+z+t); 
---J=ideal(4*x+y-2*z+5*t); 
---assert(stableIntersection(tropicalVariety(I, true),tropicalVariety(J, true))==tropicalVariety(ideal (I, J), true))
---)
+F1:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}});
+T1:= tropicalCycle(F1,{1,1,1});
+R1:= stableIntersection(T1,T1,Strategy=>"atint")
+R2:= stableIntersection(T1,T1,Strategy=>"gfan")
+assert(R1#"Fan" == R2)
+assert(dim R2 == 3)
+assert(maxCones R2 == {{1, 2}, {0, 2}, {0, 1}})
+)
+
+if polymakeOkay then (
+R =QQ[x,y,z,t];
+I=ideal(x+y+z+t); 
+J=ideal(4*x+y-2*z+5*t); 
+T1 = stableIntersection(tropicalVariety(I),tropicalVariety(J));
+T2 = tropicalVariety(I+J);
+assert(T1#"Fan" == T2#"Fan")
+assert(T1#"Multiplicities" == T2#"Multiplicities")
 )  
+
+if polymakeOkay then (
+R = QQ[x,y,z];
+I = ideal(x^2+y^2+z^2-1);
+T1 = tropicalVariety(I);
+J = ideal(x*y+y*z+x*z+1);
+T2 = tropicalVariety(J);
+V = tropicalVariety(I+J);
+W1 =  stableIntersection(T1,T2,Strategy=>"gfan");
+W2 =  stableIntersection(T1,T2,Strategy=>"atint");
+assert(V#"Fan" == W1)
+assert(V#"Fan" == W2#"Fan")
+)
+///
 
 -----------------------
 --tropicalVariety
