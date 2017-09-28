@@ -161,9 +161,10 @@ findSymmetry List := polys-> (
 
 getCanonicalString = method()
 getCanonicalString (Ideal) := (I) -> (
-	getCanonicalString first entries gens I
-);
-getCanonicalString (List) := (Polys) -> (
+	if numgens ring I != #support I then (
+		error "All variables in the ideal must be used.";
+	);
+	Polys := first entries gens I;
 	dreadnautStrs := findDreadnautStrs(Polys);
 	dreadnautStr := concatenate(for i in 0..(#dreadnautStrs)*2 - 1 list (if i % 2 == 1 then 1 else dreadnautStrs#(i//2)));
 	secondsLocation := regex(":", dreadnautStr);
