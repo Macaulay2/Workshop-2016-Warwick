@@ -90,9 +90,12 @@ minmaxSwitch (TropicalCycle) := T ->(
 isBalanced = method(TypicalValue => Boolean)
 
 isBalanced (TropicalCycle):= T->(
+--in polymake, the lineality span (1,...,1) is default.
+--we embed the fans in a higher dimensional fan in case our lineality span does not contain (1,...,1)
+	C := tropicalCycle(embedFan fan T, multiplicities T);
 -- parse object into a polymake script, run polymake and get result back from the same file (which got overwritten by polymake)
 	filename := temporaryFileName();
-	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(T) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
+	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(C) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
 	runstring := "polymake "|filename;
 	run runstring;
 	result := get filename;
@@ -386,14 +389,16 @@ embedFan = F -> (
 --and DOES NOT add the lineality space (1,...,1)
 	--1) adjust rays
 	rs := entries transpose rays F;
-	rs = apply(rs, s -> s|{-sum s});	
+--	rs = apply(rs, s -> s|{-sum s});	
+	rs = apply(rs, s -> s|{0});	
 	numberOfEntries := #first(rs);
 	rs = transpose matrix rs;
 	--2) adjust lineality space
  	ls := entries transpose linSpace F;	
 	if (#ls != 0) then(
-		ls = apply(ls, s -> s|{-sum s});
-		ad := ambDim F;
+--		ls = apply(ls, s -> s|{-sum s});
+		ls = apply(ls, s -> s|{0});
+--		ad := ambDim F;
 --		ls = ls|{apply(ad+1, i -> 1)};
 		ls = transpose matrix ls;
 	) else (
@@ -407,9 +412,10 @@ unembedFan = F -> (
 	--1) adjust rays
 	rs := entries transpose rays F;
 	if (#rs != 0) then (
-		rs = apply(rs, s -> apply(s, i -> i-sum(s)/(#s)));	
+--		rs = apply(rs, s -> apply(s, i -> i-sum(s)/(#s)));	
+		rs = apply(rs, s -> apply(s, i -> i-last(s)));	
 		rs = apply(rs, s -> drop(s,-1));
-		rs = apply(rs, s -> apply(s, i -> i*(#s+1)));
+--		rs = apply(rs, s -> apply(s, i -> i*(#s+1)));
 		rs = transpose matrix rs;
 	) else (
 		rs = matrix apply(numgens(target rays F)-1, i -> {});
@@ -417,10 +423,10 @@ unembedFan = F -> (
 	--2) adjust lineality space
 	ls := entries transpose linSpace F;
 	if (#ls != 0) then (
-		ls = apply(ls, s -> apply(s, i -> i-sum(s)/(#s)));	
---ls = apply(ls, s -> apply(s, i -> i-last(s)));
+--		ls = apply(ls, s -> apply(s, i -> i-sum(s)/(#s)));	
+		ls = apply(ls, s -> apply(s, i -> i-last(s)));
 		ls = apply(ls, s -> drop(s,-1));
-		ls = apply(ls, s -> apply(s, i -> i*(#s+1)));
+--		ls = apply(ls, s -> apply(s, i -> i*(#s+1)));
 		ls = transpose matrix ls;
 	) else (
 		ls = matrix apply(numgens(target rays F)-1, i -> {});
