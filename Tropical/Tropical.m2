@@ -471,17 +471,19 @@ convertToPolymake = (T) ->(
 	));
 --delete last comma
 	str = substring(0,#str-1,str);
-	str = str|"],LINEALITY_SPACE=>[";
---add lineality space
 	ls := entries transpose linSpace F;
-	scan (#ls, i -> (
-		ray = ls#i;
-		str = str|"[0";
-		scan(#ray, j -> str = str|","|(ray#j));	
-		str = str|"],";
-	));
+	if (#ls != 0) then (
+		str = str|"],LINEALITY_SPACE=>[";
+--add lineality space
+		scan (#ls, i -> (
+			ray = ls#i;
+			str = str|"[0";
+			scan(#ray, j -> str = str|","|(ray#j));	
+			str = str|"],";
+		));
 --delete last comma
-	if (#ls != 0) then str = substring(0,#str-1,str);
+		str = substring(0,#str-1,str);
+	);
 	str = str|"],WEIGHTS=>[";
 --the multiplicities stay unchanged
 	mult := multiplicities(T);
