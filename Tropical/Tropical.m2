@@ -1211,17 +1211,17 @@ assert((ambDim T)==(3))
 
 --fVector
 TEST///
-T:=new TropicalCycle
-F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
-T#"Multiplicities" ={1,1,1};
-T#"Fan" = F;
-assert((fVector T)==( {1, 3, 3}))
-F:=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
-T#"Multiplicities" ={1};
-T#"Fan" = F;
-assert((fVector T)==({1}))
+T1:=new TropicalCycle
+G:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}})
+T1#"Multiplicities" ={1,1,1};
+T1#"Fan" = G;
+assert((fVector T1)==( {0, 1, 3, 3}))
+G=fan(map(ZZ^3,ZZ^0,0),matrix{{1},{1},{1}},{{}})
+T1#"Multiplicities" ={1};
+T1#"Fan" = G;
+assert((fVector T1)==({0,1}))
 ///
-
+ 
 
 
 --linealitySpace
@@ -1231,7 +1231,7 @@ F:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}}
 T#"Multiplicities" ={1,1,1};
 T#"Fan" = F;
 assert((linealitySpace T)==( matrix{{1},{1},{1}}))
-F:=fan(matrix{{1,0,-1},{0,1,-1}},map(ZZ^2,ZZ^0,0),{{0,1},{0,2},{1,2}})
+F=fan(matrix{{1,0,-1},{0,1,-1}},map(ZZ^2,ZZ^0,0),{{0,1},{0,2},{1,2}})
 T#"Multiplicities" ={1,1,1};
 T#"Fan" = F;
 assert((linealitySpace T)==(0))
@@ -1320,7 +1320,6 @@ assert((rays F) == matrix {{1,1,-1},{5,-3,-1},{-3,5,-1},{-3,-3,3}})
 -----------------------
 
 TEST///
-
 if polymakeOkay then (
 F1:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}});
 T1:= tropicalCycle(F1,{1,1,1});
@@ -1353,6 +1352,7 @@ W2 =  stableIntersection(T1,T2,Strategy=>"atint");
 assert(V#"Fan" == W1)
 assert(V#"Fan" == W2#"Fan")
 )
+
 ///
 
 -----------------------

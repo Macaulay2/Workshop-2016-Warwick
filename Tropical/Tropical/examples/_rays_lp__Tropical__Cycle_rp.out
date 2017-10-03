@@ -1,4 +1,4 @@
--- -*- M2-comint -*- {* hash: 1089403876 *}
+-- -*- M2-comint -*- {* hash: -1556992540 *}
 --loading configuration for package "FourTiTwo" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-FourTiTwo.m2
 --loading configuration for package "gfanInterface2" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-gfanInterface2.m2
 --loading configuration for package "Tropical" from file /Users/saralamboglia/Library/Application Support/Macaulay2/init-Tropical.m2
@@ -10,13 +10,11 @@ o1 = QQ[x, y, z, w]
 
 o1 : PolynomialRing
 
-i2 : I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3);
+i2 : I=ideal(x^2-y*z+w^2,w^3-x*y^3+z^3);
 
 o2 : Ideal of QQ[x, y, z, w]
 
 i3 : T=tropicalVariety I;
-        2          2      3       3      3
-ideal (x  - y*z + w , AA*z  + AA*w  - x*y )
 
 i4 : rays T
 
