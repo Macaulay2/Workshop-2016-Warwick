@@ -760,7 +760,9 @@ doc///
 	    W1 =  stableIntersection(T1,T2,Strategy=>"atint");
 	    W2 =  stableIntersection(T1,T2,Strategy=>"gfan");
 	    V#"Fan" == W1#"Fan"
+	    V#"Multiplicities" == W1#"Multiplicities"
 	    V#"Fan" == W2
+	    
 ///
 
 
@@ -1290,13 +1292,18 @@ assert((cones(1,T))==({{}}))
 if polymakeOkay then (
 
 TEST///
+
+F=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}});
+T= tropicalCycle(F,{1,1,1});
+assert(isBalanced T)
+
 R=QQ[x,y,z]; 
 V = tropicalVariety(ideal(x+y+z))
 assert(isBalanced V)
 
-F = V;
-F#"Multiplicities" = {1,2,1}
-assert(isBalanced F == false)
+G = V;
+G#"Multiplicities" = {1,2,1}
+assert(isBalanced G == false)
 
 ///
 
@@ -1320,6 +1327,13 @@ assert((rays F) == matrix {{1,1,-1},{5,-3,-1},{-3,5,-1},{-3,-3,3}})
 -----------------------
 
 TEST///
+
+F=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}});
+T= tropicalCycle(F,{1,1,1});
+R= stableIntersection(T,T,Strategy=>"gfan")
+assert(dim R == 3)
+assert(maxCones R == {{1, 2}, {0, 2}, {0, 1}})
+
 if polymakeOkay then (
 F1:=fan(matrix{{0,0,0},{1,0,-1},{0,1,-1}},matrix{{1},{1},{1}},{{0,1},{0,2},{1,2}});
 T1:= tropicalCycle(F1,{1,1,1});
@@ -1351,7 +1365,9 @@ W1 =  stableIntersection(T1,T2,Strategy=>"gfan");
 W2 =  stableIntersection(T1,T2,Strategy=>"atint");
 assert(V#"Fan" == W1)
 assert(V#"Fan" == W2#"Fan")
+assert(V#"Multiplicities" == W2#"Multiplicities")
 )
+
 
 ///
 
