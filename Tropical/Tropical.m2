@@ -347,8 +347,9 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (T1,T2) -> (
 	maxConeStr := "\"MAXIMAL_CONES\\n\";";
 	weightStr := "\"\\nMULTIPLICITIES\\n\";";
 	filename << "use application 'tropical';" << "my $c = "|convertToPolymake(C1) << "my $d = "|convertToPolymake(C2) << "my $i = intersect($c,$d);" << "use strict;" << "my $filename = '" << filename << "';" << "open(my $fh, '>', $filename);" << "print $fh " << openingStr << "print $fh $i->AMBIENT_DIM;" << "print $fh " << dimStr << "print $fh $i->DIM;" << "print $fh " << linDimStr << "print $fh $i->LINEALITY_DIM;" << "print $fh " << raysStr << "print $fh $i->RAYS;" << "print $fh " << nRaysStr << "print $fh $i->N_RAYS;" << "print $fh " << linSpaceStr << "print $fh $i->LINEALITY_SPACE;" << "print $fh " << orthLinStr << "print $fh $i->ORTH_LINEALITY_SPACE;" << "print $fh " << fStr << "print $fh $i->F_VECTOR;" << "print $fh " << simpStr << "print $fh $i->SIMPLICIAL;" << "print $fh " << pureStr << "print $fh $i->PURE;" << "print $fh " << coneStr << "my $cones = $i->CONES;" << "$cones =~ s/['\\>','\\<']//g;" << "print $fh $cones;" << "print $fh " << maxConeStr << "print $fh $i->MAXIMAL_CONES;" << "print $fh " << weightStr << "print $fh $i->WEIGHTS;" << "close $fh;" << close;
-	runstring := "polymake "|filename;
+	runstring := "polymake "|filename | " 2> "|filename|".err";
 	run runstring;
+	removeFile (filename|".err");
 	result := get filename;
 	parsedResult := gfanParsePolyhedralFan(result);
 	if instance(parsedResult, String) then return parsedResult;
