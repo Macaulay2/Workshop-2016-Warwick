@@ -2372,7 +2372,9 @@ gfanTropicalStartingCone (List) := opts -> (L) -> (
 	(ringMap, newL) := gfanConvertToNewRing(L);
 	L = newL;
 	input := gfanRingToString(ring first L) | gfanPolynomialListToString(L);
-	MIP := gfanParseMarkedIdealPair first runGfanCommand("gfan _tropicalstartingcone", opts, input);
+ 	string := first runGfanCommand("gfan _tropicalstartingcone", opts, input);
+	if (length(string) == 0) then return "error: this fan is empty";
+	MIP := gfanParseMarkedIdealPair string;
 	if (instance(first flattenRecursive MIP,ZZ)) then return "error: this fan is empty";
 	gfanRevertToOriginalRing(MIP, ringMap)
 )
