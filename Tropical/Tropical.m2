@@ -96,10 +96,10 @@ isBalanced (TropicalCycle):= T->(
 -- parse object into a polymake script, run polymake and get result back from the same file (which got overwritten by polymake)
 	filename := temporaryFileName();
 	filename << "use application 'tropical';" << endl << "my $c = "|convertToPolymake(C) << endl << "print is_balanced($c);" << endl << "use strict;" << endl << "my $filename = '" << filename << "';" << endl << "open(my $fh, '>', $filename);" << endl << "print $fh is_balanced($c);" << endl << "close $fh;" << endl << close;
-	runstring := "polymake "|filename | " 2> "|filename|".err";
+	runstring := "polymake "|filename | " > "|filename|".out  2> "|filename|".err";
 	run runstring;
 	removeFile (filename|".err");
-	result := get filename;
+	result := get (filename|".out");
 	if (result=="1") then return true
 	else if (result=="") then return false
 	else return "Polymake throws an error";
