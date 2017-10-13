@@ -100,6 +100,7 @@ isBalanced (TropicalCycle):= T->(
 	run runstring;
 	removeFile (filename|".err");
 	result := get (filename|".out");
+	removeFile (filename|".out");
 	if (result=="1") then return true
 	else if (result=="") then return false
 	else return "Polymake throws an error";
