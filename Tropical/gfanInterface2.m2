@@ -1,3 +1,7 @@
+--TODO: gfan errors printed on screen in:
+-- QQ[x,y,z,w]; I=ideal(x-y,w+y-x); gfanTropicalStartingCone I; tropicalVariety I; tropicalVariety ideal(x);
+
+
 -- -*- coding: utf-8 -*-
 
 newPackage(
