@@ -101,6 +101,7 @@ isBalanced (TropicalCycle):= T->(
 	removeFile (filename|".err");
 	result := get (filename|".out");
 	removeFile (filename|".out");
+	removeFile (filename);
 	if (result=="1") then return true
 	else if (result=="") then return false
 	else return "Polymake throws an error";
@@ -353,6 +354,7 @@ stableIntersection (TropicalCycle, TropicalCycle) := o -> (T1,T2) -> (
 	run runstring;
 	removeFile (filename|".err");
 	result := get filename;
+	removeFile (filename);
 	parsedResult := gfanParsePolyhedralFan(result);
 	if instance(parsedResult, String) then return parsedResult;
 	(polyfan, mult) := parsedResult;
