@@ -1402,6 +1402,13 @@ assert ((rays T)==(0))
 assert((linealitySpace T)==( matrix {{0, 1, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}))
 assert((maxCones T)==( {{}}))
 assert((multiplicities T)==( {{}}))
+--non homogeneous
+I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3)
+T=tropicalVariety(I)
+assert((rays T)== (matrix {{-6, -3, 0, 1, 3, 6}, {-5, -2, -1, 1, 2, 5}, {-7, -3, -1, 1, 4, 7}, {-6, -3, -1, 1, 3, 7}}))
+assert((linealitySpace T)==(0))
+assert((maxCones T)==( {{0, 1}, {0, 2}, {0, 5}, {1, 3}, {2, 3}, {1, 4}, {2, 4}, {3, 5}, {4, 5}}))
+assert((multiplicities T)==( {2, 1, 1, 6, 3, 2, 1, 3, 1}))
 QQ[x,y,z]
 --non homogeneous
 I=ideal(x*y-y+1)
