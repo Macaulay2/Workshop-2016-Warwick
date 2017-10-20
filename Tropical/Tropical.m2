@@ -1,5 +1,6 @@
 polymakeOkay := try replace( "polymake version ", "", first lines get "!polymake --version 2>&1") >= "3.0" else false;
 
+--TODO: uncomment examples for isBalanced and stableIntersection in next release of M2
 optArgs = new OptionTable from if (version#"VERSION" > "1.10") then {OptionalComponentsPresent => polymakeOkay} else {}
 
 newPackage(
@@ -762,10 +763,10 @@ doc///
 	    J = ideal(x*y+y*z+x*z+1);
 	    T2 = tropicalVariety(J);
 	    V = tropicalVariety(I+J);
-	    W1 =  stableIntersection(T1,T2,Strategy=>"atint");
+	    -- W1 =  stableIntersection(T1,T2,Strategy=>"atint");
 	    W2 =  stableIntersection(T1,T2,Strategy=>"gfan");
-	    V#"Fan" == W1#"Fan"
-	    V#"Multiplicities" == W1#"Multiplicities"
+	    -- V#"Fan" == W1#"Fan"
+	    -- V#"Multiplicities" == W1#"Multiplicities"
 	    V#"Fan" == W2
 	    
 ///
