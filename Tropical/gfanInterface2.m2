@@ -1377,6 +1377,7 @@ gfanStableIntersection (Fan,List,Fan,List) := opts -> (F,m1,G,m2) -> (
      opts = opts ++ { "i1" => fileF , "i2" => fileG };
      out := runGfanCommand("gfan _fancommonrefinement --stable", opts, "");
      if (#select("empty",out#0)==1) then return "error: this fan is empty";
+     if (length(out#0)==0) then return "error: this fan is empty";
      out = gfanParsePolyhedralFan out;
      if gfanKeepFiles then (
 	  F#"GfanFileName" = fileF;

@@ -394,11 +394,17 @@ embedFan = F -> (
 --embeds a fan into a fan of one dimension higher
 --and DOES NOT add the lineality space (1,...,1)
 	--1) adjust rays
-	rs := entries transpose rays F;
---	rs = apply(rs, s -> s|{-sum s});	
-	rs = apply(rs, s -> s|{0});	
-	numberOfEntries := #first(rs);
-	rs = transpose matrix rs;
+	rs := rays F;
+	numberOfEntries := (numgens target rs)+1;
+	rs = entries transpose rs;
+	if (#rs != 0) then (
+--		rs = apply(rs, s -> s|{-sum s});	
+		rs = apply(rs, s -> s|{0});	
+--		numberOfEntries = #first(rs);
+		rs = transpose matrix rs;
+	) else (
+		rs = matrix apply(numberOfEntries, i -> {})
+	);
 	--2) adjust lineality space
  	ls := entries transpose linSpace F;	
 	if (#ls != 0) then(
