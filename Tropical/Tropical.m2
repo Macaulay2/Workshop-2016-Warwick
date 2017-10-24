@@ -13,7 +13,7 @@ newPackage(
   		{Name => "Sara Lamboglia", Email => "S.Lamboglia@warwick.ac.uk", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "D.Maclagan@warwick.ac.uk", HomePage=>"http://homepages.warwick.ac.uk/staff/D.Maclagan/"},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
-   		{Name => "Jeff Sommars", Email => "", HomePage=>""},
+   		{Name => "Jeff Sommars", Email => "sommars1@uic.edu", HomePage=>"http://homepages.math.uic.edu/~sommars"},
     		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
    		{Name => "Magda Zajaczkowska", Email => "", HomePage=>""}
 		},
