@@ -219,8 +219,6 @@ tropicalVariety = method(TypicalValue => TropicalCycle,  Options => {
 
 
 --Main function to call for tropicalVariety.  Makes no assumption on ideal
---WARNING:  There is a bug here in the way the new polynomial ring is dealt with.
--- it seems to work if we've define the new ring globally, but not inside the package.
 tropicalVariety (Ideal) := o -> (I) ->(
     local F;
     local T;
@@ -562,6 +560,13 @@ doc ///
 	    This is the main M2 package for all tropical computations.
 	    This uses Anders Jensen's package gfan, Michael Joswig's
 	    package Polymake, and also internal M2 computations.
+	    
+    	    The package defaults to using the min convention for tropical geometry.  
+	    To switch to the max convention, reload the package using the command
+            loadPackage("Tropical",Configuration=>{"tropicalMax"=>true});
+	    
+	    The main command is @TO tropicalVariety@.
+
 ///
 
 
@@ -1135,8 +1140,8 @@ doc///
 			L=linealitySpace T
 			    
 ///
-
-
+	    
+    	
 ----- TESTS -----
 
 -----------------------
