@@ -14,7 +14,7 @@ newPackage(
 	    	{Name => "Diane Maclagan", Email => "D.Maclagan@warwick.ac.uk", HomePage=>"http://homepages.warwick.ac.uk/staff/D.Maclagan/"},
    		{Name => "Benjamin Smith", Email => "", HomePage=>""},
    		{Name => "Jeff Sommars", Email => "sommars1@uic.edu", HomePage=>"http://homepages.math.uic.edu/~sommars"},
-    		{Name => "Paolo Tripoli", Email => "", HomePage=>""},
+    		{Name => "Paolo Tripoli", Email => "paolo.tripoli@nottingham.ac.uk", HomePage=>"https://sites.google.com/view/paolotripoli/home"},
    		{Name => "Magda Zajaczkowska", Email => "", HomePage=>""}
 		},
 	Headline => "A package for doing computations in tropical geometry",
