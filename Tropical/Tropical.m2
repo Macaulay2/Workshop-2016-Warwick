@@ -5,8 +5,8 @@ optArgs = new OptionTable from if (version#"VERSION" > "1.10") then {OptionalCom
 
 newPackage(
     	"Tropical",
-	Version => "0.1",
-	Date => "May 2016",
+	Version => "1.0",
+	Date => "October 2017",
 	Authors => {
    		{Name => "Carlos Amendola", Email => "amendola@math.tu-berlin.de", HomePage=>""},
 	    	{Name => "Kathlen Kohn", Email => "kohn@math.tu-berlin.de", HomePage=>""},
