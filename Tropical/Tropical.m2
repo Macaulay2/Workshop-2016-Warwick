@@ -9,7 +9,7 @@ newPackage(
 	Date => "May 2016",
 	Authors => {
    		{Name => "Carlos Amendola", Email => "amendola@math.tu-berlin.de", HomePage=>""},
-	    	{Name => "Kathlen Kohn", Email => "kohn@math.tu-berlin.de", HomePage=>""},
+	    	{Name => "Kathlen Kohn", Email => "kathlen.korn@gmail.com", HomePage=>""},
   		{Name => "Sara Lamboglia", Email => "S.Lamboglia@warwick.ac.uk", HomePage=>""},
 	    	{Name => "Diane Maclagan", Email => "D.Maclagan@warwick.ac.uk", HomePage=>"http://homepages.warwick.ac.uk/staff/D.Maclagan/"},
    		{Name => "Benjamin Smith", Email => "benjamin.smith@qmul.ac.uk", HomePage=>""},
