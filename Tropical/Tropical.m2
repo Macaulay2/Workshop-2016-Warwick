@@ -1,12 +1,12 @@
 polymakeOkay := try replace( "polymake version ", "", first lines get "!polymake --version 2>&1") >= "3.0" else false;
-
+--polymakeOkay := true;
 --TODO: uncomment examples for isBalanced and stableIntersection in next release of M2
-optArgs = new OptionTable from if (version#"VERSION" > "1.10") then {OptionalComponentsPresent => polymakeOkay} else {}
+optArgs := new OptionTable from if (version#"VERSION" > "1.10") then {OptionalComponentsPresent => polymakeOkay} else {}
 
 newPackage(
     	"Tropical",
-	Version => "1.0",
-	Date => "October 2017",
+	Version => "0.1",
+	Date => "May 2016",
 	Authors => {
    		{Name => "Carlos Amendola", Email => "amendola@math.tu-berlin.de", HomePage=>""},
 	    	{Name => "Kathlen Kohn", Email => "kathlen.korn@gmail.com", HomePage=>""},
@@ -25,7 +25,7 @@ newPackage(
 		"cachePolyhedralOutput" => true,
 		"tropicalMax" => false
 	},
-        PackageExports => {"gfanInterface2","EliminationMatrices","Binomials"},
+        PackageExports => {"gfanInterface","EliminationMatrices","Binomials"},
 	DebuggingMode => true,
 	AuxiliaryFiles => true,
 	CacheExampleOutput => true,
@@ -46,7 +46,8 @@ export {
   "IsHomogeneous"}
 
 
-if polymakeOkay then << "-- polymake is installed\n" else << "-- polymake not present\n"
+-- Don't print anything when package is loaded:
+-- if polymakeOkay then << "-- polymake is installed\n" else << "-- polymake not present\n"
 
 
 ------------------------------------------------------------------------------
@@ -93,6 +94,7 @@ isBalanced = method(TypicalValue => Boolean)
 isBalanced (TropicalCycle):= T->(
 --in polymake, the lineality span (1,...,1) is default.
 --we embed the fans in a higher dimensional fan in case our lineality span does not contain (1,...,1)
+   if polymakeOkay then (
 	C := tropicalCycle(embedFan fan T, multiplicities T);
 -- parse object into a polymake script, run polymake and get result back from the same file (which got overwritten by polymake)
 	filename := temporaryFileName();
@@ -106,6 +108,8 @@ isBalanced (TropicalCycle):= T->(
 	if (result=="1") then return true
 	else if (result=="") then return false
 	else return "Polymake throws an error";
+    )
+    else return "Polymake 3.0 or later needs to be installed."	
 )
 
 
@@ -630,14 +634,14 @@ doc///
     	B:Boolean
     Description
 		Text
-			This function checks if a tropical cycle is balanced.
+			This function checks if a tropical cycle is balanced. Currently this method requires polymake version 3.0 or later to be installed.
 		Example
 			QQ[x,y,z]
 			V = tropicalVariety(ideal(x+y+z))
-			-- isBalanced V
+			isBalanced V
 			F = fan {posHull matrix {{1},{0},{0}}, posHull matrix {{0},{1},{0}}, posHull matrix {{0},{0},{1}}, posHull matrix {{-1},{-1},{-1}}} 
 			mult = {1,2,-3,1}
-			-- isBalanced (tropicalCycle(F, mult))
+			isBalanced (tropicalCycle(F, mult))
 ///
 
 
@@ -763,7 +767,7 @@ doc///
 	    This computes the stable intersection of two tropical
 	    cycles.  For details on the definition of stable
 	    intersection, see, for example, Section 3.6 of TROPICALBOOK.
-	    If a recent enough version of polymake is installed,
+	    If polymake version 3.0 or later is installed,
 	    the Strategy "atint" is default. Otherwise "gfan" will be used,
 	    which only computes the fan of the stable intersection
 	    without multiplicities.
@@ -774,7 +778,7 @@ doc///
 	    J = ideal(x*y+y*z+x*z+1);
 	    T2 = tropicalVariety(J);
 	    V = tropicalVariety(I+J);
-	    -- W1 =  stableIntersection(T1,T2,Strategy=>"atint");
+--	    W1 =  stableIntersection(T1,T2,Strategy=>"atint");
 	    W2 =  stableIntersection(T1,T2,Strategy=>"gfan");
 	    -- V#"Fan" == W1#"Fan"
 	    -- V#"Multiplicities" == W1#"Multiplicities"
@@ -844,13 +848,20 @@ doc///
 			This option allows to compute the multiplicities in case the ideal I is not prime. In fact the output of gfan 
 			does not include them and hence they are computed separately by this package. By default the ideal is assumed to be prime.
 		Example
-			QQ[x,y,z];
-			I=ideal(x^2-y^2);
-			isPrime I
-			T=tropicalVariety(I,Prime=>false,ComputeMultiplicities=>true);
-			rays T
-			maxCones T
-			multiplicities T
+			QQ[x, y, z, w, t];
+			I=ideal(x-w,y-w)
+			J=ideal(z-w,t-w)
+			TropIJ=tropicalVariety(I*J,Prime=>false,ComputeMultiplicities=>true);
+			rays TropIJ
+			maxCones TropIJ
+			multiplicities TropIJ
+		Text
+		    	Note that if we do not declare that the ideal is not prime then we get the wrong answer.
+		Example	
+			TropIJ=tropicalVariety(I*J)
+			rays TropIJ
+			maxCones TropIJ
+			multiplicities TropIJ
 ///
 
 doc///
@@ -1106,7 +1117,7 @@ doc///
     
     Description
 		Text
-		        This function computes the cone of codimension k of the fan associated to the tropical cycle T.	
+		        This function computes the cones of codimension k of the fan associated to the tropical cycle T.	
 		Example
 			QQ[x,y,z,w,t]
 			I=ideal(x^2-y*z+w^2,w^3-y^3*x+z^3,t-w+x);
